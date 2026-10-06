@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "code_sha": "b29dc7ce6cc4cd7fac49661e4f5bb2df52fd0982",
+  "run_id": 37464111653,
+  "run_url": "https://github.com/KazeBox33/kaze-quant/actions/runs/37464111653",
+  "status": "completed",
+  "conclusion": "success",
+  "event": "push",
+  "created_at": "2026-10-06T12:33:33Z",
+  "updated_at": "2026-10-06T12:42:37Z",
+  "jobs": [
+    {
+      "id": 112270698007,
+      "name": "check (macos-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 112270698247,
+      "name": "check (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "scope": "Exact telemetry code commit; hosted Linux/macOS checks, not target-production-machine performance or 24h acceptance"
+}

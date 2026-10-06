@@ -50,6 +50,6 @@ reports/telemetry-binary configs/live-telemetry-load.json reports/telemetry.db B
 
 单直方图记录组件在Apple M5/macOS26.5.2/rustc1.99 release下，100万次、一次预热、七轮中位4.113458ns/record；输入预载、导出不计时、没有CPU绑定，后台同时运行旧全天实验及短纸面实验。[原始七轮与来源身份](evidence/v06/telemetry-bench.json)。该结果排除了时钟读取、其余直方图、策略、网络与持久化，不能描述成整个引擎4ns、HFT优势或比其他平台快。
 
-借鉴[HdrHistogram](https://docs.rs/hdrhistogram/latest/hdrhistogram/)的固定内存/桶误差思想，当前不是该库实现，也没有照搬源码或完整特性。故障收尾参考[NautilusTrader实时运行契约](https://nautilustrader.io/docs/latest/concepts/live/)。本轮本地142项Rust debug/release、15项Python及严格静态检查通过，[环境与源码身份](evidence/v06/validation-mac.json)。
+借鉴[HdrHistogram](https://docs.rs/hdrhistogram/latest/hdrhistogram/)的固定内存/桶误差思想，当前不是该库实现，也没有照搬源码或完整特性。故障收尾参考[NautilusTrader实时运行契约](https://nautilustrader.io/docs/latest/concepts/live/)。本轮本地142项Rust debug/release、15项Python及严格静态检查通过，[环境与源码身份](evidence/v06/validation-mac.json)。代码提交b29dc7c的[Linux/macOS CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37464111653)全部通过，[CI身份](evidence/v06/ci.json)与[完整步骤](evidence/v06/ci-jobs.json)保留；不是24h通过证据。
 
 旧24小时进程继续使用冻结的v05二进制，不具备本轮新统计/收尾检查。它的结果只能验收旧二进制；升级后需全新会话重新跑完整全天，不能混合版本或累计断开的分钟数。

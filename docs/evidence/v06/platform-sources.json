@@ -129,18 +129,20 @@
       "sources": [
         {
           "path": "README.md",
-          "url": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/develop/README.md",
+          "url": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/4f021bafc2e99c5490cee204b0fc2bd2c83baab4/README.md",
           "sha256": "4283d8b5efe5ea2e0d00c3cf332d5bcc90454fb319d8a2ddc701ca71d1dadc94",
           "bytes": 37852
         },
         {
           "path": "LICENSE",
-          "url": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/develop/LICENSE",
+          "url": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/4f021bafc2e99c5490cee204b0fc2bd2c83baab4/LICENSE",
           "sha256": "ee907919ec88c9c017b1f8b608db20960b6598aefcc4fe58820bde955d65ed3c",
           "bytes": 7651
         }
       ],
-      "pin_error": "HTTP Error 403: rate limit exceeded"
+      "sha": "4f021bafc2e99c5490cee204b0fc2bd2c83baab4",
+      "previous_pin_error": "HTTP Error 403: rate limit exceeded",
+      "pin_recovered_via": "authenticated read-only GitHub connector"
     },
     {
       "repo": "QuantConnect/Lean",
@@ -148,18 +150,20 @@
       "sources": [
         {
           "path": "readme.md",
-          "url": "https://raw.githubusercontent.com/QuantConnect/Lean/master/readme.md",
+          "url": "https://raw.githubusercontent.com/QuantConnect/Lean/82810ea63d5542f05dc58f9d1db0557cf174d0ea/readme.md",
           "sha256": "c93d2d649740ffdbfeca35ee5035eff668dc1f0a6b97873756addb70f4f4b91e",
           "bytes": 11001
         },
         {
           "path": "LICENSE",
-          "url": "https://raw.githubusercontent.com/QuantConnect/Lean/master/LICENSE",
+          "url": "https://raw.githubusercontent.com/QuantConnect/Lean/82810ea63d5542f05dc58f9d1db0557cf174d0ea/LICENSE",
           "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba",
           "bytes": 10737
         }
       ],
-      "pin_error": "HTTP Error 403: rate limit exceeded"
+      "sha": "82810ea63d5542f05dc58f9d1db0557cf174d0ea",
+      "previous_pin_error": "HTTP Error 403: rate limit exceeded",
+      "pin_recovered_via": "authenticated read-only GitHub connector"
     },
     {
       "repo": "nkaz001/hftbacktest",
@@ -171,17 +175,21 @@
         },
         {
           "path": "LICENSE",
-          "url": "https://raw.githubusercontent.com/nkaz001/hftbacktest/master/LICENSE",
+          "url": "https://raw.githubusercontent.com/nkaz001/hftbacktest/5f3ec40b2afb764e0fea112f941ed85523ef4e88/LICENSE",
           "sha256": "b40367c13dfa67c617d6e8037d45581496d9f0429a3274ab19f117404b519a5a",
           "bytes": 1079
         }
       ],
-      "pin_error": "HTTP Error 403: rate limit exceeded"
+      "sha": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "previous_pin_error": "HTTP Error 403: rate limit exceeded",
+      "pin_recovered_via": "authenticated read-only GitHub connector"
     }
   ],
   "notes": [
-    "Only vn.py core/CTA/Algo and ABU commit refs were pinned; other refs are mutable with file hashes recorded.",
+    "Seven repository source revisions pinned; successful downloaded files hash-checked against the pinned ref.",
     "HftBacktest README path returned 404; simulation findings use official documentation instead.",
-    "Source files are held in local research scratch space; no upstream code is copied into KazeQuant."
-  ]
+    "Latest documentation URLs are mutable and carry the retrieval date; source hashes are not performance evidence.",
+    "Source files stay in local research scratch space; no upstream code is copied into KazeQuant."
+  ],
+  "updated_utc": "2026-10-06T12:36:29.749853+00:00"
 }
