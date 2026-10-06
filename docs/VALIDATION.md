@@ -27,7 +27,7 @@
 
 ## 验证范围
 
-GitHub Actions 配置Linux/macOS、锁依赖、静态检查、debug/release测试、文档和纸面重试冒烟。远程结果以仓库对应提交的Actions页面为准；本文件仅列实际本地验证。
+代码提交 `4e30f30030171f508126adb337dc0eed8ec610ea` 的 [GitHub Actions](https://github.com/KazeBox33/kaze-quant/actions/runs/37425102399) 已在2026-10-06完成：Linux和macOS两项job均success，包含工具链安装、锁依赖、静态检查、debug/release全部测试、严格文档检查和纸面恢复/重试冒烟。后续提交的结果仍以其对应Actions为准。
 
 没有实盘订单/成交对账、真实历史数据队列/冲击校准、网络恢复、断电/存储控制器故障、长时间压力或RSS/分配探针。文件锁/硬链接依赖本地文件系统语义；不覆盖不遵守锁协议的外部写入。
 

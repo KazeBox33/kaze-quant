@@ -113,6 +113,35 @@ mkdir -p reports
 
 随着项目推进学习：收益率、价差/手续费、回撤、换手率、概率与期望、方差、相关性、线性回归、时间序列训练/验证划分。你需要能解释“净收益为什么变化”，也需要理解多次尝试策略参数会造成选择偏差。
 
-后续工程顺序：Instrument 元数据 → L2 文件/协议适配与序号缺口恢复 → 更可信的流动性/队列模型 → 真实历史数据与样本外实验 → 行情网络适配 → 执行回报与撤单延迟 → 纸面交易与运行恢复。根据每阶段测量，再决定是否需要多线程、SIMD、事件队列或 Linux 专项 profiling。
+0.2 已加入整数网格元数据、BookFeed缺口/快照、纸面运行和持久恢复。后续研究先补真实历史数据与样本外实验，再按市场需求增加网络协议、队列/流动性校准与独立执行回报/撤单延迟。根据实际测量，再决定多线程、SIMD或Linux专项profiling。
 
 项目更新沿用小步方式：改一个机制，解释所有权与交易含义，用手算或不变量验证，必要时测量，再做范围明确的提交。
+
+
+## 第 8 课：多资产和批量策略
+
+阅读 config.rs、paper.rs 和 examples/custom_strategy.rs。跟踪 `(market, order_id)` 为什么比单独的订单号更完整，以及不同资产怎样拥有各自的账户预算。比较泛型 Strategy 的静态调用与平台 Box<dyn Strategy> 的动态回调。
+
+运行 custom_strategy，手算两笔成交的300分金额和两次各1分费用；再把流动性改为2，预测哪张IOC被取消。运行 tests/paper.rs，解释动作缓冲溢出为什么不能执行前64个动作。
+
+## 第 9 课：从日志恢复，而不是复制内存
+
+阅读 journal.rs。顺序是校验输入 → 写入命令和哈希 → sync_all → 修改内存 → 回执。分别在“同步前”和“同步后但未确认”中断，预测重投同一编号会发生什么。
+
+```sh
+./scripts/cargo.sh test --test journal
+./scripts/cargo.sh test --test paper_cli killed_process_recovers_durable_ack_and_retries_safely
+```
+
+练习：对比观察events.csv与完整输入WAL，解释为何accepted事件不足以还原限价委托。区分残缺尾帧、完整帧校验失败，以及整个有效尾部被删除；不要把SHA链当成认证签名。恢复测试共用运行逻辑，所以也要保留前几课的独立手算。
+
+## 第 10 课：运行风控和可靠性成本
+
+阅读 expire_feeds、halt_market 与 OPERATIONS.md。解释新鲜报价到达前为何先撤销超时订单；解释暂停后持仓还会随行情变动。
+
+```sh
+./scripts/cargo.sh test --test paper
+./scripts/cargo.sh run --release --example paper_bench -- 2000
+```
+
+观察内存处理与每命令同步落盘的差别。下一次优化应提出明确需求：降低模拟CPU时间、提高持久吞吐，还是缩短恢复？这些目标需要不同负载和验证，不能用一个漂亮倍数互相代替。
