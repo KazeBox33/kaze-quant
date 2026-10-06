@@ -49,3 +49,24 @@ flowchart LR
 BookFeed 用预分配双缓冲实现帧级原子性，复制成本 O(depth)，帧重复价位检查 O(changes log changes)。单档 OrderBook 的原始路径仍保留，不把帧级复制的性能描述成单档 O(log n)。
 
 Rust 所有权与禁止自定义 unsafe 缩小内存风险，但不证明所有第三方依赖或未来策略永不泄漏。策略回调属于受信任代码；隔离不可信插件、沙箱与热加载不在当前范围内。
+
+
+## 0.3 事务边界与有限热状态
+
+```mermaid
+flowchart LR
+  Input[有限输入通道] --> Batch[数量或期限触发]
+  Confirmed[已确认运行状态] --> Candidate[完整候选状态]
+  Batch --> Candidate
+  Candidate --> Check[逐命令校验与执行]
+  Check --> TX[事务写入命令 回执 检查点]
+  TX --> Commit[SQLite FULL提交]
+  Commit --> Publish[替换运行状态并输出回执]
+  TX --> Audit[磁盘命令历史]
+```
+
+`store.rs` 封装候选状态、SQL事务、磁盘去重、检查点验证和全量重放审计。`kaze-run` 负责有界输入、批次期限、回执传输、健康报告与备份。每命令后稳定回收终态记录使最终投影与批次切分无关；账户、活跃委托、下一订单 ID、策略窗口、风控与时钟保留。热订单二分查找使用真实 ID，回收后不能用 ID-1 当 Vec 下标。
+
+`PaperSnapshot` / `EngineSnapshot` 可序列化但恢复要重新验证不变量；它们不取代审计历史或身份认证。内存自定义策略默认不提供 checkpoint，持久化需要显式注册确定性内置策略与版本，不能把任意 trait object 的内存字节当快照。
+
+依赖新增 rusqlite bundled，交易决策和资金类型不依赖数据库。SQLite 的同步和批次复制是控制路径成本，CPU内核保持同步确定性，不引入网络运行时。Linux专用绑核、io_uring、SIMD并未启用；先测量当前瓶颈再决定优化。

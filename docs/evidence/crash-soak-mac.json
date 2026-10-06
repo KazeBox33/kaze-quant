@@ -1,0 +1,227 @@
+{
+  "seed": "0x4B415A45",
+  "cycles": [
+    {
+      "cycle": 0,
+      "kill_requested": true,
+      "wait_seconds": 0.17142803875814222,
+      "observed_ack": 3584,
+      "recovered_commands": 3840,
+      "verified_commands": 3840,
+      "recovery_ns": 6754959
+    },
+    {
+      "cycle": 1,
+      "kill_requested": true,
+      "wait_seconds": 0.0729884120624328,
+      "observed_ack": 3584,
+      "recovered_commands": 3840,
+      "verified_commands": 3840,
+      "recovery_ns": 5603500
+    },
+    {
+      "cycle": 2,
+      "kill_requested": true,
+      "wait_seconds": 0.10504273009907213,
+      "observed_ack": 3584,
+      "recovered_commands": 3840,
+      "verified_commands": 3840,
+      "recovery_ns": 5514208
+    },
+    {
+      "cycle": 3,
+      "kill_requested": true,
+      "wait_seconds": 0.1585196873171124,
+      "observed_ack": 6144,
+      "recovered_commands": 6144,
+      "verified_commands": 6144,
+      "recovery_ns": 6602500
+    },
+    {
+      "cycle": 4,
+      "kill_requested": true,
+      "wait_seconds": 0.11736239668343298,
+      "observed_ack": 6144,
+      "recovered_commands": 6144,
+      "verified_commands": 6144,
+      "recovery_ns": 5756458
+    },
+    {
+      "cycle": 5,
+      "kill_requested": true,
+      "wait_seconds": 0.21922459360233587,
+      "observed_ack": 11520,
+      "recovered_commands": 11776,
+      "verified_commands": 11776,
+      "recovery_ns": 8387791
+    },
+    {
+      "cycle": 6,
+      "kill_requested": true,
+      "wait_seconds": 0.10744107100008451,
+      "observed_ack": 11520,
+      "recovered_commands": 11776,
+      "verified_commands": 11776,
+      "recovery_ns": 5389250
+    },
+    {
+      "cycle": 7,
+      "kill_requested": true,
+      "wait_seconds": 0.11955685504458663,
+      "observed_ack": 11520,
+      "recovered_commands": 11776,
+      "verified_commands": 11776,
+      "recovery_ns": 5367958
+    },
+    {
+      "cycle": 8,
+      "kill_requested": true,
+      "wait_seconds": 0.030177556281925005,
+      "observed_ack": 11520,
+      "recovered_commands": 11776,
+      "verified_commands": 11776,
+      "recovery_ns": 5325083
+    },
+    {
+      "cycle": 9,
+      "kill_requested": true,
+      "wait_seconds": 0.12012829063145108,
+      "observed_ack": 11520,
+      "recovered_commands": 11776,
+      "verified_commands": 11776,
+      "recovery_ns": 5421417
+    },
+    {
+      "cycle": 10,
+      "kill_requested": true,
+      "wait_seconds": 0.047026012702324003,
+      "observed_ack": 11520,
+      "recovered_commands": 11776,
+      "verified_commands": 11776,
+      "recovery_ns": 5481250
+    },
+    {
+      "cycle": 11,
+      "kill_requested": true,
+      "wait_seconds": 0.17244916727722404,
+      "observed_ack": 14080,
+      "recovered_commands": 14080,
+      "verified_commands": 14080,
+      "recovery_ns": 6440333
+    },
+    {
+      "cycle": 12,
+      "kill_requested": true,
+      "wait_seconds": 0.19075783994377937,
+      "observed_ack": 16640,
+      "recovered_commands": 16896,
+      "verified_commands": 16896,
+      "recovery_ns": 7245791
+    },
+    {
+      "cycle": 13,
+      "kill_requested": true,
+      "wait_seconds": 0.17146517852694187,
+      "observed_ack": 18432,
+      "recovered_commands": 18432,
+      "verified_commands": 18432,
+      "recovery_ns": 6247750
+    },
+    {
+      "cycle": 14,
+      "kill_requested": true,
+      "wait_seconds": 0.08863644731324015,
+      "observed_ack": 18432,
+      "recovered_commands": 18432,
+      "verified_commands": 18432,
+      "recovery_ns": 5456667
+    },
+    {
+      "cycle": 15,
+      "kill_requested": true,
+      "wait_seconds": 0.1743295577098264,
+      "observed_ack": 19712,
+      "recovered_commands": 19968,
+      "verified_commands": 19968,
+      "recovery_ns": 6312667
+    },
+    {
+      "cycle": 16,
+      "kill_requested": true,
+      "wait_seconds": 0.07896463730438845,
+      "observed_ack": 19712,
+      "recovered_commands": 19968,
+      "verified_commands": 19968,
+      "recovery_ns": 5608375
+    },
+    {
+      "cycle": 17,
+      "kill_requested": true,
+      "wait_seconds": 0.0706218563787532,
+      "observed_ack": 19712,
+      "recovered_commands": 19968,
+      "verified_commands": 19968,
+      "recovery_ns": 5386959
+    },
+    {
+      "cycle": 18,
+      "kill_requested": true,
+      "wait_seconds": 0.06345064095502384,
+      "observed_ack": 19712,
+      "recovered_commands": 19968,
+      "verified_commands": 19968,
+      "recovery_ns": 5402167
+    },
+    {
+      "cycle": 19,
+      "kill_requested": true,
+      "wait_seconds": 0.09314041065938884,
+      "observed_ack": 19712,
+      "recovered_commands": 19968,
+      "verified_commands": 19968,
+      "recovery_ns": 5431625
+    }
+  ],
+  "final_commands": 1000001,
+  "final_state": {
+    "clock_ns": 1704073538913000000,
+    "closed": true,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "998038345540",
+        "equity_minor": "998038345540",
+        "fees_minor": "1565354460",
+        "halted": "finished",
+        "market": 0,
+        "metrics": {
+          "accepted": 184,
+          "cancelled": 0,
+          "fills": 184,
+          "max_drawdown_minor": "1961654460",
+          "orders_examined": 896,
+          "peak_equity_minor": "1000000000000",
+          "quotes": 1000000,
+          "rejected": 0
+        },
+        "pnl_minor": "-1961654460",
+        "position_units": 0,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "symbol": "BTCUSDT-QUOTE",
+        "units": {
+          "currency": "USDT",
+          "money_scale": 100000000,
+          "quantity_scale": 100000
+        }
+      }
+    ],
+    "processed": 1000001,
+    "schema_version": 1
+  },
+  "audit_chain_sha256": "260732ed9af40763f297407c133b9b5790dca61e5a37e1a10f110e42ddd0425b",
+  "binary_sha256": "21210f33c52365fdc45b5d4e3e6575b0dd50b657a670eea305c878091be6345d",
+  "config_sha256": "50a18add6e70e1b554cf654093fc60c169e800a179af18d413fb6c16c36b57cf",
+  "final_reference_equal": true,
+  "limitation": "process SIGKILL; no power loss/controller failure or authenticated tamper test"
+}

@@ -1,3 +1,4 @@
+use sha2::{Digest, Sha256};
 use std::fs;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
@@ -158,6 +159,12 @@ fn csv_quote_input_and_report_no_clobber() {
     assert!(o.status.success(), "{}", String::from_utf8_lossy(&o.stderr));
     assert!(o.stdout.is_empty());
     let before = fs::read(&report).unwrap();
+    let v: serde_json::Value = serde_json::from_slice(&before).unwrap();
+    let bytes = fs::read("data/demo.csv").unwrap();
+    assert_eq!(
+        v["input_sha256"],
+        kaze_quant::journal::hex(&Sha256::digest(bytes))
+    );
     let o = t
         .command()
         .arg("--recover-only")

@@ -111,6 +111,18 @@ fn read_small(path: &PathBuf) -> Result<Vec<u8>, PaperError> {
     }
     Ok(bytes)
 }
+/// 哈希与实际读取共用同一字节流，避免预先扫描再打开文件的身份竞态。
+struct HashingRead<'a, R> {
+    reader: R,
+    hash: &'a mut Sha256,
+}
+impl<R: Read> Read for HashingRead<'_, R> {
+    fn read(&mut self, buffer: &mut [u8]) -> io::Result<usize> {
+        let n = self.reader.read(buffer)?;
+        self.hash.update(&buffer[..n]);
+        Ok(n)
+    }
+}
 enum Input {
     Command(Envelope),
     End(String),
@@ -121,8 +133,12 @@ fn input_worker(path: String, quotes: bool) -> Receiver<Input> {
     std::thread::spawn(move || {
         let result = (|| -> Result<String, PaperError> {
             if quotes {
-                let hash = kaze_quant::journal::file_hash(std::path::Path::new(&path))?;
-                let reader = QuoteReader::new(BufReader::new(File::open(&path)?))
+                let mut hash = Sha256::new();
+                let source = HashingRead {
+                    reader: File::open(&path)?,
+                    hash: &mut hash,
+                };
+                let reader = QuoteReader::new(BufReader::new(source))
                     .map_err(|e| PaperError(e.to_string()))?;
                 for q in reader {
                     let q = q.map_err(|e| PaperError(e.to_string()))?;
@@ -139,7 +155,7 @@ fn input_worker(path: String, quotes: bool) -> Receiver<Input> {
                         return Err("consumer closed".into());
                     }
                 }
-                return Ok(hash);
+                return Ok(hex(&hash.finalize()));
             }
             let mut reader: Box<dyn BufRead> = if path == "-" {
                 Box::new(BufReader::new(io::stdin()))

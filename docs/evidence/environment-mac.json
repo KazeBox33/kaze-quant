@@ -1,0 +1,19 @@
+{
+  "measurement_date": "2026-10-06",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "architecture": "arm64",
+  "cpu": "Apple M5",
+  "logical_cpus": "10",
+  "physical_cpus": "10",
+  "memory_bytes": "25769803776",
+  "rust": "1.99.0",
+  "build": "release thin-LTO codegen-units=1",
+  "execution": "single writer, no affinity, local macOS filesystem; plugged power; no hardware counters",
+  "timing": "Instant monotonic wall clock; external process sampling via ps every 100ms",
+  "binaries_sha256": {
+    "target/release/kaze-run": "21210f33c52365fdc45b5d4e3e6575b0dd50b657a670eea305c878091be6345d",
+    "target/release/examples/store_bench": "dbbda5680970421a69c90b9aec7a2a118aada5c80f3e4ddfc7503f45caad9779"
+  },
+  "sqlite_version": "3.53.2",
+  "source_commit": "a8171ae11d341737482979afacb2dd08e5b50a65"
+}

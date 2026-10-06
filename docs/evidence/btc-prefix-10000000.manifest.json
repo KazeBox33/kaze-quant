@@ -1,0 +1,26 @@
+{
+  "transform_version": "binance-bookticker-prefix-v1",
+  "source_url": "https://data.binance.vision/data/futures/um/daily/bookTicker/BTCUSDT/BTCUSDT-bookTicker-2024-01-01.zip",
+  "checksum_url": "https://data.binance.vision/data/futures/um/daily/bookTicker/BTCUSDT/BTCUSDT-bookTicker-2024-01-01.zip.CHECKSUM",
+  "archive_sha256": "f9d281b949ac10aa59af3a7b07f41b4e640a8ecc76210f97c4c25ae7c8173e7c",
+  "archive_bytes": 128284409,
+  "selection": "contiguous archive prefix; no timestamp sort or price filter",
+  "source_prefix_sha256": "91fed4c712a4498d02c5e992a80c547865bc2704ebaefd679879ddca144af7f3",
+  "normalized_sha256": "d8394604778e5bfad004fb902335caa6b0c2306c26aa5044c2ac466c60171747",
+  "normalized_bytes": 595592866,
+  "units": {
+    "currency": "USDT",
+    "money_scale": 100000000,
+    "quantity_scale": 100000
+  },
+  "timestamp_rule": "event_time ms to ns; clamp regressions to previous observed event_time; record every clamp",
+  "sequence_rule": "one-based archive row index; exchange update IDs need not be contiguous",
+  "last_event_ns": 1704142135539000000,
+  "last_update_id": 3755351179677,
+  "rows": 10000000,
+  "clock_clamps": 0,
+  "quantity_rounds": 0,
+  "duplicate_update_ids": 0,
+  "first_event_ns": 1704067200011000000,
+  "first_update_id": 3751155539277
+}

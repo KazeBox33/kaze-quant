@@ -1,5 +1,7 @@
 # 性能实验记录
 
+0.3 的最新批量持久化、百万真实报价、RSS 和恢复测量见 [EVIDENCE.md](EVIDENCE.md)。下文保留早期 CPU 算法与逐命令 WAL 基线，不能用旧二进制数值替代最新端到端结果。
+
 日期：2026-10-04；硬件 Apple M5，arm64；macOS 26.5.2；Rust 1.99.0 (b940084d7 2026-09-28)。
 
 编译使用 Cargo release 默认优化、thin LTO、codegen-units=1；未启用 target-cpu=native。单线程，没有绑核、固定频率或隔离系统负载。

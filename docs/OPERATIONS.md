@@ -1,3 +1,49 @@
+# 0.3 事务运行、监控与恢复
+
+当前推荐入口为 `kaze-run`，原来的 `kaze-paper` 文件 WAL 路径保留用于学习和性能对照。二者不互相隐式转换。
+
+```sh
+cargo build --locked --release --bins
+# 批次提交、确认后输出 JSON 回执；EOF 保留会话，finish 显式封闭。
+target/release/kaze-run --config configs/paper.json --db reports/session.db \
+  --input data/paper.jsonl --finish --verify-full --report reports/first.json
+# 不覆盖已有备份或报告。
+target/release/kaze-run --db reports/session.db --recover-only --verify-full \
+  --backup reports/backup.db --report reports/recovered.json
+target/release/kaze-run --db reports/backup.db --recover-only --verify-full \
+  --report reports/backup-checked.json
+```
+
+默认批次最多 256 条，首条进入当前批次后 5ms 触发提交，EOF 也会提交不足一批的命令。stdin 静默不会让部分批次永久等候；计时是本地处理/调度约束，不是硬实时承诺。输入通道最多 256 条，单行 <=8192 bytes。stdout 全部回执在事务成功后发送，阻塞 stdout 将停止继续消费；如发送失败，命令可能已提交，应重投相同 seq/payload。解析失败会丢弃当前尚未确认批次，先前批次保持有效。业务拒单仍是有回执的命令。
+
+`--batch-size` 可在 1..=StoreOptions.max_batch 中选取，不改变交易语义；低流量用短 deadline，高吞吐接受批次等待。`--quiet` 适用于文件回放基准，不向外部生产者提供确认通道。`--quotes CSV` 将规范化单资产 QuoteReader 输入映射至 market=0、全局 seq=quote.sequence；已有人工命令混入的会话应使用 JSONL，不可直接混用 CSV 序号。
+
+单位元数据必须与适配器一致：`price × quantity = money minor`。BTC 示例每货币 100000000 minor、每 BTC 100000 lot，价格整数值 = USDT/BTC × 1000。账户金额以字符串表示，序号/纳秒为 u64。客户端不能用损失精度的 JavaScript Number 解析大纳秒值。
+
+## 资源与健康
+
+默认 `StoreOptions`：终态保留每资产 64 条、最大批次 256、生命周期命令 <=10^12、数据库 1 GiB、WAL 软限 64 MiB。可通过 `--store-options PATH` 传严格 JSON；所有选项绑定 manifest，恢复时必须相同。数据库页配额用 SQLite max_page_count，WAL 达到软限请求 truncate checkpoint，读者持有旧快照则反压拒绝当前批次，不无限增长。WAL 允许一批有界超调，理论上限由 64MiB 状态与每批命令/回执上限共同决定；软限不是严格文件字节上限。
+
+报告 `storage_stats` 给出逻辑数据库大小、WAL 字节、热检查点字节和限额，`run` 给出处理时间、确认批次数与有界直方图。直方图是每批事务执行时间，排除排队/stdout；bucket i 上界 2^i ns，最后桶为溢出桶。它不是逐命令完整确认延迟分位数。容量告警/周期审计/备份调度由调用方执行；CLI 不偷偷创建后台任务。
+
+存储写入/提交错误会 poison 当前 session：保留已有已确认状态，不继续写入，退出并恢复确认结果不确定的输入。数据库满需归档或按预先规划的新会话处理；不要删历史、修改 meta 或清除旧持仓绕开配额。当前没有就地扩容、历史归档轮换或跨会话持仓迁移命令。
+
+## 检查与备份
+
+快速恢复读取经过 SHA-256 校验的热检查点，验证账号守恒、冻结、订单身份/顺序、策略窗口、时钟和尾高水位。性能主要随热状态与剩余 SQLite WAL 变化，而非完整 commands 表长度；未承诺绝对常数时间。定期用 `--verify-full` 扫描所有命令、链、回执并重建最终状态。快速启动没有扫描的中间损坏可能延后到审计才发现；不把快速检查描述为完整数据健康证明。
+
+在线备份使用 SQLite Backup API，再 sync 与不可覆盖发布，包含同一事务版本的状态和审计。正在运行的 WAL 数据库不能只复制 `.db` 文件；不要替换、删除 `.db/-wal/-shm/.lock`。SHA 链检测意外修改，不防具备写权限的攻击者重新计算所有哈希；整份数据库回滚到旧合法备份需要外部确认高水位/链摘要识别。
+
+Mac 可以作为第一阶段开发和纸面运行机器，SQLite bundled 避免依赖机器上预装库。Linux CI 验证同一整数模型；迁移硬件必须复测吞吐、同步、内存和恢复。manifest 绑定二进制，所以 Mac 的数据库不能由 Linux 新二进制直接续写；当前迁移方式是保留规范化完整输入并在目标环境重新回放、核对账本，在新的运行身份下继续实验。跨平台继承真实资金会话的迁移工具尚未实现。
+
+WAL 依赖同主机本地文件系统；不部署到网络共享盘。测试覆盖进程 kill、SQL 写失败、真实页配额满和读者阻塞，不覆盖实际断电/控制器缓存故障。当前验收目标是可恢复的确定性回放/纸面运行，不包含实盘 venue 或交易所保证金语义。
+
+---
+
+# 保留的 0.2 kaze-paper 文件 WAL 路径
+
+以下章节只描述 `kaze-paper` 的逐命令同步、有界全历史重放路径；0.3 的 `kaze-run` 使用上面的事务与检查点契约。
+
 # 纸面运行与恢复手册
 
 ## 构建与运行身份

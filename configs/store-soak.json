@@ -1,0 +1,7 @@
+{
+  "terminal_retention": 64,
+  "max_batch": 256,
+  "max_commands": 1000000000000,
+  "max_database_bytes": 17179869184,
+  "max_wal_bytes": 67108864
+}

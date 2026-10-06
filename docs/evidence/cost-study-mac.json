@@ -1,0 +1,124 @@
+{
+  "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+  "model": "unlevered long-only best-quote shared liquidity, 1ms delay; fees are hypothetical assumptions",
+  "strategy": "window4096 entry1bps exit0bps quantity1000 lots; engineering fixture, no alpha tuning",
+  "runs": [
+    {
+      "fee_bps_per_fill": 0,
+      "state": {
+        "schema_version": 1,
+        "processed": 1000000,
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            },
+            "market": 0,
+            "symbol": "BTCUSDT-QUOTE",
+            "halted": null,
+            "cash_minor": "999603700000",
+            "reserved_cash_minor": "0",
+            "position_units": 0,
+            "equity_minor": "999603700000",
+            "pnl_minor": "-396300000",
+            "fees_minor": "0",
+            "risk_rejections": 0,
+            "active_orders": 0,
+            "metrics": {
+              "quotes": 1000000,
+              "accepted": 184,
+              "rejected": 0,
+              "fills": 184,
+              "cancelled": 0,
+              "orders_examined": 896,
+              "peak_equity_minor": "1000028500000",
+              "max_drawdown_minor": "444400000"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fee_bps_per_fill": 2,
+      "state": {
+        "schema_version": 1,
+        "processed": 1000000,
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            },
+            "market": 0,
+            "symbol": "BTCUSDT-QUOTE",
+            "halted": null,
+            "cash_minor": "998038345540",
+            "reserved_cash_minor": "0",
+            "position_units": 0,
+            "equity_minor": "998038345540",
+            "pnl_minor": "-1961654460",
+            "fees_minor": "1565354460",
+            "risk_rejections": 0,
+            "active_orders": 0,
+            "metrics": {
+              "quotes": 1000000,
+              "accepted": 184,
+              "rejected": 0,
+              "fills": 184,
+              "cancelled": 0,
+              "orders_examined": 896,
+              "peak_equity_minor": "1000000000000",
+              "max_drawdown_minor": "1961654460"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fee_bps_per_fill": 5,
+      "state": {
+        "schema_version": 1,
+        "processed": 1000000,
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            },
+            "market": 0,
+            "symbol": "BTCUSDT-QUOTE",
+            "halted": null,
+            "cash_minor": "995690313850",
+            "reserved_cash_minor": "0",
+            "position_units": 0,
+            "equity_minor": "995690313850",
+            "pnl_minor": "-4309686150",
+            "fees_minor": "3913386150",
+            "risk_rejections": 0,
+            "active_orders": 0,
+            "metrics": {
+              "quotes": 1000000,
+              "accepted": 184,
+              "rejected": 0,
+              "fills": 184,
+              "cancelled": 0,
+              "orders_examined": 896,
+              "peak_equity_minor": "1000000000000",
+              "max_drawdown_minor": "4309686150"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

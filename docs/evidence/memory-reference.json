@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "processed": 1000000,
+  "clock_ns": 1704073538913000000,
+  "closed": false,
+  "markets": [
+    {
+      "units": {
+        "currency": "USDT",
+        "money_scale": 100000000,
+        "quantity_scale": 100000
+      },
+      "market": 0,
+      "symbol": "BTCUSDT-QUOTE",
+      "halted": null,
+      "cash_minor": "998038345540",
+      "reserved_cash_minor": "0",
+      "position_units": 0,
+      "equity_minor": "998038345540",
+      "pnl_minor": "-1961654460",
+      "fees_minor": "1565354460",
+      "risk_rejections": 0,
+      "active_orders": 0,
+      "metrics": {
+        "quotes": 1000000,
+        "accepted": 184,
+        "rejected": 0,
+        "fills": 184,
+        "cancelled": 0,
+        "orders_examined": 896,
+        "peak_equity_minor": "1000000000000",
+        "max_drawdown_minor": "1961654460"
+      }
+    }
+  ]
+}

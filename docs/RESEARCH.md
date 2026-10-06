@@ -47,3 +47,15 @@ Barter 提供事件驱动交易框架、Strategy/RiskManager 扩展与索引组�
 实现依据：[Rust File 锁与同步](https://doc.rust-lang.org/std/fs/struct.File.html)、[Serde 容器属性](https://serde.rs/container-attrs.html)、[sha2 API](https://docs.rs/sha2/latest/sha2/)。价格/数量使用 try_from 验证反序列化；JSON 无参数命令使用空结构变体，避免单元变体忽略额外字段；该边界有实际失败后修复的回归测试。
 
 我们的特色是把小型 CPU 执行内核、有界策略/风险边界和可验证恢复明确分开。性能、持久性与教学可读性各自有可检查的代价，而不是把更多框架堆在核心热路径上。
+
+## 0.3 事务与检查点取舍
+
+继续参考 [NautilusTrader](https://github.com/nautechsystems/nautilus_trader) 的确定性事件模型及 [Barter](https://github.com/barter-rs/barter-rs) 的状态/策略边界。这里独立实现热状态投影：账户、活跃委托、单调订单编号、风控和滚动窗口进入检查点，已结束订单从 CPU 热状态回收，完整命令和回执保留在磁盘。不是上游引擎的移植，也没有上游性能对比。
+
+持久化依据 [SQLite WAL](https://www.sqlite.org/wal.html)、[synchronous](https://www.sqlite.org/pragma.html#pragma_synchronous)、[fullfsync](https://www.sqlite.org/pragma.html#pragma_fullfsync)、[在线备份](https://www.sqlite.org/backup.html)。使用 `rusqlite 0.40.2` / bundled SQLite 3.53.2，项目 Rust 代码继续禁止 unsafe；SQLite 和依赖自己的实现并不属于此禁用范围。WAL/FULL 与 macOS fullfsync 保留同步要求，批量合并同步次数，不通过降低持久化等级制造速度提升。
+
+我们的实现先在候选状态完整执行，再将命令、回执、链摘要与检查点放入同一 SQL 事务。提交成功才替换内存状态。每条候选命令后执行确定性历史回收，使检查点/链结果与批次边界无关。启动只校验检查点及审计尾高水位；`--verify-full` 才核对完整链、逐事件回执和最终状态，公开 O(hot state) 与 O(history) 的差别。
+
+历史去重走磁盘主键查询；不在 RAM 保存无限增长的全部命令哈希。有限通道、批次/单行/回执/检查点上限、数据库页配额及 WAL 反压使资源边界可操作。候选复制和检查点序列化也有成本，热状态变大时必须重新测量，不能把本次小状态的确认延迟外推到百万活跃订单。
+
+真实数据依据 [Binance Public Data 官方说明](https://github.com/binance/binance-public-data) 与 [官方数据站](https://data.binance.vision/)。固定 archive SHA-256，选择连续前缀而不筛选价格。使用 2024 futures bookTicker 的 event_time 毫秒字段（不能套用 2025 spot 的微秒规则）。这些报价仅作为工程负载和无杠杆纸面成本模型的输入；没有实现期货资金费、保证金或结算。
