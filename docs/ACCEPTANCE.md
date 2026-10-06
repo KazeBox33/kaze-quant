@@ -116,3 +116,8 @@ v4独立声明离线重建：每个UTC秒选最早的交易所事件，平局按
 新增18项Rust测试，当前本机debug/release合计各160项、原15项Python检查通过。真实私有Testnet3次POST（1撤销、2成交），6私有执行事件、2成交，原币费用和全部资产变化匹配，独立进程恢复与6次已捕获事件再投递一致。详情、失败记录和限定范围见[EXTERNAL_LEDGER](EXTERNAL_LEDGER.md)。这是有界手工测试网能力；真实部分成交、物理断流补洞、持续策略节点、新版本24h与alpha仍未通过。自身审计组件有合成同负载改善证据，不是与vn.py/ABU/Nautilus完整比较。
 
 本阶段代码`b6e338199ec33e199e3dba09e5d29665811f4e2f`的[CI37473198292](https://github.com/KazeBox33/kaze-quant/actions/runs/37473198292)Ubuntu/macOS全部成功；[SIGKILL恢复证据](evidence/v07/private-process-kill.json)补充验证私有认证连接后进程崩溃，不声称间隙成交/物理断流证明。
+
+
+## 历史补洞与连续观察后续增量
+
+新期初 REST 历史游标、整轮原子补查、持久连接代次与有界只读重连观察已经实现。验收、完整本地恢复计时、SQL索引修复和旧版24h失败见[HISTORY_RECOVERY](HISTORY_RECOVERY.md)。本增量替代本文之前“历史游标/连续重连尚未实现”的状态；不表示自动策略路由、全天运行、主网、真实部分成交或完整上游平台性能排名通过。下一顺序仍是目标仓位与可组合策略，再进入持久TWAP和更严谨的研究/仿真。

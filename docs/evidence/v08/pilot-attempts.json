@@ -1,0 +1,36 @@
+{
+  "attempts": [
+    {
+      "build_role": "preliminary local build",
+      "success": true,
+      "submitted_orders": 1,
+      "binary_sha256": "4a1066fecd05fe374ee405d55f2a791224b64e5155666b41b231ade92fd83642",
+      "fees_units_1e8": {
+        "BTC": 17
+      },
+      "same_intent_new_posts": 0
+    },
+    {
+      "build_role": "preliminary local build",
+      "success": true,
+      "submitted_orders": 1,
+      "binary_sha256": "381616aaeaa0cd723ad06f53fa7235584c874e84d600c33943da025b3101a2ac",
+      "fees_units_1e8": {
+        "BTC": 17
+      },
+      "same_intent_new_posts": 0
+    },
+    {
+      "build_role": "published final binary",
+      "success": true,
+      "submitted_orders": 1,
+      "binary_sha256": "4122207f18fb372e185a0818fc3b9487ee467996f3ec392e57bf75389e0aafca",
+      "fees_units_1e8": {
+        "BTC": 17
+      },
+      "same_intent_new_posts": 0
+    }
+  ],
+  "total_virtual_order_posts": 3,
+  "scope": "three bounded virtual buys across preliminary/final builds, final acceptance uses published binary only; no physical packet loss or mainnet"
+}

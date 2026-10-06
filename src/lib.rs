@@ -29,3 +29,7 @@ pub mod telemetry;
 
 pub mod external_state;
 pub mod user_stream;
+
+pub mod recovery;
+
+pub mod continuous;

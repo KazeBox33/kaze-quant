@@ -13,6 +13,26 @@ struct AcceptanceVenue<V> {
     discarded: bool,
 }
 impl<V: ExecutionVenue> ExecutionVenue for AcceptanceVenue<V> {
+    fn history_head(&mut self, s: &str) -> Result<kaze_quant::recovery::HistoryHead, VenueError> {
+        self.inner.history_head(s)
+    }
+    fn order_history(
+        &mut self,
+        s: &str,
+        f: u64,
+        l: u16,
+    ) -> Result<Vec<OrderObservation>, VenueError> {
+        self.inner.order_history(s, f, l)
+    }
+    fn trade_history(
+        &mut self,
+        s: &str,
+        f: u64,
+        l: u16,
+    ) -> Result<Vec<TradeObservation>, VenueError> {
+        self.inner.trade_history(s, f, l)
+    }
+
     fn capabilities(&self) -> kaze_quant::external_state::VenueCapabilities {
         self.inner.capabilities()
     }
@@ -67,11 +87,27 @@ impl<V: ExecutionVenue> ExecutionVenue for AcceptanceVenue<V> {
         self.inner.trades(o)
     }
 }
+/// 只读验收：一次主动消费者终止，网络线程退出时释放真实连接。
+struct PilotSource {
+    inner: kaze_quant::binance::TestnetUserStream,
+    disconnect_at: Option<std::time::Instant>,
+}
+impl kaze_quant::continuous::PrivateSource for PilotSource {
+    fn receive(&mut self) -> Result<Option<kaze_quant::user_stream::UserEvent>, VenueError> {
+        if self
+            .disconnect_at
+            .is_some_and(|t| std::time::Instant::now() >= t)
+        {
+            return Err(VenueError::Unavailable);
+        }
+        self.inner.receive()
+    }
+}
 fn run() -> Result<(), PaperError> {
     let args: Vec<_> = std::env::args().skip(1).collect();
     if args.first().is_some_and(|s| s == "--help") || args.is_empty() {
         println!(
-            "Binance Spot TESTNET only; never real-money endpoint.\nUsage: kaze-testnet JOURNAL submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL submit-drop-ack INTENT.json MAX_USDT\n       kaze-testnet JOURNAL stream-watch SECONDS\n       kaze-testnet JOURNAL stream-submit INTENT.json MAX_USDT SECONDS\n       kaze-testnet JOURNAL ledger-init SYMBOL\n       kaze-testnet JOURNAL reconcile\n       kaze-testnet JOURNAL cancel CLIENT_ID\n       kaze-testnet JOURNAL audit\n       kaze-testnet market SYMBOL\nCredentials: local env or configs/testnet.credentials.env.\nsubmit-drop-ack intentionally discards an accepted response; it is NOT a wire-level fault.\nUncertain submissions are never resent, even if query returns not-found."
+            "Binance Spot TESTNET only; never real-money endpoint.\nUsage: kaze-testnet JOURNAL submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL submit-drop-ack INTENT.json MAX_USDT\n       kaze-testnet JOURNAL gap-submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL monitor SECONDS\n       kaze-testnet JOURNAL monitor-gap SECONDS\n       kaze-testnet JOURNAL stream-watch SECONDS\n       kaze-testnet JOURNAL stream-submit INTENT.json MAX_USDT SECONDS\n       kaze-testnet JOURNAL ledger-init SYMBOL\n       kaze-testnet JOURNAL reconcile\n       kaze-testnet JOURNAL cancel CLIENT_ID\n       kaze-testnet JOURNAL audit\n       kaze-testnet market SYMBOL\nCredentials: local env or configs/testnet.credentials.env.\nsubmit-drop-ack intentionally discards an accepted response; it is NOT a wire-level fault.\nUncertain submissions are never resent, even if query returns not-found."
         );
         return Ok(());
     }
@@ -97,12 +133,51 @@ fn run() -> Result<(), PaperError> {
     }
     let mut venue = AcceptanceVenue {
         inner: BinanceTestnet::from_env()?,
-        discard_ack: args[1] == "submit-drop-ack",
+        discard_ack: matches!(args[1].as_str(), "submit-drop-ack" | "gap-submit"),
         submit_calls: 0,
         discarded: false,
     };
     let mut stream_report = serde_json::Value::Null;
     let result = match args[1].as_str() {
+        "monitor" | "monitor-gap" if args.len() == 3 => {
+            let seconds = args[2]
+                .parse::<u64>()
+                .map_err(|_| "invalid monitor duration")?;
+            if args[1] == "monitor-gap" && seconds < 15 {
+                return Err("monitor-gap requires at least15 seconds".into());
+            }
+            let forced = args[1] == "monitor-gap";
+            let mut connections = 0u64;
+            let connector = BinanceTestnet::from_env()?;
+            let mut report = kaze_quant::continuous::MonitorReport::default();
+            let result = kaze_quant::continuous::monitor(
+                &mut journal,
+                &mut venue,
+                || {
+                    let inner = connector.user_stream()?;
+                    connections += 1;
+                    Ok(PilotSource {
+                        inner,
+                        disconnect_at: if forced && connections == 1 {
+                            Some(std::time::Instant::now() + std::time::Duration::from_secs(3))
+                        } else {
+                            None
+                        },
+                    })
+                },
+                kaze_quant::continuous::MonitorOptions {
+                    duration: std::time::Duration::from_secs(seconds),
+                    recovery_interval: std::time::Duration::from_secs(30),
+                    max_reconnects: 8,
+                },
+                &mut report,
+            );
+            stream_report = serde_json::to_value(report)?;
+            stream_report["intentional_client_disconnect"] = serde_json::json!(forced);
+            stream_report["fault_scope"] =
+                serde_json::json!("one consumer termination; no physical packet loss");
+            result
+        }
         "stream-watch" if args.len() == 3 => {
             let seconds = args[2]
                 .parse::<u64>()
@@ -136,12 +211,30 @@ fn run() -> Result<(), PaperError> {
             )
         }
 
+        "gap-submit" if args.len() == 4 => {
+            use std::io::Read;
+            let mut bytes = Vec::new();
+            std::fs::File::open(&args[2])?
+                .take(8193)
+                .read_to_end(&mut bytes)?;
+            if bytes.len() > 8192 {
+                return Err("intent exceeds 8 KiB".into());
+            }
+            let i: OrderIntent = serde_json::from_slice(&bytes)?;
+            let cap = decimal::parse(&args[3])?;
+            if cap > 100 * decimal::SCALE {
+                return Err("testnet pilot cap must be <=100 USDT".into());
+            }
+            i.validate(cap)?;
+            gap_pilot(&mut journal, &mut venue, &i, cap, &mut stream_report)
+        }
         "ledger-init" if args.len() == 3 => {
             let caps = venue.capabilities();
             if !caps.account_identity
                 || !caps.account_open_orders
                 || !caps.original_currency_fees
                 || !caps.spot_limit_gtc
+                || !caps.cursor_history
             {
                 return Err("venue lacks required ledger capabilities".into());
             }
@@ -163,7 +256,28 @@ fn run() -> Result<(), PaperError> {
             let (identity, account) = venue
                 .account_identity()
                 .map_err(|e| PaperError(e.to_string()))?;
-            journal.bind_account(&identity, &account, &[binding])?;
+            let first = venue
+                .history_head(&args[2])
+                .map_err(|e| PaperError(e.to_string()))?;
+            let (again, snapshot) = venue
+                .account_identity()
+                .map_err(|e| PaperError(e.to_string()))?;
+            let second = venue
+                .history_head(&args[2])
+                .map_err(|e| PaperError(e.to_string()))?;
+            if identity != again
+                || serde_json::to_value(&account)? != serde_json::to_value(&snapshot)?
+                || first != second
+                || !venue
+                    .account_open_orders()
+                    .map_err(|e| PaperError(e.to_string()))?
+                    .is_empty()
+            {
+                return Err(
+                    "account/history changed during baseline capture; use isolated account".into(),
+                );
+            }
+            journal.bind_account_with_history(&identity, &snapshot, &[binding], &[second])?;
             journal.reconcile(&mut venue)
         }
 
@@ -195,6 +309,66 @@ fn run() -> Result<(), PaperError> {
         "fault_scope":"application response suppression, not wire-level packet loss"
     });
     println!("{}", serde_json::to_string_pretty(&audit)?);
+    result
+}
+/// 测试消费者漏收，不声称成交发生在物理线路断开后。
+fn gap_pilot(
+    j: &mut ExecutionJournal,
+    v: &mut AcceptanceVenue<BinanceTestnet>,
+    i: &OrderIntent,
+    cap: i128,
+    report: &mut serde_json::Value,
+) -> Result<(), PaperError> {
+    let epoch = j.begin_stream_epoch()?;
+    let stream = match v.inner.user_stream() {
+        Ok(s) => s,
+        Err(e) => {
+            j.end_stream_epoch(epoch, "gap pilot subscription failed", false, false)?;
+            return Err(PaperError(e.to_string()));
+        }
+    };
+    j.stream_subscribed(epoch)?;
+    if let Err(e) = j.reconcile(v) {
+        j.end_stream_epoch(epoch, "gap pilot initial recovery failed", false, false)?;
+        return Err(e);
+    }
+    j.stream_recovered(epoch)?;
+    let submit = j.submit_once(v, i, cap);
+    // 验收期间从未调用 receive；成功 ACK 在应用层抑制，连接由客户端主动关闭。
+    drop(stream);
+    j.end_stream_epoch(
+        epoch,
+        "intentional private consumer gap after suppressed ACK",
+        false,
+        false,
+    )?;
+    if !v.discarded || v.submit_calls != 1 {
+        return submit.and(Err(
+            "gap pilot requires one newly accepted suppressed ACK".into()
+        ));
+    }
+    let unknown = j
+        .orders()?
+        .into_iter()
+        .find(|o| o.intent.client_order_id == i.client_order_id)
+        .is_some_and(|o| o.phase == "unknown" && o.observation.is_none());
+    if !unknown {
+        return Err("suppressed ACK did not leave unknown durable intent".into());
+    }
+    let connector = BinanceTestnet::from_env()?;
+    let mut monitor = kaze_quant::continuous::MonitorReport::default();
+    let result = kaze_quant::continuous::monitor(
+        j,
+        v,
+        || connector.user_stream(),
+        kaze_quant::continuous::MonitorOptions {
+            duration: std::time::Duration::from_secs(5),
+            recovery_interval: std::time::Duration::from_secs(30),
+            max_reconnects: 2,
+        },
+        &mut monitor,
+    );
+    *report = serde_json::json!({"accepted_ack_suppressed":true,"unknown_before_recovery":unknown,"private_receive_calls_before_disconnect":0,"consumer_gap_epoch":epoch,"recovery_monitor":monitor,"scope":"application ACK suppression and intentional unread private consumer disconnect; no physical packet-loss or fill-timing claim"});
     result
 }
 /// 有界人工验收；网络与 SQLite 共用一个写入者，不宣称连续实盘节点。

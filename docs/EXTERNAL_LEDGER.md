@@ -77,3 +77,8 @@ cargo run --locked --release --example private_event_replay -- reports/my-extern
 本阶段代码提交为`b6e338199ec33e199e3dba09e5d29665811f4e2f`；CI只认同一SHA，后续证据文档提交不改变核心二进制。
 
 精确代码提交的[CI运行37473198292](https://github.com/KazeBox33/kaze-quant/actions/runs/37473198292)已完成：Ubuntu/macOS两个job均success，含fmt、严格clippy、debug/release测试、rustdoc、Python检查、CLI回放/恢复/备份及存储实验。原始[运行记录](evidence/v07/ci.json)和[job记录](evidence/v07/ci-jobs.json)固定到同一SHA；文档补充提交不代替代码验证。
+
+
+## 历史补洞与连续观察后续增量
+
+新期初 REST 历史游标、整轮原子补查、持久连接代次与有界只读重连观察已经实现。验收、完整本地恢复计时、SQL索引修复和旧版24h失败见[HISTORY_RECOVERY](HISTORY_RECOVERY.md)。本增量替代本文之前“历史游标/连续重连尚未实现”的状态；不表示自动策略路由、全天运行、主网、真实部分成交或完整上游平台性能排名通过。下一顺序仍是目标仓位与可组合策略，再进入持久TWAP和更严谨的研究/仿真。

@@ -15,21 +15,33 @@ const PRIVATE_WS: &str = "wss://ws-api.testnet.binance.vision/ws-api/v3";
 pub struct TestnetUserStream {
     socket: tungstenite::WebSocket<tungstenite::stream::MaybeTlsStream<std::net::TcpStream>>,
     subscription: u64,
+    last_wire: std::time::Instant,
 }
 impl TestnetUserStream {
     pub fn receive(&mut self) -> Result<Option<crate::user_stream::UserEvent>, VenueError> {
         use tungstenite::{Error, Message};
+        if self.last_wire.elapsed() > Duration::from_secs(60) {
+            return Err(VenueError::Unavailable);
+        }
         match self.socket.read() {
             Ok(Message::Text(text)) => {
+                self.last_wire = std::time::Instant::now();
                 crate::user_stream::parse_event(text.as_bytes(), self.subscription)
                     .map(Some)
-                    .map_err(|_| VenueError::Unavailable)
+                    .map_err(|_| VenueError::Protocol("invalid private event protocol"))
             }
             Ok(Message::Ping(_)) => {
+                self.last_wire = std::time::Instant::now();
                 self.socket.flush().map_err(|_| VenueError::Unavailable)?;
                 Ok(None)
             }
-            Ok(Message::Pong(_)) => Ok(None),
+            Err(Error::Capacity(_) | Error::Protocol(_)) | Ok(Message::Binary(_)) => Err(
+                VenueError::Protocol("invalid private wire protocol/capacity"),
+            ),
+            Ok(Message::Pong(_)) => {
+                self.last_wire = std::time::Instant::now();
+                Ok(None)
+            }
             Err(Error::Io(e))
                 if matches!(
                     e.kind(),
@@ -57,18 +69,18 @@ impl BinanceTestnet {
         use std::net::{TcpStream, ToSocketAddrs};
         let addresses = ("ws-api.testnet.binance.vision", 443)
             .to_socket_addrs()
-            .map_err(|_| VenueError::Protocol("private DNS failed"))?;
+            .map_err(|_| VenueError::Unavailable)?;
         let tcp = addresses
             .take(4)
             .find_map(|a| TcpStream::connect_timeout(&a, Duration::from_secs(2)).ok())
-            .ok_or(VenueError::Protocol("private TCP connect failed"))?;
+            .ok_or(VenueError::Unavailable)?;
         tcp.set_read_timeout(Some(Duration::from_secs(2)))
             .map_err(|_| VenueError::Unavailable)?;
         tcp.set_write_timeout(Some(Duration::from_secs(5)))
             .map_err(|_| VenueError::Unavailable)?;
         let (mut socket, _) =
             tungstenite::client_tls_with_config(PRIVATE_WS, tcp, Some(config), None)
-                .map_err(|_| VenueError::Protocol("private TLS/WebSocket handshake failed"))?;
+                .map_err(|_| VenueError::Unavailable)?;
         let time = self.request(reqwest::Method::GET, "/time", &[], false)?["serverTime"]
             .as_u64()
             .ok_or(VenueError::Unavailable)?;
@@ -102,6 +114,7 @@ impl BinanceTestnet {
                     return Ok(TestnetUserStream {
                         socket,
                         subscription,
+                        last_wire: std::time::Instant::now(),
                     });
                 }
                 Ok(Message::Ping(_)) => {
@@ -229,6 +242,79 @@ fn units(v: &Value) -> Result<i128, VenueError> {
     decimal::parse(v.as_str().ok_or(VenueError::Unavailable)?).map_err(|_| VenueError::Unavailable)
 }
 impl ExecutionVenue for BinanceTestnet {
+    fn history_head(&mut self, symbol: &str) -> Result<crate::recovery::HistoryHead, VenueError> {
+        let orders = self.request(
+            reqwest::Method::GET,
+            "/allOrders",
+            &[("symbol", symbol.into()), ("limit", "1".into())],
+            true,
+        )?;
+        let trades = self.request(
+            reqwest::Method::GET,
+            "/myTrades",
+            &[("symbol", symbol.into()), ("limit", "1".into())],
+            true,
+        )?;
+        let orders = orders.as_array().ok_or(VenueError::Unknown)?;
+        let trades = trades.as_array().ok_or(VenueError::Unknown)?;
+        if orders.len() > 1
+            || trades.len() > 1
+            || orders.first().is_some_and(|v| v["symbol"] != symbol)
+            || trades.first().is_some_and(|v| v["symbol"] != symbol)
+        {
+            return Err(VenueError::Unknown);
+        }
+        let order_id = orders
+            .first()
+            .map(|v| v["orderId"].as_u64().ok_or(VenueError::Unknown))
+            .transpose()?;
+        let trade_id = trades
+            .first()
+            .map(|v| v["id"].as_u64().ok_or(VenueError::Unknown))
+            .transpose()?;
+        Ok(crate::recovery::HistoryHead {
+            symbol: symbol.into(),
+            order_id,
+            trade_id,
+        })
+    }
+    fn order_history(
+        &mut self,
+        symbol: &str,
+        from: u64,
+        limit: u16,
+    ) -> Result<Vec<OrderObservation>, VenueError> {
+        serde_json::from_value(self.request(
+            reqwest::Method::GET,
+            "/allOrders",
+            &[
+                ("symbol", symbol.into()),
+                ("orderId", from.to_string()),
+                ("limit", limit.to_string()),
+            ],
+            true,
+        )?)
+        .map_err(|_| VenueError::Unknown)
+    }
+    fn trade_history(
+        &mut self,
+        symbol: &str,
+        from: u64,
+        limit: u16,
+    ) -> Result<Vec<TradeObservation>, VenueError> {
+        serde_json::from_value(self.request(
+            reqwest::Method::GET,
+            "/myTrades",
+            &[
+                ("symbol", symbol.into()),
+                ("fromId", from.to_string()),
+                ("limit", limit.to_string()),
+            ],
+            true,
+        )?)
+        .map_err(|_| VenueError::Unknown)
+    }
+
     fn capabilities(&self) -> crate::external_state::VenueCapabilities {
         crate::external_state::VenueCapabilities {
             spot_limit_gtc: true,
@@ -236,6 +322,7 @@ impl ExecutionVenue for BinanceTestnet {
             account_open_orders: true,
             original_currency_fees: true,
             private_stream: true,
+            cursor_history: true,
         }
     }
     fn account_identity(
@@ -516,6 +603,13 @@ fn bind_known_observation(
     }
     Ok(observation)
 }
+
+impl crate::continuous::PrivateSource for TestnetUserStream {
+    fn receive(&mut self) -> Result<Option<crate::user_stream::UserEvent>, VenueError> {
+        TestnetUserStream::receive(self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

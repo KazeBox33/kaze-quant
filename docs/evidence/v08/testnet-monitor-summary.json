@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "environment": "binance-spot-testnet",
+  "binary_sha256": "4122207f18fb372e185a0818fc3b9487ee467996f3ec392e57bf75389e0aafca",
+  "success": true,
+  "monitor": {
+    "duplicates": 0,
+    "duration_seconds": 91.642162625,
+    "epochs": 2,
+    "events": 0,
+    "fault_scope": "one consumer termination; no physical packet loss",
+    "gaps": [
+      "private transport failed"
+    ],
+    "intentional_client_disconnect": true,
+    "reconnects": 1,
+    "recovered_new_trades": 0,
+    "recovery_rounds": 5,
+    "rest_source_operations": 35,
+    "success": true
+  },
+  "epochs": [
+    {
+      "id": 1,
+      "reason": "intentional private consumer gap after suppressed ACK",
+      "status": "gap"
+    },
+    {
+      "id": 2,
+      "reason": "private monitor stopped; restart requires new subscription",
+      "status": "stopped"
+    },
+    {
+      "id": 3,
+      "reason": "private transport failed",
+      "status": "gap"
+    },
+    {
+      "id": 4,
+      "reason": "private monitor stopped; restart requires new subscription",
+      "status": "stopped"
+    }
+  ],
+  "new_posts": 0,
+  "all_order_trade_audit_clear": true,
+  "movement_replay_equal": true,
+  "scope": "bounded read-only real authenticated sockets; one intentional consumer termination releases original connection and triggers automated resubscription/REST recovery; no physical packet-loss, new trade during gap, mainnet or 24h claim"
+}

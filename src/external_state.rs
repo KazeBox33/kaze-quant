@@ -34,6 +34,7 @@ pub struct VenueCapabilities {
     pub account_open_orders: bool,
     pub original_currency_fees: bool,
     pub private_stream: bool,
+    pub cursor_history: bool,
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -78,7 +79,7 @@ pub(crate) fn create_schema(c: &Connection) -> Result<(), PaperError> {
     c.execute("UPDATE external_control SET health='needs_reconciliation',reason='process opened' WHERE blocked=0",[])?;
     Ok(())
 }
-fn totals(a: &AccountObservation) -> Result<BTreeMap<String, i128>, PaperError> {
+pub(crate) fn totals(a: &AccountObservation) -> Result<BTreeMap<String, i128>, PaperError> {
     if !a.can_trade || a.balances.len() > 4096 {
         return Err("account unavailable or balance capacity exceeded".into());
     }
@@ -124,7 +125,7 @@ fn movement(c: &Connection, t: &TradeObservation) -> Result<BTreeMap<String, i12
         [&t.symbol],
         |r| Ok((r.get(0)?, r.get(1)?)),
     )?;
-    let body:String=c.query_row("SELECT intent FROM intents WHERE json_extract(observation,'$.symbol')=?1 AND json_extract(observation,'$.orderId')=?2",
+    let body:String=c.query_row("SELECT intent FROM intents WHERE observation IS NOT NULL AND json_extract(observation,'$.symbol')=?1 AND json_extract(observation,'$.orderId')=?2",
         params![t.symbol,i64::try_from(t.order_id).map_err(|_|"order identity exceeds SQLite bound")?],|r|r.get(0))?;
     let i: OrderIntent = serde_json::from_str(&body)?;
     let buy = i.side == crate::types::Side::Buy;
@@ -200,6 +201,24 @@ impl ExecutionJournal {
         a: &AccountObservation,
         instruments: &[InstrumentBinding],
     ) -> Result<(), PaperError> {
+        self.bind_account_inner(id, a, instruments, None)
+    }
+    pub fn bind_account_with_history(
+        &mut self,
+        id: &ExecutionIdentity,
+        a: &AccountObservation,
+        instruments: &[InstrumentBinding],
+        heads: &[crate::recovery::HistoryHead],
+    ) -> Result<(), PaperError> {
+        self.bind_account_inner(id, a, instruments, Some(heads))
+    }
+    fn bind_account_inner(
+        &mut self,
+        id: &ExecutionIdentity,
+        a: &AccountObservation,
+        instruments: &[InstrumentBinding],
+        heads: Option<&[crate::recovery::HistoryHead]>,
+    ) -> Result<(), PaperError> {
         id.validate()?;
         if instruments.is_empty() || instruments.len() > 64 {
             return Err("instrument capacity invalid".into());
@@ -233,6 +252,9 @@ impl ExecutionJournal {
                 "INSERT INTO ledger_baseline VALUES(?1,?2)",
                 params![a, n.to_string()],
             )?;
+        }
+        if let Some(heads) = heads {
+            crate::recovery::bind_cursors_tx(&tx, instruments, heads)?;
         }
         tx.commit()?;
         Ok(())
@@ -325,7 +347,7 @@ impl ExecutionJournal {
         }
         Ok(
             serde_json::json!({"identity":id,"health":health,"reason":reason,"external_activity_blocked":blocked!=0,
-            "expected_total_assets":self.expected_balances()?,"movement_replay_equal":true,"private_execution_events":self.conn.query_row("SELECT count(*) FROM private_events",[],|r|r.get::<_,i64>(0))?,
+            "expected_total_assets":self.expected_balances()?,"movement_replay_equal":true,"history_recovery":self.history_audit()?,"private_stream":self.stream_audit()?,"private_execution_events":self.conn.query_row("SELECT count(*) FROM private_events",[],|r|r.get::<_,i64>(0))?,
             "scope":"original asset totals, fixed baseline; no FX valuation, deposit adoption, strategy PnL or proof of absence of external activity"}),
         )
     }

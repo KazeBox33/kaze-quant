@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "environment": "binance-spot-testnet",
+  "binary_sha256": "4122207f18fb372e185a0818fc3b9487ee467996f3ec392e57bf75389e0aafca",
+  "success": true,
+  "steps": [
+    {
+      "action": "ledger-init",
+      "exit_code": 0,
+      "duration_seconds": 3.950891542248428
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "duration_seconds": 0.3936129165813327
+    },
+    {
+      "action": "gap-submit",
+      "exit_code": 0,
+      "duration_seconds": 12.809989499859512
+    },
+    {
+      "action": "submit",
+      "exit_code": 0,
+      "duration_seconds": 0.6307060001417994
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 1.6055712075904012
+    },
+    {
+      "action": "audit",
+      "exit_code": 0,
+      "duration_seconds": 0.023015916347503662
+    }
+  ],
+  "submitted_orders": 1,
+  "filled_orders": 1,
+  "unique_trades": 1,
+  "fees_units_1e8": {
+    "BTC": 17
+  },
+  "all_asset_deltas_match": true,
+  "economic_deltas": {
+    "BTC": "0.00016983",
+    "USDT": "-14.54710570"
+  },
+  "fresh_process_equal": true,
+  "same_intent_new_posts": 0,
+  "pilot": {
+    "accepted_ack_suppressed": true,
+    "consumer_gap_epoch": 1,
+    "private_receive_calls_before_disconnect": 0,
+    "recovery_monitor": {
+      "duplicates": 0,
+      "duration_seconds": 8.205927334,
+      "epochs": 1,
+      "events": 0,
+      "gaps": [],
+      "reconnects": 0,
+      "recovered_new_trades": 1,
+      "recovery_rounds": 2,
+      "rest_source_operations": 14,
+      "success": true
+    },
+    "scope": "application ACK suppression and intentional unread private consumer disconnect; no physical packet-loss or fill-timing claim",
+    "unknown_before_recovery": true
+  },
+  "epochs": [
+    {
+      "id": 1,
+      "reason": "intentional private consumer gap after suppressed ACK",
+      "status": "gap"
+    },
+    {
+      "id": 2,
+      "reason": "private monitor stopped; restart requires new subscription",
+      "status": "stopped"
+    }
+  ],
+  "history": {
+    "confirmed_rounds": 6,
+    "cursors": [
+      {
+        "confirmed": {
+          "order_id": 9981252,
+          "symbol": "BTCUSDT",
+          "trade_id": 2478214
+        },
+        "seed": {
+          "order_id": 9980651,
+          "symbol": "BTCUSDT",
+          "trade_id": 2478158
+        }
+      }
+    ],
+    "last_round": {
+      "account_requests": 2,
+      "history_head_requests": 2,
+      "new_trades": 0,
+      "open_order_requests": 1,
+      "order_pages": 1,
+      "order_records": 1,
+      "pending_order_queries": 0,
+      "trade_pages": 1,
+      "trade_records": 1
+    },
+    "schema_version": 1,
+    "scope": "registered symbols only, durable REST cursors; server history retention/coverage and dedicated-account baseline required; no global private-stream sequence"
+  },
+  "scope": "one bounded virtual order; application ACK suppression and intentionally unread private subscription; actual missed trade REST recovery, not physical packet loss or fill-after-disconnect timing proof; no mainnet/alpha/24h claim"
+}

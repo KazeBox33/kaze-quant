@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "before": [
+    [
+      2,
+      0,
+      216,
+      "SCAN intents"
+    ]
+  ],
+  "after": [
+    [
+      3,
+      0,
+      45,
+      "SEARCH intents USING INDEX venue_order_identity (<expr>=? AND <expr>=?)"
+    ]
+  ],
+  "scope": "same existing partial unique index; explicit non-null predicate allows SQLite planner to use it; no timing claim"
+}

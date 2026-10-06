@@ -1,0 +1,102 @@
+{
+  "cases": [
+    {
+      "cursor_median_ms": 10.973500000000001,
+      "cursor_ms": [
+        10.917916,
+        11.124666999999999,
+        10.973500000000001,
+        11.727834,
+        10.959834,
+        11.02775,
+        10.96475
+      ],
+      "cursor_rest_source_operations": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "economic_equality_every_round": true,
+      "legacy_median_ms": 23.023875,
+      "legacy_ms": [
+        25.751125,
+        23.023875,
+        23.065042000000002,
+        22.985958,
+        24.548750000000002,
+        22.986125,
+        22.858625
+      ],
+      "legacy_rest_source_operations": [
+        404,
+        404,
+        404,
+        404,
+        404,
+        404,
+        404
+      ],
+      "median_speedup": 2.098134141340502,
+      "orders": 200,
+      "rounds": 7,
+      "symbols": 1,
+      "trades": 200
+    },
+    {
+      "cursor_median_ms": 21.975749999999998,
+      "cursor_ms": [
+        22.072875,
+        22.490625,
+        21.792209,
+        21.547541,
+        21.893,
+        22.547250000000002,
+        21.975749999999998
+      ],
+      "cursor_rest_source_operations": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "economic_equality_every_round": true,
+      "legacy_median_ms": 49.490917,
+      "legacy_ms": [
+        49.877207999999996,
+        48.827125,
+        49.490917,
+        49.036375,
+        48.792875,
+        49.874874999999996,
+        49.756
+      ],
+      "legacy_rest_source_operations": [
+        4004,
+        4004,
+        4004,
+        4004,
+        4004,
+        4004,
+        4004
+      ],
+      "median_speedup": 2.2520695311877867,
+      "orders": 2000,
+      "rounds": 7,
+      "symbols": 1,
+      "trades": 2000
+    }
+  ],
+  "profile": "release thin LTO, codegen-units=1",
+  "schema_version": 1,
+  "scope": "self comparison, complete local recovery including SQLite WAL/FULL and full order/trade/asset audits; indexed mock venue, synthetic terminal history preload outside timing; no transport, signing clock GET, upstream platform or latency percentiles; cursor path also has stronger failure atomicity",
+  "hardware": "Apple M5, macOS 26.5.2, arm64",
+  "rustc": "1.99.0 (b940084d7 2026-09-28)",
+  "binary_sha256": "c3f2eedbd9a06a6df43f59a251779650b819f573f06478052db2cf1134340281"
+}

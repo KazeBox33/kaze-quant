@@ -60,3 +60,8 @@ python3 scripts/testnet_acceptance.py --output reports/my-testnet-acceptance
 ## 私有回报与原币资产核对
 
 新增`ledger-init`、`stream-watch`和`stream-submit`。全新账本绑定全账户期初余额，私有回报按执行身份去重并原子记录原币手续费；最终REST补查核对每币种free+locked。完整运行命令、故障策略、公开证据与局限见[EXTERNAL_LEDGER](EXTERNAL_LEDGER.md)。旧账本不自动补期初资产，有界人工验收不等于连续实盘节点。
+
+
+## 历史补洞与连续观察后续增量
+
+新期初 REST 历史游标、整轮原子补查、持久连接代次与有界只读重连观察已经实现。验收、完整本地恢复计时、SQL索引修复和旧版24h失败见[HISTORY_RECOVERY](HISTORY_RECOVERY.md)。本增量替代本文之前“历史游标/连续重连尚未实现”的状态；不表示自动策略路由、全天运行、主网、真实部分成交或完整上游平台性能排名通过。下一顺序仍是目标仓位与可组合策略，再进入持久TWAP和更严谨的研究/仿真。

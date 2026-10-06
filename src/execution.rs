@@ -163,6 +163,8 @@ impl ExecutionJournal {
             _ => return Err("execution journal revision mismatch".into()),
         }
         crate::external_state::create_schema(&conn)?;
+        crate::recovery::create_schema(&conn)?;
+        crate::continuous::create_schema(&conn)?;
         Ok(Self { conn, _lock: lock })
     }
     /// 返回 false 表示身份已存在，调用方不得再次发送。
@@ -254,28 +256,7 @@ impl ExecutionJournal {
         Ok(())
     }
     pub fn record_account(&mut self, a: &AccountObservation) -> Result<(), PaperError> {
-        let count: i64 = self
-            .conn
-            .query_row("SELECT count(*) FROM accounts", [], |r| r.get(0))?;
-        if count >= 100_000 {
-            return Err("account snapshot history capacity exceeded".into());
-        }
-        if a.balances.len() > 4096 {
-            return Err("balance capacity exceeded".into());
-        }
-        let mut assets = std::collections::HashSet::new();
-        for b in &a.balances {
-            if b.asset.is_empty() || !assets.insert(&b.asset) {
-                return Err("duplicate balance asset".into());
-            }
-            decimal::parse(&b.free)?;
-            decimal::parse(&b.locked)?;
-        }
-        self.conn.execute(
-            "INSERT INTO accounts(body) VALUES (?1)",
-            [serde_json::to_string(a)?],
-        )?;
-        Ok(())
+        record_account_tx(&self.conn, a)
     }
     /// 用真实成交数量核对订单累计量；手续费按原币种保留，不能冒充已换算 PnL。
     pub fn audit(&self) -> Result<serde_json::Value, PaperError> {
@@ -325,6 +306,25 @@ impl std::fmt::Display for VenueError {
 impl std::error::Error for VenueError {}
 /// 传输适配器只返回交易所证据；本地订单 ID 和重投政策由网关统一管理。
 pub trait ExecutionVenue {
+    fn history_head(&mut self, _symbol: &str) -> Result<crate::recovery::HistoryHead, VenueError> {
+        Err(VenueError::Unavailable)
+    }
+    fn order_history(
+        &mut self,
+        _symbol: &str,
+        _from: u64,
+        _limit: u16,
+    ) -> Result<Vec<OrderObservation>, VenueError> {
+        Err(VenueError::Unavailable)
+    }
+    fn trade_history(
+        &mut self,
+        _symbol: &str,
+        _from: u64,
+        _limit: u16,
+    ) -> Result<Vec<TradeObservation>, VenueError> {
+        Err(VenueError::Unavailable)
+    }
     fn capabilities(&self) -> crate::external_state::VenueCapabilities {
         crate::external_state::VenueCapabilities::default()
     }
@@ -429,6 +429,11 @@ impl ExecutionJournal {
         Ok(())
     }
     pub fn reconcile(&mut self, venue: &mut impl ExecutionVenue) -> Result<(), PaperError> {
+        if self.has_history_recovery()? {
+            return self
+                .recover_history(venue, crate::recovery::RecoveryOptions::default())
+                .map(|_| ());
+        }
         self.mark_execution_gap("REST reconciliation started", false)?;
         if let Some(expected) = self.execution_identity()? {
             let (actual, _) = venue.account_identity().map_err(venue_error)?;
@@ -603,6 +608,9 @@ pub(crate) fn record_trades_tx(
         return Err("trade page capacity exceeded".into());
     }
     let mut inserted = 0;
+    let count: i64 = tx.query_row("SELECT count(*) FROM trades", [], |r| r.get(0))?;
+    let bound = identity_bound(tx)?;
+    let mut affected = std::collections::BTreeSet::new();
     for t in trades {
         let t = canonical_trade(t)?;
         let fee = decimal::parse(&t.commission)?;
@@ -632,8 +640,7 @@ pub(crate) fn record_trades_tx(
             }
             continue;
         }
-        let count: i64 = tx.query_row("SELECT count(*) FROM trades", [], |r| r.get(0))?;
-        if count >= 100_000 {
+        if count + inserted as i64 >= 100_000 {
             return Err("trade history capacity exceeded".into());
         }
         crate::external_state::record_trade_movement(tx, &t)?;
@@ -641,32 +648,33 @@ pub(crate) fn record_trades_tx(
             "INSERT INTO trades VALUES (?1,?2,?3)",
             params![t.symbol, t.id as i64, json],
         )?;
-        if identity_bound(tx)? {
-            let body:String=tx.query_row("SELECT observation FROM intents WHERE json_extract(observation,'$.symbol')=?1 AND json_extract(observation,'$.orderId')=?2",params![t.symbol,t.order_id as i64],|r|r.get(0))?;
-            let obs: OrderObservation = serde_json::from_str(&body)?;
-            let mut stmt = tx.prepare(
-                "SELECT body FROM trades WHERE symbol=?1 AND json_extract(body,'$.orderId')=?2",
-            )?;
-            let mut qty = 0i128;
-            let mut quote = 0i128;
-            for body in stmt.query_map(params![t.symbol, t.order_id as i64], |r| {
-                r.get::<_, String>(0)
-            })? {
-                let a: TradeObservation = serde_json::from_str(&body?)?;
-                qty = qty
-                    .checked_add(decimal::parse(&a.qty)?)
-                    .ok_or("quantity overflow")?;
-                quote = quote
-                    .checked_add(decimal::parse(&a.quote_qty)?)
-                    .ok_or("quote overflow")?;
-            }
-            if qty > decimal::parse(&obs.executed_qty)?
-                || quote > decimal::parse(&obs.cummulative_quote_qty)?
-            {
-                return Err("trades exceed observed cumulative fill".into());
-            }
+        if bound {
+            affected.insert((t.symbol.clone(), t.order_id));
         }
         inserted += 1;
+    }
+    for (symbol, order_id) in affected {
+        let body:String=tx.query_row("SELECT observation FROM intents WHERE observation IS NOT NULL AND json_extract(observation,'$.symbol')=?1 AND json_extract(observation,'$.orderId')=?2",params![symbol,order_id as i64],|r|r.get(0))?;
+        let obs: OrderObservation = serde_json::from_str(&body)?;
+        let mut stmt = tx.prepare(
+            "SELECT body FROM trades WHERE symbol=?1 AND json_extract(body,'$.orderId')=?2",
+        )?;
+        let mut qty = 0i128;
+        let mut quote = 0i128;
+        for body in stmt.query_map(params![symbol, order_id as i64], |r| r.get::<_, String>(0))? {
+            let a: TradeObservation = serde_json::from_str(&body?)?;
+            qty = qty
+                .checked_add(decimal::parse(&a.qty)?)
+                .ok_or("quantity overflow")?;
+            quote = quote
+                .checked_add(decimal::parse(&a.quote_qty)?)
+                .ok_or("quote overflow")?;
+        }
+        if qty > decimal::parse(&obs.executed_qty)?
+            || quote > decimal::parse(&obs.cummulative_quote_qty)?
+        {
+            return Err("trades exceed observed cumulative fill".into());
+        }
     }
     Ok(inserted)
 }
@@ -748,4 +756,27 @@ impl ExecutionJournal {
         }
         Ok(())
     }
+}
+
+pub(crate) fn record_account_tx(c: &Connection, a: &AccountObservation) -> Result<(), PaperError> {
+    let count: i64 = c.query_row("SELECT count(*) FROM accounts", [], |r| r.get(0))?;
+    if count >= 100_000 {
+        return Err("account snapshot history capacity exceeded".into());
+    }
+    if a.balances.len() > 4096 {
+        return Err("balance capacity exceeded".into());
+    }
+    let mut assets = std::collections::HashSet::new();
+    for b in &a.balances {
+        if b.asset.is_empty() || !assets.insert(&b.asset) {
+            return Err("duplicate balance asset".into());
+        }
+        decimal::parse(&b.free)?;
+        decimal::parse(&b.locked)?;
+    }
+    c.execute(
+        "INSERT INTO accounts(body) VALUES (?1)",
+        [serde_json::to_string(a)?],
+    )?;
+    Ok(())
 }

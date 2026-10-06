@@ -1,0 +1,13 @@
+{
+  "attempt_success": false,
+  "error": "feed stale: fail closed",
+  "duration_seconds": 10056.112872125,
+  "quotes_committed": 1210292,
+  "recovered_state_chain_equal": true,
+  "verified_commands": 1210293,
+  "accepted_24h": false,
+  "binary_sha256": "dde2a5154037a29a6e60f05057e4ae4a5fab0b8785b1396007c4985b220a1aaa",
+  "report": "reports/live-paper-24h-v05.json",
+  "recovery": "reports/live-paper-24h-v05-recovery.json",
+  "scope": "one attempt only; no credentials, orders, notifications or aggregate-duration acceptance"
+}

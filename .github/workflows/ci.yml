@@ -44,6 +44,7 @@ jobs:
       - name: Reproducible storage comparison
         run: |
           cargo run --locked --release --example store_bench -- 2000 | tee reports/ci-store.csv
+          cargo run --locked --release --example history_recovery_bench > reports/ci-history.json
           rustc -vV > reports/rustc.txt
           uname -a > reports/host.txt
       - uses: actions/upload-artifact@v4
@@ -51,6 +52,7 @@ jobs:
           name: storage-evidence-${{ matrix.os }}
           path: |
             reports/ci-store.csv
+            reports/ci-history.json
             reports/rustc.txt
             reports/host.txt
             reports/sql-first.json
