@@ -1,0 +1,30 @@
+name: Rust checks
+on: [push, pull_request]
+permissions:
+  contents: read
+concurrency:
+  group: rust-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy
+      - run: cargo fmt --check
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked --all-targets
+      - run: cargo test --locked --release
+      - run: cargo doc --locked --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
+      - name: Replay and recover paper session
+        run: |
+          cargo run --locked --release --bin kaze-paper -- --input data/paper.jsonl --journal reports/ci.wal --finish --report reports/first.json
+          cargo run --locked --release --bin kaze-paper -- --input data/paper.jsonl --journal reports/ci.wal --finish --report reports/retry.json
+          cargo run --locked --example custom_strategy
