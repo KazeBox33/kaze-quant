@@ -23,8 +23,27 @@ jobs:
       - run: cargo doc --locked --no-deps
         env:
           RUSTDOCFLAGS: -D warnings
+      - run: python3 scripts/test_market_data.py
       - name: Replay and recover paper session
         run: |
           cargo run --locked --release --bin kaze-paper -- --input data/paper.jsonl --journal reports/ci.wal --finish --report reports/first.json
           cargo run --locked --release --bin kaze-paper -- --input data/paper.jsonl --journal reports/ci.wal --finish --report reports/retry.json
           cargo run --locked --example custom_strategy
+      - name: Transactional replay and backup
+        run: |
+          cargo run --locked --release --bin kaze-run -- --input data/paper.jsonl --db reports/ci.db --finish --verify-full --report reports/sql-first.json --backup reports/ci-backup.db
+          cargo run --locked --release --bin kaze-run -- --db reports/ci-backup.db --recover-only --verify-full --report reports/sql-backup.json
+      - name: Reproducible storage comparison
+        run: |
+          cargo run --locked --release --example store_bench -- 2000 > reports/ci-store.csv
+          rustc -vV > reports/rustc.txt
+          uname -a > reports/host.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: storage-evidence-${{ matrix.os }}
+          path: |
+            reports/ci-store.csv
+            reports/rustc.txt
+            reports/host.txt
+            reports/sql-first.json
+            reports/sql-backup.json

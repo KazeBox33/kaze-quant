@@ -1,13 +1,18 @@
 use crate::types::{Fill, Price, Side};
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Account {
+    #[serde(with = "crate::config::money")]
     pub(crate) cash: i128,
     pub(crate) position: u64,
+    #[serde(with = "crate::config::money")]
     pub(crate) reserved_cash: i128,
     pub(crate) reserved_sell: u64,
     pub(crate) pending_buy: u64,
+    #[serde(with = "crate::config::money")]
     pub(crate) fees_paid: i128,
+    #[serde(with = "crate::config::money")]
     pub(crate) net_buy_notional: i128,
 }
 

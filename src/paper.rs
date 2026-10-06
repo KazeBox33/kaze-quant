@@ -1,6 +1,6 @@
 //! 可重放的命令边界：直接整数索引路由，多资产采用独立预算；没有隐藏跨账户融资。
-use crate::config::PaperConfig;
-use crate::engine::{Engine, Metrics};
+use crate::config::{BuiltinStrategy, PaperConfig};
+use crate::engine::{Engine, EngineSnapshot, MAX_LIFETIME_ORDERS, Metrics};
 use crate::strategy::{ActionBuffer, Strategy, StrategyView};
 use crate::types::*;
 use serde::{Deserialize, Serialize};
@@ -106,6 +106,7 @@ pub struct PaperRuntime {
     closed: bool,
     processed: u64,
     actions: ActionBuffer,
+    retention: Option<usize>,
 }
 impl PaperRuntime {
     pub fn new(config: PaperConfig) -> Result<Self, PaperError> {
@@ -143,6 +144,7 @@ impl PaperRuntime {
             closed: false,
             processed: 0,
             actions: ActionBuffer::new(64)?,
+            retention: None,
         })
     }
     pub fn config(&self) -> &PaperConfig {
@@ -351,6 +353,18 @@ impl PaperRuntime {
         let mut events = Vec::new();
         match action {
             Action::Submit(request) => {
+                if let Some(retain) = self.retention
+                    && self.markets[i].engine.orders().len()
+                        >= self.config.markets[i].engine.max_orders
+                {
+                    let budget = retain.min(
+                        self.config.markets[i]
+                            .engine
+                            .max_orders
+                            .saturating_sub(self.markets[i].engine.active_count() + 1),
+                    );
+                    self.markets[i].engine.compact_terminal_orders(budget);
+                }
                 if let Some(reason) = self.risk(i, request) {
                     self.markets[i].risk_rejections += 1;
                     notices.push(Notice::RiskRejected { market: i, reason });
@@ -370,6 +384,90 @@ impl PaperRuntime {
             Action::None => (),
         }
         self.dispatch_events(i, events, notices);
+    }
+    pub fn configure_retention(&mut self, terminal_budget: usize) -> Result<(), PaperError> {
+        if terminal_budget > 4096 {
+            return Err("terminal retention exceeds 4096 per market".into());
+        }
+        self.retention = Some(terminal_budget);
+        Ok(())
+    }
+    pub fn compact_checkpoint(&mut self) {
+        if let Some(retain) = self.retention {
+            for m in &mut self.markets {
+                m.engine.compact_terminal_orders(retain);
+            }
+        }
+    }
+    pub fn snapshot(&self) -> Result<PaperSnapshot, PaperError> {
+        let markets = self
+            .markets
+            .iter()
+            .map(|m| {
+                Ok(MarketSnapshot {
+                    engine: m.engine.snapshot(),
+                    strategy: m
+                        .strategy
+                        .checkpoint()
+                        .ok_or("strategy does not provide a deterministic checkpoint")?,
+                    halted: m.halted,
+                    risk_rejections: m.risk_rejections,
+                })
+            })
+            .collect::<Result<Vec<_>, PaperError>>()?;
+        Ok(PaperSnapshot {
+            schema_version: 1,
+            markets,
+            clock_ns: self.clock_ns,
+            closed: self.closed,
+            processed: self.processed,
+            retention: self.retention,
+        })
+    }
+    pub fn restore(config: PaperConfig, state: PaperSnapshot) -> Result<Self, PaperError> {
+        config.validate()?;
+        if state.schema_version != 1
+            || state.processed > MAX_LIFETIME_ORDERS
+            || state.markets.len() != config.markets.len()
+            || state.retention.is_some_and(|n| n > 4096)
+        {
+            return Err("invalid runtime snapshot bounds".into());
+        }
+        let mut markets = Vec::with_capacity(config.markets.len());
+        for (c, m) in config.markets.iter().zip(state.markets) {
+            m.strategy.validate_state(&c.strategy)?;
+            let engine = Engine::restore(c.engine.clone(), m.engine)?;
+            if engine
+                .last_quote()
+                .is_some_and(|q| q.timestamp_ns > state.clock_ns)
+                || engine.metrics().quotes > state.processed
+                || m.risk_rejections > state.processed.saturating_mul(64)
+            {
+                return Err("snapshot clock or counter mismatch".into());
+            }
+            if state.closed && m.halted.is_none()
+                || !state.closed && m.halted == Some(HaltReason::Finished)
+            {
+                return Err("snapshot lifecycle mismatch".into());
+            }
+            markets.push(Market {
+                engine,
+                strategy: Box::new(m.strategy),
+                halted: m.halted,
+                risk_rejections: m.risk_rejections,
+            });
+        }
+        let runtime = Self {
+            config,
+            markets,
+            clock_ns: state.clock_ns,
+            closed: state.closed,
+            processed: state.processed,
+            actions: ActionBuffer::new(64)?,
+            retention: state.retention,
+        };
+        runtime.check_invariants()?;
+        Ok(runtime)
     }
     pub fn check_invariants(&self) -> Result<(), PaperError> {
         for m in &self.markets {
@@ -393,6 +491,7 @@ impl PaperRuntime {
                 .map(|(i, m)| MarketReport {
                     market: i,
                     symbol: self.config.markets[i].symbol.clone(),
+                    units: self.config.markets[i].units.clone(),
                     halted: m.halted,
                     cash_minor: m.engine.account().cash(),
                     reserved_cash_minor: m.engine.account().reserved_cash(),
@@ -418,6 +517,7 @@ pub struct PaperReport {
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct MarketReport {
+    pub units: crate::config::InstrumentUnits,
     pub market: usize,
     pub symbol: String,
     pub halted: Option<HaltReason>,
@@ -462,4 +562,23 @@ impl From<Metrics> for MetricReport {
             max_drawdown_minor: m.max_drawdown,
         }
     }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PaperSnapshot {
+    schema_version: u32,
+    markets: Vec<MarketSnapshot>,
+    clock_ns: u64,
+    closed: bool,
+    processed: u64,
+    pub(crate) retention: Option<usize>,
+}
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct MarketSnapshot {
+    engine: EngineSnapshot,
+    strategy: BuiltinStrategy,
+    halted: Option<HaltReason>,
+    risk_rejections: u64,
 }

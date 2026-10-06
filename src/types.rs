@@ -121,6 +121,7 @@ impl OrderStatus {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct Order {
     pub id: OrderId,
     pub request: OrderRequest,

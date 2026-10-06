@@ -18,10 +18,15 @@ pub trait Strategy {
     }
     /// 回报由引擎生成，策略只能消费，不能改写账户或订单。
     fn on_event(&mut self, _event: Event) {}
+    fn checkpoint(&self) -> Option<crate::config::BuiltinStrategy> {
+        None
+    }
     fn on_submit_result(&mut self, _request: OrderRequest, _result: Result<OrderId, RejectReason>) {
     }
 }
 
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ThresholdStrategy {
     pub buy_below: Price,
     pub sell_above: Price,
@@ -55,6 +60,8 @@ impl Strategy for ThresholdStrategy {
 }
 
 /// 预分配环形窗口 + 增量和：push O(1)，不逐次重算整个窗口。
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct RollingMean {
     values: Vec<u64>,
     next: usize,
@@ -74,6 +81,27 @@ impl RollingMean {
             sum: 0,
         })
     }
+    pub(crate) fn validate_state(&self, window: usize) -> Result<(), &'static str> {
+        if self.values.len() != window
+            || window == 0
+            || self.next >= window
+            || self.count > window
+            || (self.count < window && self.next != self.count)
+        {
+            return Err("invalid rolling window state");
+        }
+        if self
+            .values
+            .iter()
+            .take(self.count)
+            .any(|&v| v == 0 || v > Price::MAX)
+            || (self.count < window && self.values[self.count..].iter().any(|&v| v != 0))
+            || self.sum != self.values.iter().map(|&v| u128::from(v)).sum::<u128>()
+        {
+            return Err("invalid rolling sum or values");
+        }
+        Ok(())
+    }
     /// 未满窗口时返回 None；均值向下取整到整数价格单位。
     pub fn push(&mut self, value: Price) -> Option<u64> {
         self.sum -= u128::from(self.values[self.next]);
@@ -89,11 +117,23 @@ impl RollingMean {
 }
 
 /// 只用于学习信号/执行分离的均值趋势示例，不代表已验证的交易优势。
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MomentumStrategy {
     mean: RollingMean,
     quantity: Quantity,
 }
 impl MomentumStrategy {
+    pub(crate) fn validate_state(
+        &self,
+        window: usize,
+        quantity: Quantity,
+    ) -> Result<(), &'static str> {
+        if self.quantity != quantity {
+            return Err("momentum quantity changed");
+        }
+        self.mean.validate_state(window)
+    }
     pub fn new(window: usize, quantity: Quantity) -> Result<Self, &'static str> {
         Ok(Self {
             mean: RollingMean::new(window)?,

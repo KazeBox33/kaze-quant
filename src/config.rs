@@ -31,12 +31,55 @@ pub struct PaperConfig {
 #[serde(deny_unknown_fields)]
 pub struct MarketConfig {
     pub symbol: String,
-    /// 分/整数资产单位；tick 和 quantity_step 只约束整数网格，不引入隐含合约乘数。
+    #[serde(default)]
+    pub units: InstrumentUnits,
+    /// 每个整数 lot 的货币 minor 数，tick/quantity_step 约束整数网格。
     pub price_tick: u64,
     pub quantity_step: u64,
     pub engine: EngineConfig,
     pub risk: RiskConfig,
     pub strategy: StrategyConfig,
+}
+/// Price * Quantity = 货币 minor；原始报价 = Price * quantity_scale / money_scale。
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct InstrumentUnits {
+    pub currency: String,
+    pub money_scale: u64,
+    pub quantity_scale: u64,
+}
+impl Default for InstrumentUnits {
+    fn default() -> Self {
+        Self {
+            currency: "SIM".into(),
+            money_scale: 100,
+            quantity_scale: 1,
+        }
+    }
+}
+impl InstrumentUnits {
+    pub fn validate(&self) -> Result<(), &'static str> {
+        fn power10(mut n: u64) -> bool {
+            if n == 0 {
+                return false;
+            }
+            while n.is_multiple_of(10) {
+                n /= 10;
+            }
+            n == 1
+        }
+        if self.currency.is_empty()
+            || self.currency.len() > 16
+            || !self.currency.bytes().all(|b| b.is_ascii_uppercase())
+            || self.money_scale > 1_000_000_000_000
+            || self.quantity_scale > Quantity::MAX
+            || !power10(self.money_scale)
+            || !power10(self.quantity_scale)
+        {
+            return Err("invalid instrument unit scales or currency");
+        }
+        Ok(())
+    }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -96,6 +139,7 @@ impl PaperConfig {
             if !symbols.insert(&m.symbol) {
                 return Err("duplicate symbol");
             }
+            m.units.validate()?;
             m.engine.validate()?;
             total_orders += m.engine.max_orders;
             if total_orders > 1_000_000 {
@@ -167,6 +211,8 @@ impl PaperConfig {
     }
 }
 
+#[derive(Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum BuiltinStrategy {
     Passive,
     Threshold(ThresholdStrategy),
@@ -214,6 +260,9 @@ impl StrategyConfig {
     }
 }
 impl Strategy for BuiltinStrategy {
+    fn checkpoint(&self) -> Option<BuiltinStrategy> {
+        Some(self.clone())
+    }
     fn on_quote(&mut self, view: StrategyView<'_>) -> Action {
         match self {
             Self::Passive => Action::None,
@@ -255,6 +304,45 @@ impl Strategy for BuiltinStrategy {
                     time_in_force: TimeInForce::ImmediateOrCancel,
                 })
             }
+        }
+    }
+}
+
+impl BuiltinStrategy {
+    pub fn validate_state(&self, config: &StrategyConfig) -> Result<(), &'static str> {
+        match (self, config) {
+            (Self::Passive, StrategyConfig::Passive {}) => Ok(()),
+            (
+                Self::Threshold(s),
+                StrategyConfig::Threshold {
+                    buy_below,
+                    sell_above,
+                    quantity,
+                },
+            ) if s.buy_below == *buy_below
+                && s.sell_above == *sell_above
+                && s.quantity == *quantity =>
+            {
+                Ok(())
+            }
+            (Self::Momentum(s), StrategyConfig::Momentum { window, quantity }) => {
+                s.validate_state(*window, *quantity)
+            }
+            (
+                Self::MeanReversion {
+                    mean,
+                    entry_bps,
+                    exit_bps,
+                    quantity,
+                },
+                StrategyConfig::MeanReversion {
+                    window,
+                    entry_bps: e,
+                    exit_bps: x,
+                    quantity: q,
+                },
+            ) if entry_bps == e && exit_bps == x && quantity == q => mean.validate_state(*window),
+            _ => Err("strategy checkpoint differs from configuration"),
         }
     }
 }

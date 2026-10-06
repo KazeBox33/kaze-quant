@@ -13,3 +13,5 @@ pub mod config;
 pub mod journal;
 pub mod paper;
 pub mod storage;
+
+pub mod store;

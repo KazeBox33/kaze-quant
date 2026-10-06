@@ -61,7 +61,8 @@ impl EngineConfig {
     }
 }
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Metrics {
     pub quotes: u64,
     pub accepted: u64,
@@ -70,7 +71,9 @@ pub struct Metrics {
     pub cancelled: u64,
     /// 算法工作量计数，便于将时间差与扫描次数对应。
     pub orders_examined: u64,
+    #[serde(with = "crate::config::money")]
     pub peak_equity: i128,
+    #[serde(with = "crate::config::money")]
     pub max_drawdown: i128,
 }
 
@@ -90,6 +93,8 @@ pub struct Engine {
     quote: Option<Quote>,
     metrics: Metrics,
     policy: ScanPolicy,
+    next_order_id: u64,
+    archived_orders: u64,
 }
 
 impl Engine {
@@ -112,6 +117,8 @@ impl Engine {
             },
             config,
             policy,
+            next_order_id: 1,
+            archived_orders: 0,
         })
     }
     pub fn config(&self) -> &EngineConfig {
@@ -133,8 +140,8 @@ impl Engine {
         self.active.len()
     }
     pub fn order(&self, id: OrderId) -> Option<&Order> {
-        let idx = usize::try_from(id.0.checked_sub(1)?).ok()?;
-        self.orders.get(idx)
+        let index = self.orders.binary_search_by_key(&id.0, |o| o.id.0).ok()?;
+        self.orders.get(index)
     }
     pub fn equity(&self) -> i128 {
         self.quote
@@ -144,6 +151,9 @@ impl Engine {
     /// 外部输入必须先完全校验，失败时不修改账户、订单、时钟与统计。
     pub fn on_quote(&mut self, q: Quote, sink: &mut impl EventSink) -> Result<(), &'static str> {
         q.validate()?;
+        if self.metrics.quotes >= MAX_LIFETIME_ORDERS {
+            return Err("quote lifetime capacity reached");
+        }
         if let Some(prev) = self.quote {
             if q.sequence <= prev.sequence {
                 return Err("quote sequences must strictly increase");
@@ -239,12 +249,19 @@ impl Engine {
         request: OrderRequest,
         sink: &mut impl EventSink,
     ) -> Result<OrderId, RejectReason> {
+        if self.metrics.accepted + self.metrics.rejected >= MAX_LIFETIME_ORDERS * 64 {
+            return Err(RejectReason::HistoryLimit);
+        }
         // 达到历史容量时无新 ID 和事件：调用方必须检查 Result。
         if self.orders.len() >= self.config.max_orders {
             self.metrics.rejected += 1;
             return Err(RejectReason::HistoryLimit);
         }
-        let id = OrderId(self.orders.len() as u64 + 1);
+        if self.next_order_id > MAX_LIFETIME_ORDERS {
+            return Err(RejectReason::HistoryLimit);
+        }
+        let id = OrderId(self.next_order_id);
+        self.next_order_id += 1;
         let sequence = self.quote.map_or(0, |q| q.sequence);
         let timestamp = self.quote.map_or(0, |q| q.timestamp_ns);
         let eligible = timestamp.checked_add(self.config.latency_ns);
@@ -332,7 +349,10 @@ impl Engine {
         if !order.status.is_active() {
             return false;
         }
-        let index = (id.0 - 1) as usize;
+        let index = self
+            .orders
+            .binary_search_by_key(&id.0, |o| o.id.0)
+            .expect("validated existing order");
         self.cancel_index(index, sink);
         self.active.retain(|&i| i != index);
         debug_assert!(self.check_invariants().is_ok());
@@ -347,8 +367,131 @@ impl Engine {
         debug_assert!(self.check_invariants().is_ok());
     }
 
+    /// 冷路径归档：保留全部活跃订单和最新 terminal_budget 个终态记录。
+    /// ID 永不复用；账户累计项与FIFO顺序保持不变，审计历史由持久层拥有。
+    pub fn compact_terminal_orders(&mut self, terminal_budget: usize) -> usize {
+        let terminal_count = self.orders.len() - self.active.len();
+        let mut discard = terminal_count.saturating_sub(terminal_budget);
+        let removed = discard;
+        self.archived_orders += removed as u64;
+        self.orders.retain(|o| {
+            if !o.status.is_active() && discard > 0 {
+                discard -= 1;
+                false
+            } else {
+                true
+            }
+        });
+        self.active.clear();
+        self.active.extend(
+            self.orders
+                .iter()
+                .enumerate()
+                .filter_map(|(i, o)| o.status.is_active().then_some(i)),
+        );
+        debug_assert!(self.check_invariants().is_ok());
+        removed
+    }
+    pub fn snapshot(&self) -> EngineSnapshot {
+        EngineSnapshot {
+            account: self.account.clone(),
+            orders: self.orders.clone(),
+            quote: self.quote,
+            metrics: self.metrics,
+            next_order_id: self.next_order_id,
+            archived_orders: self.archived_orders,
+        }
+    }
+    pub fn restore(config: EngineConfig, state: EngineSnapshot) -> Result<Self, &'static str> {
+        config.validate()?;
+        if state.orders.len() > config.max_orders {
+            return Err("snapshot exceeds history capacity");
+        }
+        let active = state
+            .orders
+            .iter()
+            .enumerate()
+            .filter_map(|(i, o)| o.status.is_active().then_some(i))
+            .collect();
+        let engine = Self {
+            config,
+            account: state.account,
+            orders: state.orders,
+            active,
+            quote: state.quote,
+            metrics: state.metrics,
+            policy: ScanPolicy::Active,
+            next_order_id: state.next_order_id,
+            archived_orders: state.archived_orders,
+        };
+        engine.check_invariants()?;
+        Ok(engine)
+    }
+
     /// 昂贵的独立审计，只在 debug/test 或调用方主动要求时扫描完整历史。
     pub fn check_invariants(&self) -> Result<(), &'static str> {
+        self.config.validate()?;
+        const ACCOUNT_BOUND: i128 = 10_000_000_000_000_000_000_000_000_000_000_000;
+        if self.account.cash < 0
+            || self.account.reserved_cash < 0
+            || self.account.reserved_cash > ACCOUNT_BOUND
+            || self.account.pending_buy > self.config.max_position
+            || self.metrics.peak_equity > ACCOUNT_BOUND
+            || self.metrics.max_drawdown > ACCOUNT_BOUND
+            || self.account.cash > ACCOUNT_BOUND
+            || self.account.fees_paid > ACCOUNT_BOUND
+            || self.account.net_buy_notional.unsigned_abs() > ACCOUNT_BOUND as u128
+        {
+            return Err("cumulative account bound exceeded");
+        }
+        if self.archived_orders > MAX_LIFETIME_ORDERS
+            || self.archived_orders.checked_add(self.orders.len() as u64)
+                != self.next_order_id.checked_sub(1)
+        {
+            return Err("archived order count invalid");
+        }
+        if self.orders.len() > self.config.max_orders
+            || self.next_order_id == 0
+            || self.next_order_id > MAX_LIFETIME_ORDERS + 1
+        {
+            return Err("history or order identity bounds invalid");
+        }
+        let created = self.next_order_id - 1;
+        if self.metrics.quotes > MAX_LIFETIME_ORDERS
+            || self.metrics.accepted > created
+            || self.metrics.rejected > MAX_LIFETIME_ORDERS * 64
+            || self.metrics.rejected < created - self.metrics.accepted
+            || self.metrics.cancelled > self.metrics.accepted
+            || self.metrics.orders_examined > self.metrics.quotes * self.config.max_orders as u64
+            || self.metrics.fills > self.metrics.orders_examined
+            || self.quote.is_some() != (self.metrics.quotes != 0)
+        {
+            return Err("snapshot execution counters invalid");
+        }
+        if self.account.position > self.config.max_position
+            || self.account.fees_paid < 0
+            || self.metrics.max_drawdown < 0
+            || self.metrics.peak_equity < self.config.initial_cash
+        {
+            return Err("account or metrics bounds invalid");
+        }
+        if self
+            .orders
+            .windows(2)
+            .any(|pair| pair[0].id.0 >= pair[1].id.0)
+            || self
+                .orders
+                .iter()
+                .any(|o| o.id.0 == 0 || o.id.0 >= self.next_order_id)
+        {
+            return Err("order identity ordering invalid");
+        }
+        if let Some(q) = self.quote {
+            q.validate()?;
+        }
+        if self.active.iter().any(|&i| i >= self.orders.len()) {
+            return Err("active index out of bounds");
+        }
         if self.account.cash < 0
             || self.account.reserved_cash < 0
             || self.account.available_cash() < 0
@@ -378,6 +521,24 @@ impl Engine {
             }
         }
         for order in &self.orders {
+            let expected_reserve = if order.request.side == Side::Buy {
+                i128::from(order.request.limit.units())
+                    + fee(i128::from(order.request.limit.units()), self.config.fee_bps)
+            } else {
+                0
+            };
+            if order.reserved_per_unit != expected_reserve {
+                return Err("order reservation unit invalid");
+            }
+            if self.quote.is_none() && order.status.is_active() {
+                return Err("active order has no market");
+            }
+            if self
+                .quote
+                .is_some_and(|q| order.submitted_sequence > q.sequence)
+            {
+                return Err("order submitted in the future");
+            }
             if order.remaining > order.request.quantity.units() {
                 return Err("order remaining invalid");
             }
@@ -409,4 +570,17 @@ impl Engine {
         }
         Ok(())
     }
+}
+
+/// 生命周期至多 10^12 个订单，一笔额<=10^21，累计账务仍远低于i128边界。
+pub const MAX_LIFETIME_ORDERS: u64 = 1_000_000_000_000;
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EngineSnapshot {
+    account: Account,
+    orders: Vec<Order>,
+    quote: Option<Quote>,
+    metrics: Metrics,
+    next_order_id: u64,
+    archived_orders: u64,
 }
