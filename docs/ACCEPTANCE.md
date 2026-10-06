@@ -103,4 +103,4 @@ target/release/kaze-research reports/new-plan.json reports/new-research.json
 
 v4独立声明离线重建：每个UTC秒选最早的交易所事件，平局按event_time/update_id/source行号；所有原始行完整计数/哈希。归档以交易时间划日，event必须在交易后0..60秒；发布越过UTC日末的行保留计数/哈希、排除本日网格，避免训练测试重叠。未按价格或回报挑行，未改日期、策略候选、成本和筛选规则。该数据假设提供交易所事件时间排序的离线研究，不能代表在线接收因果、测量真实网络延迟或校准成交概率；期货报价用于无杠杆现货式模型的限制继续保留。v4转换完1月2日后，在1月3日第7283469行发现84.722秒的事件发布延迟，超过预先声明的60秒上限而失败；未放松阈值，也未生成策略收益。[v4失败与时间戳](evidence/v05/holdout-v4-failure.json)、[已完成1月2日转换manifest](evidence/v05/BTCUSDT-2024-01-02-utc-second-first-event.manifest.json)。这些失败说明数据质量与假设仍需解决，不支持收益门槛通过。
 
-本地本轮133项Rust debug/release通过，15项Python通过；fmt、all-features/all-targets clippy和严格rustdoc通过，[本轮身份](evidence/v05/validation-mac.json)。新增队列FIFO/溢出不覆盖、故障注入只丢成功ACK、三币种手续费手算、独立训练单量/哈希/时间边界以及离线事件重建测试。新提交的Linux/macOS CI应另行确认，历史CI不能替代。
+本地本轮133项Rust debug/release通过，15项Python通过；fmt、all-features/all-targets clippy和严格rustdoc通过，[本轮身份](evidence/v05/validation-mac.json)。新增队列FIFO/溢出不覆盖、故障注入只丢成功ACK、三币种手续费手算、独立训练单量/哈希/时间边界以及离线事件重建测试。代码提交8c16421的[本轮Linux/macOS CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37457351772)已全部通过；[运行身份](evidence/v05/ci.json)、[完整步骤](evidence/v05/ci-jobs.json)公开，历史CI没有被当作本轮替代。
