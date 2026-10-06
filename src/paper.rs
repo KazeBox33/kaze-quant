@@ -1,10 +1,13 @@
 //! 可重放的命令边界：直接整数索引路由，多资产采用独立预算；没有隐藏跨账户融资。
+use crate::config::StrategyConfig;
 use crate::config::{BuiltinStrategy, PaperConfig};
 use crate::engine::{Engine, EngineSnapshot, MAX_LIFETIME_ORDERS, Metrics};
+use crate::registry::{CustomCheckpoint, StrategyRegistry};
 use crate::strategy::{ActionBuffer, Strategy, StrategyView};
 use crate::types::*;
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct PaperError(pub String);
@@ -107,16 +110,37 @@ pub struct PaperRuntime {
     processed: u64,
     actions: ActionBuffer,
     retention: Option<usize>,
+    registry: Arc<StrategyRegistry>,
 }
 impl PaperRuntime {
     pub fn new(config: PaperConfig) -> Result<Self, PaperError> {
+        Self::new_with_registry(config, Arc::new(StrategyRegistry::default()))
+    }
+    pub fn new_with_registry(
+        config: PaperConfig,
+        registry: Arc<StrategyRegistry>,
+    ) -> Result<Self, PaperError> {
         config.validate()?;
         let strategies = config
             .markets
             .iter()
-            .map(|m| m.strategy.build().map(|s| Box::new(s) as Box<dyn Strategy>))
+            .map(|m| -> Result<Box<dyn Strategy>, PaperError> {
+                match &m.strategy {
+                    StrategyConfig::Registered {
+                        name,
+                        version,
+                        parameters,
+                    } => registry.build(name, *version, parameters, None),
+                    config => Ok(Box::new(config.build()?)),
+                }
+            })
             .collect::<Result<Vec<_>, _>>()?;
-        Self::with_strategies(config, strategies)
+        let mut runtime = Self::with_strategies(config, strategies)?;
+        runtime.registry = registry;
+        Ok(runtime)
+    }
+    pub fn registry(&self) -> Arc<StrategyRegistry> {
+        self.registry.clone()
     }
     /// 自定义策略的内存运行入口。DurableSession 只启用版本化内置策略；
     /// 若要持久恢复自定义策略，将其显式注册到 StrategyConfig 并升级执行版本。
@@ -145,6 +169,7 @@ impl PaperRuntime {
             processed: 0,
             actions: ActionBuffer::new(64)?,
             retention: None,
+            registry: Arc::new(StrategyRegistry::default()),
         })
     }
     pub fn config(&self) -> &PaperConfig {
@@ -403,13 +428,47 @@ impl PaperRuntime {
         let markets = self
             .markets
             .iter()
-            .map(|m| {
+            .enumerate()
+            .map(|(i, m)| {
+                let strategy = match &self.config.markets[i].strategy {
+                    StrategyConfig::Registered {
+                        name,
+                        version,
+                        parameters,
+                    } => {
+                        let state = m
+                            .strategy
+                            .custom_checkpoint()
+                            .ok_or("registered strategy lacks deterministic checkpoint")?;
+                        if state.name != *name
+                            || state.version != *version
+                            || serde_json::to_vec(&state.state)?.len() > 65536
+                        {
+                            return Err(
+                                "registered strategy checkpoint identity/bounds mismatch".into()
+                            );
+                        }
+                        // 写盘前用工厂验证新状态，并要求恢复后检查点完全相同。
+                        let restored =
+                            self.registry
+                                .build(name, *version, parameters, Some(&state.state))?;
+                        if restored.custom_checkpoint().as_ref() != Some(&state) {
+                            return Err(
+                                "custom strategy checkpoint fails canonical restore validation"
+                                    .into(),
+                            );
+                        }
+                        StrategyCheckpoint::Registered { registered: state }
+                    }
+                    _ => StrategyCheckpoint::Builtin(
+                        m.strategy
+                            .checkpoint()
+                            .ok_or("strategy does not provide a deterministic checkpoint")?,
+                    ),
+                };
                 Ok(MarketSnapshot {
                     engine: m.engine.snapshot(),
-                    strategy: m
-                        .strategy
-                        .checkpoint()
-                        .ok_or("strategy does not provide a deterministic checkpoint")?,
+                    strategy,
                     halted: m.halted,
                     risk_rejections: m.risk_rejections,
                 })
@@ -425,6 +484,13 @@ impl PaperRuntime {
         })
     }
     pub fn restore(config: PaperConfig, state: PaperSnapshot) -> Result<Self, PaperError> {
+        Self::restore_with_registry(config, state, Arc::new(StrategyRegistry::default()))
+    }
+    pub fn restore_with_registry(
+        config: PaperConfig,
+        state: PaperSnapshot,
+        registry: Arc<StrategyRegistry>,
+    ) -> Result<Self, PaperError> {
         config.validate()?;
         if state.schema_version != 1
             || state.processed > MAX_LIFETIME_ORDERS
@@ -435,7 +501,27 @@ impl PaperRuntime {
         }
         let mut markets = Vec::with_capacity(config.markets.len());
         for (c, m) in config.markets.iter().zip(state.markets) {
-            m.strategy.validate_state(&c.strategy)?;
+            let strategy: Box<dyn Strategy> = match (m.strategy, &c.strategy) {
+                (StrategyCheckpoint::Builtin(s), config) => {
+                    s.validate_state(config)?;
+                    Box::new(s)
+                }
+                (
+                    StrategyCheckpoint::Registered { registered: s },
+                    StrategyConfig::Registered {
+                        name,
+                        version,
+                        parameters,
+                    },
+                ) if s.name == *name && s.version == *version => {
+                    registry.build(name, *version, parameters, Some(&s.state))?
+                }
+                _ => {
+                    return Err(
+                        "strategy checkpoint differs from configured registry identity".into(),
+                    );
+                }
+            };
             let engine = Engine::restore(c.engine.clone(), m.engine)?;
             if engine
                 .last_quote()
@@ -452,7 +538,7 @@ impl PaperRuntime {
             }
             markets.push(Market {
                 engine,
-                strategy: Box::new(m.strategy),
+                strategy,
                 halted: m.halted,
                 risk_rejections: m.risk_rejections,
             });
@@ -465,6 +551,7 @@ impl PaperRuntime {
             processed: state.processed,
             actions: ActionBuffer::new(64)?,
             retention: state.retention,
+            registry,
         };
         runtime.check_invariants()?;
         Ok(runtime)
@@ -578,7 +665,35 @@ pub struct PaperSnapshot {
 #[serde(deny_unknown_fields)]
 struct MarketSnapshot {
     engine: EngineSnapshot,
-    strategy: BuiltinStrategy,
+    strategy: StrategyCheckpoint,
     halted: Option<HaltReason>,
     risk_rejections: u64,
+}
+
+#[derive(Clone, Serialize)]
+#[serde(untagged)]
+enum StrategyCheckpoint {
+    Builtin(BuiltinStrategy),
+    Registered { registered: CustomCheckpoint },
+}
+
+impl<'de> Deserialize<'de> for StrategyCheckpoint {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        use serde::de::Error;
+        // serde untagged 的中间 Content 不支持 u128；直接走 JSON Value 保留有界整数窗口和。
+        let value = serde_json::Value::deserialize(d)?;
+        if let Some(object) = value.as_object()
+            && let Some(registered) = object.get("registered")
+        {
+            if object.len() != 1 {
+                return Err(D::Error::custom("unexpected custom checkpoint fields"));
+            }
+            return serde_json::from_value(registered.clone())
+                .map(|registered| Self::Registered { registered })
+                .map_err(D::Error::custom);
+        }
+        serde_json::from_value(value)
+            .map(Self::Builtin)
+            .map_err(D::Error::custom)
+    }
 }

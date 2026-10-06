@@ -1,0 +1,134 @@
+{
+  "barter_revision": "9770b27a83f844472b93b593b08063affc974b0d",
+  "contract_differences": "Kaze validates update IDs/symbol/bounds/crossed prices and assigns supplied monotonic receive time; Barter parses subscription metadata and supplied T into UTC DateTime with Decimal; not identical output types and not an engine throughput comparison",
+  "normalization_samples": [
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 23900083,
+      "repeat": 1,
+      "rows": 100000,
+      "variant": "barter"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 20817292,
+      "repeat": 1,
+      "rows": 100000,
+      "variant": "kaze"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 20888041,
+      "repeat": 2,
+      "rows": 100000,
+      "variant": "kaze"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 23977375,
+      "repeat": 2,
+      "rows": 100000,
+      "variant": "barter"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 23510583,
+      "repeat": 3,
+      "rows": 100000,
+      "variant": "barter"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 20487084,
+      "repeat": 3,
+      "rows": 100000,
+      "variant": "kaze"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 21206375,
+      "repeat": 4,
+      "rows": 100000,
+      "variant": "kaze"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 23421625,
+      "repeat": 4,
+      "rows": 100000,
+      "variant": "barter"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 23378000,
+      "repeat": 5,
+      "rows": 100000,
+      "variant": "barter"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 21098000,
+      "repeat": 5,
+      "rows": 100000,
+      "variant": "kaze"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 20606959,
+      "repeat": 6,
+      "rows": 100000,
+      "variant": "kaze"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 23401875,
+      "repeat": 6,
+      "rows": 100000,
+      "variant": "barter"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 23308417,
+      "repeat": 7,
+      "rows": 100000,
+      "variant": "barter"
+    },
+    {
+      "checksum": 8619286098500,
+      "elapsed_ns": 20460292,
+      "repeat": 7,
+      "rows": 100000,
+      "variant": "kaze"
+    }
+  ],
+  "order_properties": {
+    "cumulative_regression_rejected": {
+      "barter_orders_component": false,
+      "kaze": true
+    },
+    "terminal_resurrection_rejected": {
+      "barter_orders_component": false,
+      "kaze": true
+    }
+  },
+  "property_scope": "Kaze durable gateway versus standalone upstream Orders component. No claim about full Barter adapters, applications or intentional external-order adoption semantics.",
+  "source_path": "/Users/xiedongjin/Workspace/learning/kaze-quant/reports/barter-real-100000.jsonl",
+  "source_sha256": "8ed860b12684791b01ef82a0647ff7b734722700aa78adbe6f5cfd2d27fc4f85",
+  "workload": "preloaded L1 JSON parse + exact integer scale conversion; one warmup + seven alternating runs; no network, strategy, persistence, matching, allocations tracking or tracing subscriber",
+  "upstream_tracked_sources_sha256": "8a8edbaed12be1625a361d2a32174df917e10ecd9bf37c8d1b3ab3c121ba80c3",
+  "comparison_binary_sha256": "93031a354f37f1a04af07cc8ff902ec497f71fbd4ebbe03603c3426541b8d6ba",
+  "kaze_feed_source_sha256": "0bea6385bcc3bff106d54575cddab258b2c5269c1c22999f377c9cc95fcd1511",
+  "kaze_decimal_source_sha256": "0c85f79e532b003592e51fdfece062b538cbe4e793c495717762d86d72ebd690",
+  "source_archive_sha256": null,
+  "command": [
+    "/Users/xiedongjin/Workspace/learning/kaze-quant/scripts/cargo.sh",
+    "run",
+    "--locked",
+    "--release",
+    "--manifest-path",
+    "/Users/xiedongjin/Workspace/learning/kaze-quant/benchmarks/barter-comparison/Cargo.toml",
+    "--",
+    "100000",
+    "/Users/xiedongjin/Workspace/learning/kaze-quant/reports/barter-real-100000.jsonl"
+  ]
+}

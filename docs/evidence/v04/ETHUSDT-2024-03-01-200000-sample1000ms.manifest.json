@@ -1,0 +1,23 @@
+{
+  "transform_version": "bookticker-strict-prefix-v2",
+  "symbol": "ETHUSDT",
+  "date": "2024-03-01",
+  "rows": 84560,
+  "source_rows_consumed": 38096783,
+  "sample_ms": 1000,
+  "first_event_ns": 1709251200016000000,
+  "last_event_ns": 1709337599921000000,
+  "source_url": "https://data.binance.vision/data/futures/um/daily/bookTicker/ETHUSDT/ETHUSDT-bookTicker-2024-03-01.zip",
+  "checksum_url": "https://data.binance.vision/data/futures/um/daily/bookTicker/ETHUSDT/ETHUSDT-bookTicker-2024-03-01.zip.CHECKSUM",
+  "archive_sha256": "6b9a16fcf068f63a19098b9aba3da46823bca36b9123463a543c7e1926d84361",
+  "source_prefix_sha256": "b7888fa2c8b3a2134873299e270848b0c781816356b50a9a3be0ab9f6b880c31",
+  "normalized_sha256": "904da332578acc3b1f13f7832906291251aee0a3ebf9332e77cb5ef113a16119",
+  "quantity_rounds": 0,
+  "clock_clamps": 0,
+  "selection": "predeclared dates/symbols; causal first observed quote at least sample_ms after last kept quote; EOF or row cap; no price filtering/sort",
+  "units": {
+    "currency": "USDT",
+    "money_scale": 100000000,
+    "quantity_scale": 100000
+  }
+}

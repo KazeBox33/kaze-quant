@@ -95,6 +95,11 @@ pub struct RiskConfig {
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum StrategyConfig {
     Passive {},
+    Registered {
+        name: String,
+        version: u32,
+        parameters: serde_json::Value,
+    },
     Threshold {
         buy_below: Price,
         sell_above: Price,
@@ -102,6 +107,12 @@ pub enum StrategyConfig {
     },
     Momentum {
         window: usize,
+        quantity: Quantity,
+    },
+    SmaCross {
+        fast: usize,
+        slow: usize,
+        band_bps: u32,
         quantity: Quantity,
     },
     MeanReversion {
@@ -161,8 +172,24 @@ impl PaperConfig {
             {
                 return Err("invalid risk limits");
             }
+            if let StrategyConfig::Registered {
+                name,
+                version,
+                parameters,
+            } = &m.strategy
+            {
+                crate::registry::validate_identity(name, *version)
+                    .map_err(|_| "invalid registered strategy identity")?;
+                if serde_json::to_vec(parameters)
+                    .map_err(|_| "invalid strategy parameters")?
+                    .len()
+                    > 8192
+                {
+                    return Err("strategy parameters exceed 8 KiB");
+                }
+            }
             let quantity = match m.strategy {
-                StrategyConfig::Passive {} => None,
+                StrategyConfig::Passive {} | StrategyConfig::Registered { .. } => None,
                 StrategyConfig::Threshold {
                     buy_below,
                     sell_above,
@@ -177,12 +204,25 @@ impl PaperConfig {
                     Some(quantity)
                 }
                 StrategyConfig::Momentum { quantity, .. }
-                | StrategyConfig::MeanReversion { quantity, .. } => Some(quantity),
+                | StrategyConfig::MeanReversion { quantity, .. }
+                | StrategyConfig::SmaCross { quantity, .. } => Some(quantity),
             };
             if quantity.is_some_and(|q| {
                 !q.units().is_multiple_of(m.quantity_step) || q.units() > m.engine.max_position
             }) {
                 return Err("strategy quantity outside instrument grid or position limit");
+            }
+            if let StrategyConfig::SmaCross {
+                fast,
+                slow,
+                band_bps,
+                ..
+            } = m.strategy
+            {
+                if fast == 0 || fast >= slow || slow > 500_000 || band_bps > 1000 {
+                    return Err("invalid SMA windows or band");
+                }
+                total_windows += fast + slow;
             }
             match m.strategy {
                 StrategyConfig::Momentum { window, .. }
@@ -215,6 +255,12 @@ impl PaperConfig {
 #[serde(deny_unknown_fields)]
 pub enum BuiltinStrategy {
     Passive,
+    SmaCross {
+        fast: RollingMean,
+        slow: RollingMean,
+        band_bps: u32,
+        quantity: Quantity,
+    },
     Threshold(ThresholdStrategy),
     Momentum(MomentumStrategy),
     MeanReversion {
@@ -227,7 +273,26 @@ pub enum BuiltinStrategy {
 impl StrategyConfig {
     pub fn build(&self) -> Result<BuiltinStrategy, &'static str> {
         Ok(match *self {
+            Self::Registered { .. } => {
+                return Err("registered strategy requires an explicit StrategyRegistry");
+            }
             Self::Passive {} => BuiltinStrategy::Passive,
+            Self::SmaCross {
+                fast,
+                slow,
+                band_bps,
+                quantity,
+            } => {
+                if fast == 0 || fast >= slow || slow > 500_000 || band_bps > 1000 {
+                    return Err("invalid SMA windows or band");
+                }
+                BuiltinStrategy::SmaCross {
+                    fast: RollingMean::new(fast)?,
+                    slow: RollingMean::new(slow)?,
+                    band_bps,
+                    quantity,
+                }
+            }
             Self::Threshold {
                 buy_below,
                 sell_above,
@@ -266,6 +331,44 @@ impl Strategy for BuiltinStrategy {
     fn on_quote(&mut self, view: StrategyView<'_>) -> Action {
         match self {
             Self::Passive => Action::None,
+            Self::SmaCross {
+                fast,
+                slow,
+                band_bps,
+                quantity,
+            } => {
+                let a = fast.push(view.quote.bid);
+                let b = slow.push(view.quote.bid);
+                let (Some(a), Some(b)) = (a, b) else {
+                    return Action::None;
+                };
+                if view.active_orders != 0 {
+                    return Action::None;
+                }
+                let order = if view.account.position() == 0
+                    && u128::from(a) * 10000 > u128::from(b) * u128::from(10000 + *band_bps)
+                {
+                    Some((Side::Buy, view.quote.ask, *quantity))
+                } else if view.account.position() > 0
+                    && u128::from(a) * 10000 < u128::from(b) * u128::from(10000 - *band_bps)
+                {
+                    Some((
+                        Side::Sell,
+                        view.quote.bid,
+                        Quantity::new(view.account.position()).expect("bounded position"),
+                    ))
+                } else {
+                    None
+                };
+                order.map_or(Action::None, |(side, limit, quantity)| {
+                    Action::Submit(OrderRequest {
+                        side,
+                        limit,
+                        quantity,
+                        time_in_force: TimeInForce::ImmediateOrCancel,
+                    })
+                })
+            }
             Self::Threshold(s) => s.on_quote(view),
             Self::Momentum(s) => s.on_quote(view),
             Self::MeanReversion {
@@ -312,6 +415,23 @@ impl BuiltinStrategy {
     pub fn validate_state(&self, config: &StrategyConfig) -> Result<(), &'static str> {
         match (self, config) {
             (Self::Passive, StrategyConfig::Passive {}) => Ok(()),
+            (
+                Self::SmaCross {
+                    fast,
+                    slow,
+                    band_bps,
+                    quantity,
+                },
+                StrategyConfig::SmaCross {
+                    fast: f,
+                    slow: s,
+                    band_bps: b,
+                    quantity: q,
+                },
+            ) if band_bps == b && quantity == q => {
+                fast.validate_state(*f)?;
+                slow.validate_state(*s)
+            }
             (
                 Self::Threshold(s),
                 StrategyConfig::Threshold {

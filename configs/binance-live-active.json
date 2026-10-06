@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "max_commands": 1000000,
+  "markets": [
+    {
+      "symbol": "BTCUSDT",
+      "units": {
+        "currency": "USDT",
+        "money_scale": 100000000,
+        "quantity_scale": 100000
+      },
+      "price_tick": 10,
+      "quantity_step": 1,
+      "engine": {
+        "initial_cash": "1000000000000",
+        "max_position": 10000,
+        "max_active_orders": 8,
+        "max_orders": 1024,
+        "fee_bps": 10,
+        "latency_ns": 10000000,
+        "liquidity_model": "delta_budget"
+      },
+      "risk": {
+        "max_order_notional": "2000000000",
+        "max_drawdown": "1000000000",
+        "max_quote_age_ns": 10000000000,
+        "price_collar_bps": 50
+      },
+      "strategy": {
+        "type": "sma_cross",
+        "fast": 32,
+        "slow": 256,
+        "band_bps": 0,
+        "quantity": 10
+      }
+    }
+  ]
+}

@@ -1,3 +1,11 @@
+# 0.4 新证据
+
+最新完整链路约37026–38790命令/秒、RSS 7.77–7.80MiB；真实行情5分钟产生27张纸面订单、13次成交并经新进程审计。固定Barter L1组件对比21样本中位吞吐约1.148倍，但不表示整套引擎胜出。六个整日的成本研究筛选失败，测试网真实订单和24小时连续运行仍待验收。范围、复现和原始JSON见 [ACCEPTANCE](ACCEPTANCE.md)。
+
+以下0.3数字作为历史证据保留，不能冒充最新版本测量。
+
+---
+
 # 0.3 真实数据、速度与可用性证据
 
 2026-10-06，在 Apple M5 / 10 核 / 24GiB RAM / macOS 26.5.2 / Rust 1.99.0 上测量。release、thin LTO、codegen-units=1，单写入者、不绑核，接 AC 电源，本地文件系统。完整环境与实际可执行文件 SHA-256 在 [environment-mac.json](evidence/environment-mac.json)。测量的核心代码固定于 [a8171ae](https://github.com/KazeBox33/kaze-quant/commit/a8171ae11d341737482979afacb2dd08e5b50a65)。后续 CLI 将 CSV 摘要改为同一消费流计算；这里保留测量二进制身份，不把旧结果冒充新二进制结果。没有与其他交易框架做速度排名。

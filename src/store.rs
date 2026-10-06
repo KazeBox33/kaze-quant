@@ -81,6 +81,19 @@ impl SqliteSession {
         config: PaperConfig,
         options: StoreOptions,
     ) -> Result<Self, PaperError> {
+        Self::open_with_registry(
+            path,
+            config,
+            options,
+            std::sync::Arc::new(crate::registry::StrategyRegistry::default()),
+        )
+    }
+    pub fn open_with_registry(
+        path: &Path,
+        config: PaperConfig,
+        options: StoreOptions,
+        registry: std::sync::Arc<crate::registry::StrategyRegistry>,
+    ) -> Result<Self, PaperError> {
         config.validate()?;
         options.validate()?;
         // 规范化现有文件或父目录，避免不同路径别名取得两把写入者锁。
@@ -125,7 +138,7 @@ impl SqliteSession {
         if actual > pages {
             return Err("existing database exceeds configured page quota".into());
         }
-        let mut runtime = PaperRuntime::new(config.clone())?;
+        let mut runtime = PaperRuntime::new_with_registry(config.clone(), registry.clone())?;
         runtime.configure_retention(options.terminal_retention)?;
         let chain = if !existed {
             let state = serde_json::to_vec(&runtime.snapshot()?)?;
@@ -167,7 +180,7 @@ impl SqliteSession {
             if snap.retention != Some(options.terminal_retention) {
                 return Err("checkpoint retention mismatch".into());
             }
-            runtime = PaperRuntime::restore(config, snap)?;
+            runtime = PaperRuntime::restore_with_registry(config, snap, registry)?;
             if runtime.processed() != seq || seq > options.max_commands {
                 return Err("checkpoint sequence mismatch".into());
             }
@@ -212,8 +225,11 @@ impl SqliteSession {
         }
         self.guard_wal()?;
         // 所有修改发生在候选状态。任意校验或 SQL 错误都不会暴露半批次。
-        let mut candidate =
-            PaperRuntime::restore(self.runtime.config().clone(), self.runtime.snapshot()?)?;
+        let mut candidate = PaperRuntime::restore_with_registry(
+            self.runtime.config().clone(),
+            self.runtime.snapshot()?,
+            self.runtime.registry(),
+        )?;
         let mut chain = self.chain.clone();
         let mut rows: Vec<AuditRow> = Vec::new();
         let mut receipts = Vec::with_capacity(inputs.len());
@@ -358,7 +374,10 @@ impl SqliteSession {
             self.conn
                 .query_row("SELECT manifest FROM meta WHERE id=1", [], |r| r.get(0))?;
         let mut chain = digest(&manifest).to_vec();
-        let mut runtime = PaperRuntime::new(self.runtime.config().clone())?;
+        let mut runtime = PaperRuntime::new_with_registry(
+            self.runtime.config().clone(),
+            self.runtime.registry(),
+        )?;
         runtime.configure_retention(self.options.terminal_retention)?;
         let mut stmt = self
             .conn

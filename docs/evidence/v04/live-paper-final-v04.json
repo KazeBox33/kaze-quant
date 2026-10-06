@@ -1,0 +1,61 @@
+{
+  "audit_chain_sha256": "88efadb45c68f02d5bb846f0c841553c9956a96e354a31937ac751442a356f96",
+  "binary_sha256": "bf7bd45f2b0713846649307e2b4f09120ab028d04c00e890ed737775e557ed53",
+  "commit_max_ns": 140940042,
+  "config_sha256": "ab27de5471bfb2008b650372cc290c19fdb724e20f8a10217fa02f77b28f0dbd",
+  "duration_seconds": 600.112141166,
+  "error": null,
+  "last_observed_exchange_update_id": 101094808060,
+  "limits": "local receive timestamp; no real orders, queue position or market impact; stop/disconnect does not liquidate filled positions",
+  "mode": "public-live-spot-paper",
+  "quotes_committed": 46863,
+  "raw_consumed_jsonl_sha256": "31861630abf0280efe19f38fbff35f8a2d831db1a59f2558dcc39837e373b055",
+  "raw_frames_consumed": 46863,
+  "receive_to_durable_ack": {
+    "p50_ns": 10590500,
+    "p95_ns": 15894958,
+    "p99_ns": 20868167,
+    "samples": 46863,
+    "scope": "first up to 100K text frames, socket read to durable commit incl bounded queue; excludes exchange/network/kernel pre-read time and final partial batch"
+  },
+  "schema_version": 1,
+  "state": {
+    "clock_ns": 1791280271719198458,
+    "closed": true,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "1000000000000",
+        "equity_minor": "1000000000000",
+        "fees_minor": "0",
+        "halted": "finished",
+        "market": 0,
+        "metrics": {
+          "accepted": 0,
+          "cancelled": 0,
+          "fills": 0,
+          "max_drawdown_minor": "0",
+          "orders_examined": 0,
+          "peak_equity_minor": "1000000000000",
+          "quotes": 46863,
+          "rejected": 0
+        },
+        "pnl_minor": "0",
+        "position_units": 0,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "symbol": "BTCUSDT",
+        "units": {
+          "currency": "USDT",
+          "money_scale": 100000000,
+          "quantity_scale": 100000
+        }
+      }
+    ],
+    "processed": 46864,
+    "schema_version": 1
+  },
+  "success": true,
+  "symbol": "BTCUSDT",
+  "verified_commands": 46864
+}

@@ -1,0 +1,20 @@
+[package]
+name = "kaze-barter-comparison"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+kaze-quant = { path = "../.." }
+barter = { path = "../barter-source/barter" }
+barter-data = { path = "../barter-source/barter-data" }
+barter-execution = { path = "../barter-source/barter-execution" }
+barter-integration = { path = "../barter-source/barter-integration" }
+barter-instrument = { path = "../barter-source/barter-instrument" }
+chrono = "0.4"
+rust_decimal = "1"
+serde_json = "1"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1

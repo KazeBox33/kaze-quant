@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "availability": {
+    "declarations": {
+      "dates": [
+        "2024-01-01",
+        "2024-02-01",
+        "2024-03-01",
+        "2024-04-01"
+      ],
+      "symbols": [
+        "BTCUSDT",
+        "ETHUSDT"
+      ],
+      "rows": 200000,
+      "sample_ms": 1000,
+      "selection": "calendar month first day, not optimized by PnL"
+    },
+    "unavailable": [
+      {
+        "symbol": "BTCUSDT",
+        "date": "2024-04-01",
+        "reason": "official archive HTTP 404; no substituted date"
+      },
+      {
+        "symbol": "ETHUSDT",
+        "date": "2024-04-01",
+        "reason": "official archive HTTP 404; no substituted date"
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "path": "reports/research-datasets/BTCUSDT-2024-01-01-200000-sample1000ms.csv",
+      "sha256": "e9753004a2f5a08cb7a33647f7cd6d4df6cb7f85301d4e3a478cdf4264c81f8b",
+      "source_manifest": "reports/research-datasets/BTCUSDT-2024-01-01-200000-sample1000ms.manifest.json",
+      "config": "reports/research-datasets/BTCUSDT-research-config.json",
+      "folds": [
+        {
+          "train_start_ns": 1704067200011000000,
+          "train_end_ns": 1704110399780500000,
+          "test_start_ns": 1704110399780500001,
+          "test_end_ns": 1704153599550000000
+        }
+      ]
+    },
+    {
+      "path": "reports/research-datasets/BTCUSDT-2024-02-01-200000-sample1000ms.csv",
+      "sha256": "3d9f3589c7cf9c454f3c46a232701ae836c55f07da3bb22a36a807c657850fcf",
+      "source_manifest": "reports/research-datasets/BTCUSDT-2024-02-01-200000-sample1000ms.manifest.json",
+      "config": "reports/research-datasets/BTCUSDT-research-config.json",
+      "folds": [
+        {
+          "train_start_ns": 1706745600033000000,
+          "train_end_ns": 1706788799524000000,
+          "test_start_ns": 1706788799524000001,
+          "test_end_ns": 1706831999015000000
+        }
+      ]
+    },
+    {
+      "path": "reports/research-datasets/BTCUSDT-2024-03-01-200000-sample1000ms.csv",
+      "sha256": "60a0a9dbc5171c5a23f0c55a17613c0a9a2c8c615dd7e64c94def224bf1a9d16",
+      "source_manifest": "reports/research-datasets/BTCUSDT-2024-03-01-200000-sample1000ms.manifest.json",
+      "config": "reports/research-datasets/BTCUSDT-research-config.json",
+      "folds": [
+        {
+          "train_start_ns": 1709251200012000000,
+          "train_end_ns": 1709294399590500000,
+          "test_start_ns": 1709294399590500001,
+          "test_end_ns": 1709337599169000000
+        }
+      ]
+    },
+    {
+      "path": "reports/research-datasets/ETHUSDT-2024-01-01-200000-sample1000ms.csv",
+      "sha256": "7e0193eeeabde405a76a193729ff6b162335e3ffc645bf1050ca49bb09277909",
+      "source_manifest": "reports/research-datasets/ETHUSDT-2024-01-01-200000-sample1000ms.manifest.json",
+      "config": "reports/research-datasets/ETHUSDT-research-config.json",
+      "folds": [
+        {
+          "train_start_ns": 1704067200019000000,
+          "train_end_ns": 1704110399774000000,
+          "test_start_ns": 1704110399774000001,
+          "test_end_ns": 1704153599529000000
+        }
+      ]
+    },
+    {
+      "path": "reports/research-datasets/ETHUSDT-2024-02-01-200000-sample1000ms.csv",
+      "sha256": "9aa22c7e3aec0b0974b1f64a44c8a15eb4aff65d7216b2e035f80d7420835cde",
+      "source_manifest": "reports/research-datasets/ETHUSDT-2024-02-01-200000-sample1000ms.manifest.json",
+      "config": "reports/research-datasets/ETHUSDT-research-config.json",
+      "folds": [
+        {
+          "train_start_ns": 1706745600019000000,
+          "train_end_ns": 1706788799838000000,
+          "test_start_ns": 1706788799838000001,
+          "test_end_ns": 1706831999657000000
+        }
+      ]
+    },
+    {
+      "path": "reports/research-datasets/ETHUSDT-2024-03-01-200000-sample1000ms.csv",
+      "sha256": "904da332578acc3b1f13f7832906291251aee0a3ebf9332e77cb5ef113a16119",
+      "source_manifest": "reports/research-datasets/ETHUSDT-2024-03-01-200000-sample1000ms.manifest.json",
+      "config": "reports/research-datasets/ETHUSDT-research-config.json",
+      "folds": [
+        {
+          "train_start_ns": 1709251200016000000,
+          "train_end_ns": 1709294399968500000,
+          "test_start_ns": 1709294399968500001,
+          "test_end_ns": 1709337599921000000
+        }
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "type": "sma_cross",
+      "fast": 16,
+      "slow": 128,
+      "band_bps": 2,
+      "quantity": 1000
+    },
+    {
+      "type": "sma_cross",
+      "fast": 32,
+      "slow": 256,
+      "band_bps": 5,
+      "quantity": 1000
+    },
+    {
+      "type": "sma_cross",
+      "fast": 64,
+      "slow": 512,
+      "band_bps": 10,
+      "quantity": 1000
+    },
+    {
+      "type": "mean_reversion",
+      "window": 256,
+      "entry_bps": 5,
+      "exit_bps": 0,
+      "quantity": 1000
+    },
+    {
+      "type": "mean_reversion",
+      "window": 1024,
+      "entry_bps": 10,
+      "exit_bps": 0,
+      "quantity": 1000
+    },
+    {
+      "type": "mean_reversion",
+      "window": 4096,
+      "entry_bps": 20,
+      "exit_bps": 0,
+      "quantity": 1000
+    }
+  ],
+  "costs": [
+    {
+      "name": "spot-10bps-10ms",
+      "fee_bps": 10,
+      "latency_ns": 10000000
+    },
+    {
+      "name": "cost-stress-20bps-100ms",
+      "fee_bps": 20,
+      "latency_ns": 100000000
+    },
+    {
+      "name": "slip-1bps-delta-budget",
+      "fee_bps": 10,
+      "latency_ns": 10000000,
+      "slippage_bps": 1,
+      "liquidity_model": "delta_budget"
+    }
+  ]
+}

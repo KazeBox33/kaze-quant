@@ -17,18 +17,23 @@ jobs:
       - uses: actions/checkout@v4
       - run: rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy
       - run: cargo fmt --check
-      - run: cargo clippy --locked --all-targets -- -D warnings
-      - run: cargo test --locked --all-targets
-      - run: cargo test --locked --release
-      - run: cargo doc --locked --no-deps
+      - run: cargo clippy --locked --all-features --all-targets -- -D warnings
+      - run: cargo test --locked --all-features --all-targets
+      - run: cargo test --locked --all-features --release
+      - run: cargo doc --locked --all-features --no-deps
         env:
           RUSTDOCFLAGS: -D warnings
       - run: python3 scripts/test_market_data.py
+      - run: python3 scripts/test_research_data.py
       - name: Replay and recover paper session
         run: |
           cargo run --locked --release --bin kaze-paper -- --input data/paper.jsonl --journal reports/ci.wal --finish --report reports/first.json
           cargo run --locked --release --bin kaze-paper -- --input data/paper.jsonl --journal reports/ci.wal --finish --report reports/retry.json
           cargo run --locked --example custom_strategy
+          cargo run --locked --release --example durable_strategy -- reports/ci-pulse.db
+          cargo run --locked --release --example durable_strategy -- reports/ci-pulse.db
+          cargo run --locked --features network --bin kaze-testnet -- --help
+          cargo run --locked --features network --bin kaze-live-paper -- --help
       - name: Transactional replay and backup
         run: |
           cargo run --locked --release --bin kaze-run -- --input data/paper.jsonl --db reports/ci.db --finish --verify-full --report reports/sql-first.json --backup reports/ci-backup.db

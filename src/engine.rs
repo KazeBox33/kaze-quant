@@ -25,8 +25,19 @@ pub struct EngineConfig {
     pub max_orders: usize,
     pub fee_bps: u32,
     pub latency_ns: u64,
+    #[serde(default)]
+    pub slippage_bps: u32,
+    #[serde(default)]
+    pub liquidity_model: LiquidityModel,
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum LiquidityModel {
+    #[default]
+    QuoteRefresh,
+    DeltaBudget,
+}
 impl Default for EngineConfig {
     fn default() -> Self {
         Self {
@@ -36,6 +47,8 @@ impl Default for EngineConfig {
             max_orders: 10_000,
             fee_bps: 10,
             latency_ns: 0,
+            slippage_bps: 0,
+            liquidity_model: LiquidityModel::QuoteRefresh,
         }
     }
 }
@@ -53,6 +66,9 @@ impl EngineConfig {
         }
         if self.max_active_orders == 0 || self.max_active_orders > self.max_orders {
             return Err("max_active_orders must be in 1..=max_orders");
+        }
+        if self.slippage_bps > 1000 {
+            return Err("slippage must not exceed 1000 bps");
         }
         if self.fee_bps > 10_000 {
             return Err("fee_bps must not exceed 10000");
@@ -95,6 +111,8 @@ pub struct Engine {
     policy: ScanPolicy,
     next_order_id: u64,
     archived_orders: u64,
+    liquidity_bid_remaining: u64,
+    liquidity_ask_remaining: u64,
 }
 
 impl Engine {
@@ -119,6 +137,8 @@ impl Engine {
             policy,
             next_order_id: 1,
             archived_orders: 0,
+            liquidity_bid_remaining: 0,
+            liquidity_ask_remaining: 0,
         })
     }
     pub fn config(&self) -> &EngineConfig {
@@ -162,10 +182,40 @@ impl Engine {
                 return Err("quote timestamps must not decrease");
             }
         }
+        let budget = |old_price: Price,
+                      new_price: Price,
+                      old_display: u64,
+                      new_display: u64,
+                      remaining: u64| {
+            if self.config.liquidity_model == LiquidityModel::QuoteRefresh || old_price != new_price
+            {
+                new_display
+            } else {
+                (i128::from(remaining) + i128::from(new_display) - i128::from(old_display))
+                    .clamp(0, i128::from(new_display)) as u64
+            }
+        };
+        let (mut bid_available, mut ask_available) =
+            self.quote.map_or((q.bid_quantity, q.ask_quantity), |p| {
+                (
+                    budget(
+                        p.bid,
+                        q.bid,
+                        p.bid_quantity,
+                        q.bid_quantity,
+                        self.liquidity_bid_remaining,
+                    ),
+                    budget(
+                        p.ask,
+                        q.ask,
+                        p.ask_quantity,
+                        q.ask_quantity,
+                        self.liquidity_ask_remaining,
+                    ),
+                )
+            });
         self.quote = Some(q);
         self.metrics.quotes += 1;
-        let mut bid_available = q.bid_quantity;
-        let mut ask_available = q.ask_quantity;
         // 没有终结/拒绝历史时，所有记录均活跃，可直接连续扫描。
         // 一旦存在非活跃历史，切换到索引，避免间接访问成为密集负载的成本。
         if self.policy == ScanPolicy::History || self.active.len() == self.orders.len() {
@@ -180,6 +230,8 @@ impl Engine {
                 self.try_execute(index, q, &mut bid_available, &mut ask_available, sink);
             }
         }
+        self.liquidity_bid_remaining = bid_available;
+        self.liquidity_ask_remaining = ask_available;
         // retain 不分配，不打乱相对顺序；终结记录仍保留在 orders 中。
         self.active.retain(|&i| self.orders[i].status.is_active());
         let equity = self.equity();
@@ -207,11 +259,27 @@ impl Engine {
         {
             return;
         }
-        let (price, available, crossing) = match order.request.side {
-            Side::Buy => (q.ask, ask_available, order.request.limit >= q.ask),
-            Side::Sell => (q.bid, bid_available, order.request.limit <= q.bid),
+        // 不利滑点必须仍在用户 limit 内；不得用压力模型绕过冻结金额/限价保护。
+        let (execution_units, available) = match order.request.side {
+            Side::Buy => (
+                (u128::from(q.ask.units()) * u128::from(10000 + self.config.slippage_bps))
+                    .div_ceil(10000),
+                ask_available,
+            ),
+            Side::Sell => (
+                u128::from(q.bid.units()) * u128::from(10000 - self.config.slippage_bps) / 10000,
+                bid_available,
+            ),
         };
+        let price = u64::try_from(execution_units)
+            .ok()
+            .and_then(|p| Price::new(p).ok());
+        let crossing = price.is_some_and(|p| match order.request.side {
+            Side::Buy => order.request.limit >= p,
+            Side::Sell => order.request.limit <= p,
+        });
         if crossing && *available > 0 {
+            let price = price.expect("bounded eligible execution price");
             let quantity = order.remaining.min(*available);
             let fill = Fill {
                 order_id: order.id,
@@ -400,6 +468,8 @@ impl Engine {
             metrics: self.metrics,
             next_order_id: self.next_order_id,
             archived_orders: self.archived_orders,
+            liquidity_bid_remaining: self.liquidity_bid_remaining,
+            liquidity_ask_remaining: self.liquidity_ask_remaining,
         }
     }
     pub fn restore(config: EngineConfig, state: EngineSnapshot) -> Result<Self, &'static str> {
@@ -423,6 +493,8 @@ impl Engine {
             policy: ScanPolicy::Active,
             next_order_id: state.next_order_id,
             archived_orders: state.archived_orders,
+            liquidity_bid_remaining: state.liquidity_bid_remaining,
+            liquidity_ask_remaining: state.liquidity_ask_remaining,
         };
         engine.check_invariants()?;
         Ok(engine)
@@ -431,6 +503,15 @@ impl Engine {
     /// 昂贵的独立审计，只在 debug/test 或调用方主动要求时扫描完整历史。
     pub fn check_invariants(&self) -> Result<(), &'static str> {
         self.config.validate()?;
+        if self.quote.map_or(
+            self.liquidity_bid_remaining != 0 || self.liquidity_ask_remaining != 0,
+            |q| {
+                self.liquidity_bid_remaining > q.bid_quantity
+                    || self.liquidity_ask_remaining > q.ask_quantity
+            },
+        ) {
+            return Err("invalid liquidity budget snapshot");
+        }
         const ACCOUNT_BOUND: i128 = 10_000_000_000_000_000_000_000_000_000_000_000;
         if self.account.cash < 0
             || self.account.reserved_cash < 0
@@ -583,4 +664,8 @@ pub struct EngineSnapshot {
     metrics: Metrics,
     next_order_id: u64,
     archived_orders: u64,
+    #[serde(default)]
+    liquidity_bid_remaining: u64,
+    #[serde(default)]
+    liquidity_ask_remaining: u64,
 }

@@ -1,10 +1,10 @@
 [package]
 name = "kaze-quant"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2024"
 default-run = "kaze-quant"
 rust-version = "1.99"
-description = "Deterministic Rust replay and durable multi-instrument paper trading"
+description = "Auditable Rust replay, strategy research, live paper trading and testnet execution"
 license = "MIT"
 
 [dependencies]
@@ -31,3 +31,36 @@ all = "warn"
 [[bin]]
 name = "kaze-run"
 path = "src/bin/run.rs"
+
+[features]
+default = []
+network = ["dep:reqwest", "dep:hmac", "dep:tungstenite"]
+
+[dependencies.reqwest]
+version = "0.12"
+default-features = false
+features = ["blocking", "json", "rustls-tls"]
+optional = true
+
+[dependencies.hmac]
+version = "0.12"
+optional = true
+
+[dependencies.tungstenite]
+version = "0.28"
+features = ["rustls-tls-webpki-roots"]
+optional = true
+
+[[bin]]
+name = "kaze-testnet"
+path = "src/bin/testnet.rs"
+required-features = ["network"]
+
+[[bin]]
+name = "kaze-live-paper"
+path = "src/bin/live_paper.rs"
+required-features = ["network"]
+
+[[bin]]
+name = "kaze-research"
+path = "src/bin/research.rs"

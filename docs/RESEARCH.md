@@ -59,3 +59,11 @@ Barter 提供事件驱动交易框架、Strategy/RiskManager 扩展与索引组�
 历史去重走磁盘主键查询；不在 RAM 保存无限增长的全部命令哈希。有限通道、批次/单行/回执/检查点上限、数据库页配额及 WAL 反压使资源边界可操作。候选复制和检查点序列化也有成本，热状态变大时必须重新测量，不能把本次小状态的确认延迟外推到百万活跃订单。
 
 真实数据依据 [Binance Public Data 官方说明](https://github.com/binance/binance-public-data) 与 [官方数据站](https://data.binance.vision/)。固定 archive SHA-256，选择连续前缀而不筛选价格。使用 2024 futures bookTicker 的 event_time 毫秒字段（不能套用 2025 spot 的微秒规则）。这些报价仅作为工程负载和无杠杆纸面成本模型的输入；没有实现期货资金费、保证金或结算。
+
+## 0.4 实盘边界与研究复现
+
+读取 [Barter](https://github.com/barter-rs/barter-rs/tree/9770b27a83f844472b93b593b08063affc974b0d)、[Nautilus live/reconciliation](https://nautilustrader.io/docs/latest/concepts/live/)、[HftBacktest fill assumptions](https://hftbacktest.readthedocs.io/en/latest/order_fill.html)、[Freqtrade lookahead analysis](https://www.freqtrade.io/en/stable/lookahead-analysis/)。参考策略/执行分离、未知订单状态核对、仿真局限和独立时间切分；核心逻辑独立实现，Barter仅作为固定依赖进入独立对照工具。
+
+协议依据 [Binance Spot Testnet REST](https://developers.binance.com/en/docs/products/spot/testnet/rest-api) 和 [Spot WebSocket bookTicker](https://developers.binance.com/en/docs/catalog/core-trading-spot-trading/api/ws-streams/~)。POST超时/5xx不能证明未执行，client ID可能在终态后被复用，因此本地永久拒绝复用ID；同一意图恢复只查询。当前没有私有流或自动策略实盘桥接，真实测试网验收仍需账户凭据。
+
+借用JSON文本字段避免临时String分配，输出Quote是独立整数值，不延长原始帧的生命周期。固定真实100000条源报价，逐条核对价格/数量，交替计时上游实际DTO与本项目normalizer；UTC元数据/更新ID校验等语义差异保留在结果。数字和复现方式见 [验收记录](ACCEPTANCE.md)。

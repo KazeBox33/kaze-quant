@@ -1,0 +1,23 @@
+{
+  "transform_version": "bookticker-strict-prefix-v2",
+  "symbol": "BTCUSDT",
+  "date": "2024-02-01",
+  "rows": 83350,
+  "source_rows_consumed": 30225403,
+  "sample_ms": 1000,
+  "first_event_ns": 1706745600033000000,
+  "last_event_ns": 1706831999015000000,
+  "source_url": "https://data.binance.vision/data/futures/um/daily/bookTicker/BTCUSDT/BTCUSDT-bookTicker-2024-02-01.zip",
+  "checksum_url": "https://data.binance.vision/data/futures/um/daily/bookTicker/BTCUSDT/BTCUSDT-bookTicker-2024-02-01.zip.CHECKSUM",
+  "archive_sha256": "6f9b04b08f91cedc94fa7eb95900438b08f567fce338bb3df46ebdf6f4ae93a0",
+  "source_prefix_sha256": "0e3f4b611e07231a93958c27c2dec6f8244110ee250e9b6e09d47db05de7c9c4",
+  "normalized_sha256": "3d9f3589c7cf9c454f3c46a232701ae836c55f07da3bb22a36a807c657850fcf",
+  "quantity_rounds": 0,
+  "clock_clamps": 0,
+  "selection": "predeclared dates/symbols; causal first observed quote at least sample_ms after last kept quote; EOF or row cap; no price filtering/sort",
+  "units": {
+    "currency": "USDT",
+    "money_scale": 100000000,
+    "quantity_scale": 100000
+  }
+}

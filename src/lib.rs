@@ -15,3 +15,12 @@ pub mod paper;
 pub mod storage;
 
 pub mod store;
+
+#[cfg(feature = "network")]
+pub mod binance;
+pub mod decimal;
+pub mod execution;
+pub mod feed;
+pub mod research;
+
+pub mod registry;

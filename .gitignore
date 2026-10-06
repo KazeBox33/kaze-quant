@@ -5,3 +5,8 @@
 
 __pycache__/
 *.pyc
+
+# 本地测试网凭据，不得提交。
+/configs/testnet.credentials.env
+/benchmarks/barter-comparison/target/
+/benchmarks/barter-source/

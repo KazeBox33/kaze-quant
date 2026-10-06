@@ -21,6 +21,9 @@ pub trait Strategy {
     fn checkpoint(&self) -> Option<crate::config::BuiltinStrategy> {
         None
     }
+    fn custom_checkpoint(&self) -> Option<crate::registry::CustomCheckpoint> {
+        None
+    }
     fn on_submit_result(&mut self, _request: OrderRequest, _result: Result<OrderId, RejectReason>) {
     }
 }
