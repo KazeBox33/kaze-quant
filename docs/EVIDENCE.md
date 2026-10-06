@@ -102,3 +102,9 @@ python3 scripts/crash_soak.py --output reports/my-crash-soak --cycles 20
 输出路径须全新；保留可执行文件（manifest 绑定 SHA）。CSV/ZIP/数据库不放进 Git，固定脚本、manifest 与结果足够核对。迁移 Linux 后重跑，不从 Mac 数值推导 Linux 的性能。CI 会上传 Linux/macOS 的同负载存储比较及恢复报告，虚拟机结果应与本机测量分开解读。
 
 CSV摘要修复后的新CLI另复跑百万报价：单次耗时22.334s（约44,775命令/s），采样峰值RSS约7.61MiB，184次成交账本与原内存参考相同，全部命令审计通过。只重复一次，原始记录在 [post-hash-fix-mac.json](evidence/post-hash-fix-mac.json)，不与旧二进制三轮数据混算分位数。
+
+## Linux / macOS CI 对照
+
+代码提交18fe54c的 [GitHub Actions](https://github.com/KazeBox33/kaze-quant/actions/runs/37437055462) 已完成，两项job均success，含102项debug/release测试、严格静态/文档检查、备份恢复及存储比较。
+
+相同2000命令负载，Linux托管机逐条文件WAL中位825.090ms、256批量8.673ms；macOS托管机分别1690.205ms、32.301ms。原始三轮CSV见 [Linux](evidence/store-2000-ci-linux.csv)、[macOS](evidence/store-2000-ci-macos.csv)，身份见 [CI记录](evidence/ci-20261006.json)。不同硬件/虚拟化/文件系统同步差异很大，Linux的一些单次样本存在百毫秒级抖动；256模式每轮仅8个事务，不能推导稳定尾延迟。此处证明跨平台同语义运行和可复现实验，不用托管机结果保证未来Linux生产机SLA。

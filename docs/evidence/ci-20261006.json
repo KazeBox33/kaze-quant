@@ -1,0 +1,17 @@
+{
+  "source_commit": "18fe54cbfd641c046273fd3c029c50a3744b91cc",
+  "run_id": 37437055462,
+  "run_url": "https://github.com/KazeBox33/kaze-quant/actions/runs/37437055462",
+  "conclusion": "success",
+  "jobs": [
+    {
+      "id": 112181340751,
+      "name": "check (ubuntu-latest)"
+    },
+    {
+      "id": 112181340902,
+      "name": "check (macos-latest)"
+    }
+  ],
+  "capture": "CSV records extracted verbatim from benchmark stdout; exact hardware not captured here; GitHub-hosted VM timing is not local hardware SLA"
+}

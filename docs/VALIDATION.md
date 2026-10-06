@@ -20,7 +20,7 @@
 | 千万条同一会话 | 10,000,001命令、两次全量审计，恢复状态与链一致，热状态约52KiB、RSS约7.55MiB |
 | 内存与持久模型 | 184 次成交的最终账本一致；成本敏感度结果公开 |
 
-核心提交 a8171ae 的 [Linux/macOS CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37435435608) 均已 success，包含102项测试、事务重放/备份和存储比较。后续修改的结果以其对应提交为准。CI 增加事务重放、在线备份恢复、行情整数转换和存储比较原始结果上传；跨平台性能数值独立于本机测量。
+核心提交 a8171ae 的 [Linux/macOS CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37435435608) 均已 success，包含102项测试、事务重放/备份和存储比较。后续代码提交18fe54c的 [最终CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37437055462) 也已完成，Linux/macOS均success；包括CSV同消费流摘要修复和回归测试。CI 增加事务重放、在线备份恢复、行情整数转换和存储比较原始结果上传；跨平台性能数值独立于本机测量。
 
 ---
 
