@@ -32,4 +32,26 @@ class Conversion(unittest.TestCase):
             d=Path(tmp)
             with self.fixture(d,regress=True),self.assertRaisesRegex(ValueError,"timestamp regression"):prepare(d,"BTCUSDT","2024-01-01",20000)
             self.assertFalse((d/"BTCUSDT-2024-01-01-20000-sample0ms.csv").exists())
+    def test_causal_quarantine_does_not_let_future_outlier_poison_watermark(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d=Path(tmp)
+            with self.fixture(d) as unused:
+                pass
+            archive=d/'BTCUSDT-bookTicker-2024-01-01.zip'
+            with zipfile.ZipFile(archive) as z:data=z.read(z.namelist()[0]).decode()
+            lines=data.splitlines();fields=lines[2].split(',');fields[-1]=str(int(fields[-1])+80000000);lines[2]=','.join(fields)
+            with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:z.writestr(archive.name.replace('.zip','.csv'),'\n'.join(lines)+'\n')
+            checksum=hashlib.sha256(archive.read_bytes()).hexdigest()
+            with patch('urllib.request.urlopen',return_value=io.BytesIO((checksum+'  '+archive.name).encode())):
+                m,p=prepare(d,'BTCUSDT','2024-01-01',20000,0,'causal_quarantine',100)
+            self.assertEqual(m['quarantine']['rejected_rows'],1)
+            self.assertEqual(m['quarantine']['reasons'],{'event_transaction_lag_over_60s':1})
+            self.assertEqual(m['source_rows_consumed'],20001)
+            self.assertEqual(int(p.read_text().splitlines()[2].split(',')[1]),1704067200003000000)
+    def test_bad_clock_ratio_aborts_without_publishing_converted_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d=Path(tmp)
+            with self.fixture(d,regress=True),self.assertRaisesRegex(ValueError,'quality threshold'):
+                prepare(d,'BTCUSDT','2024-01-01',20000,0,'causal_quarantine',0)
+            self.assertFalse(list(d.glob('*.csv')))
 if __name__=="__main__":unittest.main()

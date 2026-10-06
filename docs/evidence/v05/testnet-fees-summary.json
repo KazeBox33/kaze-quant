@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "environment": "binance-spot-testnet",
+  "binary_sha256": "480e6c991eddcb4443fc62bf13b88dec7fb14f42de16b87c2c880c4b7a867c69",
+  "completed_utc": "2026-10-06T11:28:10.388783+00:00",
+  "baseline_passed": true,
+  "per_order_cap_usdt": "20",
+  "orders": 4,
+  "trade_count": 2,
+  "recovery_equal": true,
+  "balance_reconciliation": {
+    "matched": true,
+    "mismatches": {},
+    "economic_deltas": {
+      "BTC": "0.00000983",
+      "USDT": "-0.87624074"
+    }
+  },
+  "fees": {
+    "BTC": "0.00000017",
+    "USDT": "0.01379904"
+  },
+  "accepted_ack_loss_recovered_without_second_submit": true,
+  "actual_partial_fill_observed": false,
+  "nonzero_fee_observed": true,
+  "statuses": [
+    "CANCELED",
+    "CANCELED",
+    "FILLED",
+    "FILLED"
+  ],
+  "limits": [
+    "ACK loss is explicit application response suppression, not wire-level disconnect",
+    "No private WebSocket or strategy external-routing acceptance",
+    "No forced partial-fill guarantee; zero fees cannot validate fee economics",
+    "Independent testnet balance delta check assumes no concurrent external account activity"
+  ]
+}

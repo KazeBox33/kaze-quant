@@ -1,0 +1,25 @@
+{
+  "transform_version": "offline-utc-second-first-event-v1",
+  "symbol": "BTCUSDT",
+  "date": "2024-01-02",
+  "rows": 86397,
+  "first_event_ns": 1704153600014000000,
+  "last_event_ns": 1704239999007000000,
+  "source_rows_consumed": 18518655,
+  "source_order_regressions": 180805,
+  "boundary_event_rows_excluded": 1,
+  "max_event_lag_ms": 60000,
+  "archive_sha256": "a90b5a86f55456db60171b51dba1585dd107c6b7030bef6f9bfe0f85e79f2f8b",
+  "source_prefix_sha256": "84907620886d47ba0c7552d4eae911bcabd0d853982adc86a14c6a85db5577bf",
+  "normalized_sha256": "21c56b47a91b7d3b14eeb8aa8cc7f3758a722bc1ae77c836d1142d03190f4dbc",
+  "source_url": "https://data.binance.vision/data/futures/um/daily/bookTicker/BTCUSDT/BTCUSDT-bookTicker-2024-01-02.zip",
+  "checksum_url": "https://data.binance.vision/data/futures/um/daily/bookTicker/BTCUSDT/BTCUSDT-bookTicker-2024-01-02.zip.CHECKSUM",
+  "archive_complete": true,
+  "selection": "offline chronological reconstruction: earliest event per UTC second; event/update ID/source row ties; no return filtering",
+  "limits": "exchange event chronology, not original file/arrival order; cannot estimate venue-to-client latency; futures quotes in unlevered spot-like model",
+  "units": {
+    "currency": "USDT",
+    "money_scale": 100000000,
+    "quantity_scale": 100000
+  }
+}

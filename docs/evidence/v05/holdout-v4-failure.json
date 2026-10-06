@@ -1,0 +1,23 @@
+{
+  "completed": false,
+  "screen_passed": false,
+  "error_type": "ValueError",
+  "error": "transaction outside declared day / invalid event lag",
+  "protocol": {
+    "spec_sha256": "139c32baaff43c58f992feaffd729b8ec3eee0e50fd2b7eab23769466dce1c6d",
+    "frozen_utc": "2026-10-06T11:28:34.981699+00:00",
+    "binary_sha256": "401e19e7583eb08fa265393444eb3cf8554f0d843d9c1d43e1e896d8638fb2b1",
+    "converter_sha256": "f7b307ee38ad521ad3ac4ddc5b8cefa518df18ce5a94f100d7d36717495da606",
+    "driver_sha256": "97a080975ed9b947df85332e63c6411573a08383c1588bebeb0e0fae09d626df",
+    "spec": "configs/research-holdout-v4.json",
+    "rule": "frozen before fetching any new archive; quantity only uses training data"
+  },
+  "source_clock_failure": {
+    "archive": "BTCUSDT-bookTicker-2024-01-03.zip",
+    "source_row": 7283469,
+    "transaction_ms": 1704283738675,
+    "event_ms": 1704283823397,
+    "event_lag_ms": 84722,
+    "predeclared_max_event_lag_ms": 60000
+  }
+}

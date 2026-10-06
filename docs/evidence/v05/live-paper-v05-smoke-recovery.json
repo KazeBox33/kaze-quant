@@ -1,0 +1,43 @@
+{
+  "audit_chain_sha256": "18ea7c6c4b6a5aad6ec6d1336c8f3432c5397bd8c918211664a2c30306c0f096",
+  "binary_sha256": "dde2a5154037a29a6e60f05057e4ae4a5fab0b8785b1396007c4985b220a1aaa",
+  "mode": "live-paper-recover-audit",
+  "schema_version": 1,
+  "state": {
+    "clock_ns": 1791286064460103875,
+    "closed": true,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "1000000000000",
+        "equity_minor": "1000000000000",
+        "fees_minor": "0",
+        "halted": "finished",
+        "market": 0,
+        "metrics": {
+          "accepted": 0,
+          "cancelled": 0,
+          "fills": 0,
+          "max_drawdown_minor": "0",
+          "orders_examined": 0,
+          "peak_equity_minor": "1000000000000",
+          "quotes": 2870,
+          "rejected": 0
+        },
+        "pnl_minor": "0",
+        "position_units": 0,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "symbol": "BTCUSDT",
+        "units": {
+          "currency": "USDT",
+          "money_scale": 100000000,
+          "quantity_scale": 100000
+        }
+      }
+    ],
+    "processed": 2871,
+    "schema_version": 1
+  },
+  "verified_commands": 2871
+}

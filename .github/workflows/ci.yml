@@ -25,6 +25,9 @@ jobs:
           RUSTDOCFLAGS: -D warnings
       - run: python3 scripts/test_market_data.py
       - run: python3 scripts/test_research_data.py
+      - run: python3 scripts/test_research_holdout.py
+      - run: python3 scripts/test_event_time_data.py
+      - run: python3 scripts/test_testnet_acceptance.py
       - name: Replay and recover paper session
         run: |
           cargo run --locked --release --bin kaze-paper -- --input data/paper.jsonl --journal reports/ci.wal --finish --report reports/first.json

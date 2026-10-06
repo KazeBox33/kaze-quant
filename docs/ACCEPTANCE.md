@@ -6,9 +6,9 @@
 
 | 门槛 | 已完成证据 | 尚未满足 | 结论 |
 |---|---|---|---|
-| 交易所执行可靠性 | 意图先持久化、一次发送、超时/不存在不重发、重启、部分成交累计量、终态冲突、撤单未知结果、成交去重和余额观测测试 | 测试网公开time/exchangeInfo/bookTicker实际HTTP200，但无签名订单记录；尚需测试网真实成交/撤单、网络故障后的恢复核对、费用与余额变化；无私有回报流、完整组合账本或策略自动外部路由 | 未通过 |
-| 持续纸面运行与公平比较 | 10分钟行情运行及恢复；5分钟真实行情运行产生27张纸面订单、13次成交及独立进程全量审计；百万真实报价3轮；固定上游Barter组件比较 | 24小时首轮在27.8分钟后断线/过载停止；新会话重新测试。多日运行、故障原因诊断和目标Linux硬件验证仍需补充 | 部分完成 |
-| 独立成本策略验证 | 六个整日BTC/ETH数据集，训练选参/测试冻结，3种成本情景，输入/参数/结果哈希 | 筛选失败；成交不足、费用后亏损和风控拒单。没有独立于开发选择的新留出集、统计优势或未来稳定收益证据 | 未通过 |
+| 交易所执行可靠性 | 意图先持久化、一次发送、超时/不存在不重发、重启、部分成交累计量、终态冲突、撤单未知结果、成交去重和余额观测测试 | 真实测试网两轮各4单、成交/撤单、应用丢弃ACK后的独立进程恢复与真实非零手续费/全资产余额变化核对已通过；仍缺真实部分成交、线路故障/私有回报流、完整组合账本或策略自动外部路由 | 未通过 |
+| 持续纸面运行与公平比较 | 10分钟行情运行及恢复；5分钟真实行情运行产生27张纸面订单、13次成交及独立进程全量审计；百万真实报价3轮；固定上游Barter组件比较 | 24小时首轮27.8分钟、第二轮53.4分钟失败；第二轮明确队列满且恢复通过。新增4096帧缓冲/积压监控/消费前时效检查，新会话重测中；多日运行及目标Linux硬件仍缺证据 | 部分完成 |
+| 独立成本策略验证 | 六个整日BTC/ETH数据集，训练选参/测试冻结，3种成本情景，输入/参数/结果哈希 | 筛选失败；成交不足、费用后亏损和风控拒单。独立周协议已冻结，前三轮转换失败记录保留；第4版离线事件时间重建因84.722秒发布延迟超过预先声明的60秒上限失败。没有通过筛选、统计优势或未来稳定收益证据 | 未通过 |
 
 “实现验收框架”和“通过准入”是两件事。下面保留失败结果，不能通过删除亏损数据、放松筛选或重调已看过的测试集将它变成独立验证。
 
@@ -87,3 +87,20 @@ target/release/kaze-research reports/new-plan.json reports/new-research.json
 同一2000命令合成负载、3轮、release，Linux托管runner逐条文件WAL中位471.156ms，SQLite FULL 256/批中位9.626ms；macOS托管runner对应1454.047ms、24.039ms。原始stdout CSV：[Linux](evidence/v04/store-2000-ci-linux.csv)、[macOS](evidence/v04/store-2000-ci-macos.csv)，任务步骤见[ci-jobs.json](evidence/v04/ci-jobs.json)。这是同步批量化与跨平台同语义运行的证据；硬件/虚拟化/文件系统不同，每轮256模式仅8次事务，不能推导稳定尾延迟或未来生产机器SLA，也不是Barter比较。
 
 测试网公开API连通与当前BTCUSDT过滤条件已经实测：[公共连通记录](evidence/v04/testnet-public-connectivity.json)。这不需要密钥，也不证明账户权限、订单接受、成交或撤单。诊断新二进制另外完成[30秒实时冒烟](evidence/v04/live-paper-diagnostics-smoke.json)与[独立进程恢复](evidence/v04/live-paper-diagnostics-smoke-recovery.json)，2803条报价、状态与链一致；这段时间不计入新24小时会话。
+
+
+## 2026-10-06 真实测试网与突发行情补充
+
+首轮零费用：[汇总](evidence/v05/testnet-zero-fee-summary.json)、[订单/余额/调用证据](evidence/v05/testnet-zero-fee-orders.json)。随后启用非零测试网手续费：[汇总](evidence/v05/testnet-fees-summary.json)、[订单/余额/调用证据](evidence/v05/testnet-fees-orders.json)。每轮有2个被动买单最终撤销、1个穿价买单和1个穿价卖单最终成交；每单<=20 USDT，仅测试网虚拟资产。四次相同意图重投均在新进程中submit_calls=0；应用显式丢弃交易所成功ACK后，SQLite保留unknown且没有观测值，新进程按原ID查询恢复，再撤销。该故障是应用回报抑制，不是物理网络断包；计数是适配器submit调用数，不是交易所全账户POST审计。
+
+非零轮实际2次成交，买入手续费0.00000017 BTC，卖出手续费0.01379904 USDT。成交原币种费用、订单累计量、去重交易、新进程状态均核对通过；交易前后全部账户资产的free+locked变化与成交/费用逐项一致。净变化BTC +0.00000983、USDT -0.87624074：卖出数量向下对齐LOT_SIZE后留有BTC尘埃，因此USDT差值不能解释成全部亏损或策略PnL。未观测到真实PARTIALLY_FILLED状态，仍保留该项未通过；不能用已有模拟部分成交测试替代。
+
+第二次24小时尝试在3201.921秒后因feed queue capacity exceeded失败，275611条报价、275612条命令全部新进程恢复，状态和链一致，持久暂停无订单。[运行](evidence/v05/live-paper-24h-v04-rerun.json)、[恢复](evidence/v05/live-paper-24h-v04-rerun-recovery.json)、[未通过结论](evidence/v05/live-paper-24h-v04-rerun-validation.json)。本次新增4096帧有界FIFO，每帧上限8KiB，原始payload容量上限32MiB（不含容器/分配器/线程等开销）。pending计数包括最多一个发送中的帧，high_water是成功发送的上界估计；队列满仍立即停止，消费前超过max_quote_age_ns也立即停止，绝不以扩大缓冲授权过期策略动作。
+
+新增[30秒冒烟](evidence/v05/live-paper-v05-smoke.json)和[恢复](evidence/v05/live-paper-v05-smoke-recovery.json)，随后冻结该二进制、新数据库启动全天实验；不能将旧会话分钟数叠加。此缓冲变化没有重新测Barter或完整吞吐，不沿用旧组件数据声称新版本更快。
+
+独立周日期为2024-01-02..07训练、01-08..14测试，BTC/ETH、固定8候选和3成本，训练最大ask决定100 USDT名义单量，测试价格不参与单量。v1严格原顺序转换失败，v2异常隔离失败，v3事件日边界检查过严失败，均无策略回报产生：[v1](evidence/v05/holdout-v1-failure.json)、[v2](evidence/v05/holdout-v2-failure.json)、[v3](evidence/v05/holdout-v3-failure.json)。源码归档交错多个时间段，且末日交易的毫秒发布延迟可跨日；并非可以直接当线上接收顺序回放。
+
+v4独立声明离线重建：每个UTC秒选最早的交易所事件，平局按event_time/update_id/source行号；所有原始行完整计数/哈希。归档以交易时间划日，event必须在交易后0..60秒；发布越过UTC日末的行保留计数/哈希、排除本日网格，避免训练测试重叠。未按价格或回报挑行，未改日期、策略候选、成本和筛选规则。该数据假设提供交易所事件时间排序的离线研究，不能代表在线接收因果、测量真实网络延迟或校准成交概率；期货报价用于无杠杆现货式模型的限制继续保留。v4转换完1月2日后，在1月3日第7283469行发现84.722秒的事件发布延迟，超过预先声明的60秒上限而失败；未放松阈值，也未生成策略收益。[v4失败与时间戳](evidence/v05/holdout-v4-failure.json)、[已完成1月2日转换manifest](evidence/v05/BTCUSDT-2024-01-02-utc-second-first-event.manifest.json)。这些失败说明数据质量与假设仍需解决，不支持收益门槛通过。
+
+本地本轮133项Rust debug/release通过，15项Python通过；fmt、all-features/all-targets clippy和严格rustdoc通过，[本轮身份](evidence/v05/validation-mac.json)。新增队列FIFO/溢出不覆盖、故障注入只丢成功ACK、三币种手续费手算、独立训练单量/哈希/时间边界以及离线事件重建测试。新提交的Linux/macOS CI应另行确认，历史CI不能替代。

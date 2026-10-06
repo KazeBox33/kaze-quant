@@ -1,0 +1,15 @@
+{
+  "completed": false,
+  "screen_passed": false,
+  "error_type": "ValueError",
+  "error": "source clock outside declared day / transaction after event",
+  "protocol": {
+    "spec_sha256": "43090fcbe4c5dd844d8109f8df3ed39bf724759e95994f2d6b678a0935a1a912",
+    "frozen_utc": "2026-10-06T11:26:47.879558+00:00",
+    "binary_sha256": "401e19e7583eb08fa265393444eb3cf8554f0d843d9c1d43e1e896d8638fb2b1",
+    "converter_sha256": "92f6adf3fc767a122b42071774f56d7b13f0a0ebccda36068d20c7fcd2491c88",
+    "driver_sha256": "ee942e6da250c6a74e8b791bd3ee05750829ec74742c5849146acfdd04f22fbc",
+    "spec": "configs/research-holdout-v3.json",
+    "rule": "frozen before fetching any new archive; quantity only uses training data"
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "study": "gate3-independent-week-v3",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT"
+  ],
+  "train_dates": [
+    "2024-01-02",
+    "2024-01-03",
+    "2024-01-04",
+    "2024-01-05",
+    "2024-01-06",
+    "2024-01-07"
+  ],
+  "test_dates": [
+    "2024-01-08",
+    "2024-01-09",
+    "2024-01-10",
+    "2024-01-11",
+    "2024-01-12",
+    "2024-01-13",
+    "2024-01-14"
+  ],
+  "sample_ms": 1000,
+  "quantity_rule": "floor(100 USDT / maximum training ask minor per lot); never read holdout prices for sizing",
+  "quantity_notional_usdt": "100",
+  "candidates": [
+    {
+      "type": "sma_cross",
+      "fast": 64,
+      "slow": 512,
+      "band_bps": 10
+    },
+    {
+      "type": "sma_cross",
+      "fast": 256,
+      "slow": 2048,
+      "band_bps": 20
+    },
+    {
+      "type": "sma_cross",
+      "fast": 900,
+      "slow": 7200,
+      "band_bps": 30
+    },
+    {
+      "type": "sma_cross",
+      "fast": 1800,
+      "slow": 14400,
+      "band_bps": 40
+    },
+    {
+      "type": "mean_reversion",
+      "window": 1024,
+      "entry_bps": 10,
+      "exit_bps": 0
+    },
+    {
+      "type": "mean_reversion",
+      "window": 4096,
+      "entry_bps": 20,
+      "exit_bps": 0
+    },
+    {
+      "type": "mean_reversion",
+      "window": 7200,
+      "entry_bps": 40,
+      "exit_bps": 0
+    },
+    {
+      "type": "mean_reversion",
+      "window": 14400,
+      "entry_bps": 60,
+      "exit_bps": 0
+    }
+  ],
+  "costs": [
+    {
+      "name": "spot-10bps-10ms",
+      "fee_bps": 10,
+      "latency_ns": 10000000
+    },
+    {
+      "name": "stress-20bps-100ms",
+      "fee_bps": 20,
+      "latency_ns": 100000000
+    },
+    {
+      "name": "slip-1bps-delta",
+      "fee_bps": 10,
+      "latency_ns": 10000000,
+      "slippage_bps": 1,
+      "liquidity_model": "delta_budget"
+    }
+  ],
+  "screen": "same frozen v04 gate: every OOS scenario positive, >=20 fills, no risk rejections; exploratory only",
+  "selection": "maximize training liquidation-adjusted PnL with declared candidate-order ties; no OOS adaptation",
+  "missing_data": "abort this study, never substitute dates",
+  "clock_policy": "offline_event_grid",
+  "data_rule": "Official source has interleaved time streams. Offline chronological reconstruction: earliest event per UTC second, ties event_time/update_id/source_row; every source row counted/hashed; no price/return filters or dates substituted. Does not represent live arrival causality or calibrated latency. v1 and v2 failures retained."
+}

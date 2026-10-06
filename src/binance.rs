@@ -30,6 +30,32 @@ impl BinanceTestnet {
             secret,
         })
     }
+    /// 只读公开测试网快照，供有界验收根据实时网格生成意图。
+    pub fn market_snapshot(&self, symbol: &str) -> Result<Value, VenueError> {
+        let check = OrderIntent {
+            client_order_id: "kaze-snapshot".into(),
+            symbol: symbol.into(),
+            side: crate::types::Side::Buy,
+            price: "1".into(),
+            quantity: "1".into(),
+        };
+        check.validate(SCALE).map_err(|_| VenueError::Unavailable)?;
+        let info = self.request(
+            reqwest::Method::GET,
+            "/exchangeInfo",
+            &[("symbol", symbol.into())],
+            false,
+        )?;
+        let book = self.request(
+            reqwest::Method::GET,
+            "/ticker/bookTicker",
+            &[("symbol", symbol.into())],
+            false,
+        )?;
+        Ok(
+            serde_json::json!({"environment":"binance-spot-testnet", "observed_ms":now_ms(), "exchange_info":info, "book":book}),
+        )
+    }
     fn request(
         &self,
         method: reqwest::Method,

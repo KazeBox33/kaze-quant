@@ -1,0 +1,331 @@
+{
+  "protocol": {
+    "binary_sha256": "17ac96b70626562be36b239caa1652c71990a2536f271b0fa89c128257e44617",
+    "symbol": "BTCUSDT",
+    "max_new_orders": 4,
+    "per_order_usdt_cap": "20",
+    "frozen_utc": "2026-10-06T11:19:16.505245+00:00"
+  },
+  "orders": [
+    {
+      "intent": {
+        "client_order_id": "kaze-0b50b427e89d4e3c-cancel",
+        "price": "85490.46000000",
+        "quantity": "0.00017000",
+        "side": "Buy",
+        "symbol": "BTCUSDT"
+      },
+      "observation": {
+        "clientOrderId": "kaze-0b50b427e89d4e3c-cancel",
+        "cummulativeQuoteQty": "0.00000000",
+        "executedQty": "0.00000000",
+        "orderId": 9880143,
+        "origQty": "0.00017000",
+        "price": "85490.46000000",
+        "side": "BUY",
+        "status": "CANCELED",
+        "symbol": "BTCUSDT",
+        "updateTime": 1791285561237
+      },
+      "phase": "terminal"
+    },
+    {
+      "intent": {
+        "client_order_id": "kaze-0b50b427e89d4e3c-lostack",
+        "price": "85472.64000000",
+        "quantity": "0.00017000",
+        "side": "Buy",
+        "symbol": "BTCUSDT"
+      },
+      "observation": {
+        "clientOrderId": "kaze-0b50b427e89d4e3c-lostack",
+        "cummulativeQuoteQty": "0.00000000",
+        "executedQty": "0.00000000",
+        "orderId": 9880208,
+        "origQty": "0.00017000",
+        "price": "85472.64000000",
+        "side": "BUY",
+        "status": "CANCELED",
+        "symbol": "BTCUSDT",
+        "updateTime": 1791285566954
+      },
+      "phase": "terminal"
+    },
+    {
+      "intent": {
+        "client_order_id": "kaze-0b50b427e89d4e3c-buy",
+        "price": "86422.35000000",
+        "quantity": "0.00017000",
+        "side": "Buy",
+        "symbol": "BTCUSDT"
+      },
+      "observation": {
+        "clientOrderId": "kaze-0b50b427e89d4e3c-buy",
+        "cummulativeQuoteQty": "14.67712170",
+        "executedQty": "0.00017000",
+        "orderId": 9880230,
+        "origQty": "0.00017000",
+        "price": "86422.35000000",
+        "side": "BUY",
+        "status": "FILLED",
+        "symbol": "BTCUSDT",
+        "updateTime": 1791285571006
+      },
+      "phase": "terminal"
+    },
+    {
+      "intent": {
+        "client_order_id": "kaze-0b50b427e89d4e3c-sell",
+        "price": "86249.66000000",
+        "quantity": "0.00017000",
+        "side": "Sell",
+        "symbol": "BTCUSDT"
+      },
+      "observation": {
+        "clientOrderId": "kaze-0b50b427e89d4e3c-sell",
+        "cummulativeQuoteQty": "14.67712000",
+        "executedQty": "0.00017000",
+        "orderId": 9880237,
+        "origQty": "0.00017000",
+        "price": "86249.66000000",
+        "side": "SELL",
+        "status": "FILLED",
+        "symbol": "BTCUSDT",
+        "updateTime": 1791285576086
+      },
+      "phase": "terminal"
+    }
+  ],
+  "trades": [
+    {
+      "commission": "0.00000000",
+      "commissionAsset": "BTC",
+      "id": 2459508,
+      "isBuyer": true,
+      "orderId": 9880230,
+      "price": "86336.01000000",
+      "qty": "0.00017000",
+      "quoteQty": "14.67712170",
+      "symbol": "BTCUSDT"
+    },
+    {
+      "commission": "0.00000000",
+      "commissionAsset": "USDT",
+      "id": 2459513,
+      "isBuyer": false,
+      "orderId": 9880237,
+      "price": "86336.00000000",
+      "qty": "0.00017000",
+      "quoteQty": "14.67712000",
+      "symbol": "BTCUSDT"
+    }
+  ],
+  "before_balances": [
+    {
+      "asset": "BTC",
+      "free": "1.00000000",
+      "locked": "0.00000000"
+    },
+    {
+      "asset": "USDT",
+      "free": "10000.00000000",
+      "locked": "0.00000000"
+    }
+  ],
+  "after_balances": [
+    {
+      "asset": "BTC",
+      "free": "1.00000000",
+      "locked": "0.00000000"
+    },
+    {
+      "asset": "USDT",
+      "free": "9999.99999830",
+      "locked": "0.00000000"
+    }
+  ],
+  "accepted_ack_loss": {
+    "accepted_ack_discarded": true,
+    "fault_scope": "application response suppression, not wire-level packet loss",
+    "submit_calls": 1
+  },
+  "unknown_phase": "unknown",
+  "replay_submit_calls": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "all_asset_balance_check": {
+    "matched": true,
+    "mismatches": {},
+    "economic_deltas": {
+      "BTC": "0.00000000",
+      "USDT": "-0.00000170"
+    }
+  },
+  "steps": [
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 1.1516714170575142,
+      "result_file": "001-reconcile.json",
+      "error": ""
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "duration_seconds": 0.3763589160516858,
+      "result_file": "002-market.json",
+      "error": ""
+    },
+    {
+      "action": "submit",
+      "exit_code": 0,
+      "duration_seconds": 1.1228686664253473,
+      "result_file": "003-submit.json",
+      "error": ""
+    },
+    {
+      "action": "submit",
+      "exit_code": 0,
+      "duration_seconds": 0.39614483434706926,
+      "result_file": "004-submit.json",
+      "error": ""
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 1.0159076256677508,
+      "result_file": "005-reconcile.json",
+      "error": ""
+    },
+    {
+      "action": "cancel",
+      "exit_code": 0,
+      "duration_seconds": 0.7926084576174617,
+      "result_file": "006-cancel.json",
+      "error": ""
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 1.0284461248666048,
+      "result_file": "007-reconcile.json",
+      "error": ""
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "duration_seconds": 0.38662062492221594,
+      "result_file": "008-market.json",
+      "error": ""
+    },
+    {
+      "action": "submit-drop-ack",
+      "exit_code": 1,
+      "duration_seconds": 1.6835530418902636,
+      "result_file": "009-submit-drop-ack.json",
+      "error": "error: venue outcome: Unknown; query/reconcile before any new submission"
+    },
+    {
+      "action": "submit",
+      "exit_code": 0,
+      "duration_seconds": 0.40796204190701246,
+      "result_file": "010-submit.json",
+      "error": ""
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 1.398274041712284,
+      "result_file": "011-reconcile.json",
+      "error": ""
+    },
+    {
+      "action": "cancel",
+      "exit_code": 0,
+      "duration_seconds": 0.7968154596164823,
+      "result_file": "012-cancel.json",
+      "error": ""
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 1.372705458663404,
+      "result_file": "013-reconcile.json",
+      "error": ""
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "duration_seconds": 0.390842666849494,
+      "result_file": "014-market.json",
+      "error": ""
+    },
+    {
+      "action": "submit",
+      "exit_code": 0,
+      "duration_seconds": 2.0921666249632835,
+      "result_file": "015-submit.json",
+      "error": ""
+    },
+    {
+      "action": "submit",
+      "exit_code": 0,
+      "duration_seconds": 0.41503837518393993,
+      "result_file": "016-submit.json",
+      "error": ""
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 1.7823056243360043,
+      "result_file": "017-reconcile.json",
+      "error": ""
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "duration_seconds": 0.3828250002115965,
+      "result_file": "018-market.json",
+      "error": ""
+    },
+    {
+      "action": "submit",
+      "exit_code": 0,
+      "duration_seconds": 2.49210337549448,
+      "result_file": "019-submit.json",
+      "error": ""
+    },
+    {
+      "action": "submit",
+      "exit_code": 0,
+      "duration_seconds": 0.3990206252783537,
+      "result_file": "020-submit.json",
+      "error": ""
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 2.1628971667960286,
+      "result_file": "021-reconcile.json",
+      "error": ""
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 2.1327893743291497,
+      "result_file": "022-reconcile.json",
+      "error": ""
+    },
+    {
+      "action": "audit",
+      "exit_code": 0,
+      "duration_seconds": 0.00975116528570652,
+      "result_file": "023-audit.json",
+      "error": ""
+    }
+  ],
+  "scope": "only relevant virtual balances published; full local snapshots compared across all assets; no credentials or account identifiers"
+}

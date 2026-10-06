@@ -1,0 +1,15 @@
+{
+  "completed": false,
+  "screen_passed": false,
+  "error_type": "ValueError",
+  "error": "archive too short",
+  "protocol": {
+    "spec_sha256": "0f097c8eaae1d12949220c7b838364b0ec10aa512d3edf8ad635ec51b131fb9c",
+    "frozen_utc": "2026-10-06T11:22:28.261596+00:00",
+    "binary_sha256": "401e19e7583eb08fa265393444eb3cf8554f0d843d9c1d43e1e896d8638fb2b1",
+    "converter_sha256": "95fb053eef404d0757b82c1959f3d62c1a3c03ec84f5f17638bc8f6d2c14aef2",
+    "driver_sha256": "6218792fd49f8a9b7f0371302789147cfd3729a2a942b0643a657e084615b01e",
+    "spec": "configs/research-holdout-v2.json",
+    "rule": "frozen before fetching any new archive; quantity only uses training data"
+  }
+}

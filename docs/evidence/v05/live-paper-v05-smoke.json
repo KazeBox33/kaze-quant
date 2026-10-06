@@ -1,0 +1,69 @@
+{
+  "audit_chain_sha256": "18ea7c6c4b6a5aad6ec6d1336c8f3432c5397bd8c918211664a2c30306c0f096",
+  "binary_sha256": "dde2a5154037a29a6e60f05057e4ae4a5fab0b8785b1396007c4985b220a1aaa",
+  "commit_max_ns": 16519000,
+  "config_sha256": "2c21d379595cb27d87e1624e5262b08c5df37091c04fc52973f2408bbcda43ca",
+  "duration_seconds": 30.011481708,
+  "error": null,
+  "feed_queue": {
+    "capacity": 4096,
+    "frame_max_bytes": 8192,
+    "high_water_pending": 91,
+    "pending_at_stop": 0,
+    "raw_payload_capacity_bytes": 33554432,
+    "scope": "pending includes at most one producer frame in flight; successful send high-water is an upper estimate, not latency"
+  },
+  "last_observed_exchange_update_id": 101097241129,
+  "limits": "local receive timestamp; no real orders, queue position or market impact; stop/disconnect does not liquidate filled positions",
+  "mode": "public-live-spot-paper",
+  "quotes_committed": 2870,
+  "raw_consumed_jsonl_sha256": "b73a0572ecde80c58cfc869a10a6c658fedee0e12cb15c8244eefb112bb7a896",
+  "raw_frames_consumed": 2870,
+  "receive_to_durable_ack": {
+    "p50_ns": 11461833,
+    "p95_ns": 19419833,
+    "p99_ns": 22095041,
+    "samples": 2870,
+    "scope": "first up to 100K text frames, socket read to durable commit incl bounded queue; excludes exchange/network/kernel pre-read time and final partial batch"
+  },
+  "schema_version": 1,
+  "state": {
+    "clock_ns": 1791286064460103875,
+    "closed": true,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "1000000000000",
+        "equity_minor": "1000000000000",
+        "fees_minor": "0",
+        "halted": "finished",
+        "market": 0,
+        "metrics": {
+          "accepted": 0,
+          "cancelled": 0,
+          "fills": 0,
+          "max_drawdown_minor": "0",
+          "orders_examined": 0,
+          "peak_equity_minor": "1000000000000",
+          "quotes": 2870,
+          "rejected": 0
+        },
+        "pnl_minor": "0",
+        "position_units": 0,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "symbol": "BTCUSDT",
+        "units": {
+          "currency": "USDT",
+          "money_scale": 100000000,
+          "quantity_scale": 100000
+        }
+      }
+    ],
+    "processed": 2871,
+    "schema_version": 1
+  },
+  "success": true,
+  "symbol": "BTCUSDT",
+  "verified_commands": 2871
+}

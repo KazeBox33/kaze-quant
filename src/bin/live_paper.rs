@@ -9,11 +9,41 @@ use std::net::{TcpStream, ToSocketAddrs};
 use std::path::PathBuf;
 use std::sync::{
     Arc,
-    atomic::{AtomicBool, Ordering},
+    atomic::{AtomicBool, AtomicUsize, Ordering},
     mpsc,
 };
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use tungstenite::{Message, client_tls_with_config};
+const FEED_QUEUE_CAPACITY: usize = 4096;
+const FRAME_MAX_BYTES: usize = 8192;
+/// pending包含队列帧及最多一个生产者正在发送的帧；不作为真实交易延迟指标。
+#[derive(Default)]
+struct QueueMeter {
+    pending: AtomicUsize,
+    high_water: AtomicUsize,
+}
+impl QueueMeter {
+    fn send(&self, tx: &mpsc::SyncSender<Frame>, frame: Frame) -> Result<(), PaperError> {
+        let pending = self.pending.fetch_add(1, Ordering::Relaxed) + 1;
+        match tx.try_send(frame) {
+            Ok(()) => {
+                self.high_water.fetch_max(pending, Ordering::Relaxed);
+                Ok(())
+            }
+            Err(error) => {
+                self.pending.fetch_sub(1, Ordering::Relaxed);
+                Err(match error {
+                    mpsc::TrySendError::Full(_) => "feed queue capacity exceeded",
+                    mpsc::TrySendError::Disconnected(_) => "feed consumer closed",
+                }
+                .into())
+            }
+        }
+    }
+    fn consumed(&self) {
+        self.pending.fetch_sub(1, Ordering::Relaxed);
+    }
+}
 struct Frame {
     raw: String,
     received: Instant,
@@ -77,7 +107,9 @@ fn run() -> Result<(), PaperError> {
     }
     let mut normalizer =
         FeedNormalizer::new(symbol.clone(), config.markets[0].units.clone(), 0, 0)?;
-    let (tx, rx) = mpsc::sync_channel::<Frame>(256);
+    let (tx, rx) = mpsc::sync_channel::<Frame>(FEED_QUEUE_CAPACITY);
+    let queue_meter = Arc::new(QueueMeter::default());
+    let producer_meter = queue_meter.clone();
     let failed = Arc::new(AtomicBool::new(false));
     // 单个终止原因有界保存，先发布原因再置位；主线程不再把网络失败与过载混为一谈。
     let (failure_tx, failure_rx) = mpsc::sync_channel::<String>(1);
@@ -100,8 +132,8 @@ fn run() -> Result<(), PaperError> {
             tcp.set_read_timeout(Some(Duration::from_secs(2)))?;
             tcp.set_write_timeout(Some(Duration::from_secs(2)))?;
             let config = tungstenite::protocol::WebSocketConfig::default()
-                .max_message_size(Some(8192))
-                .max_frame_size(Some(8192));
+                .max_message_size(Some(FRAME_MAX_BYTES))
+                .max_frame_size(Some(FRAME_MAX_BYTES));
             let (mut socket, _) = client_tls_with_config(
                 format!("wss://data-stream.binance.vision/ws/{wire_symbol}@bookTicker"),
                 tcp,
@@ -112,14 +144,13 @@ fn run() -> Result<(), PaperError> {
             while !stopped.load(Ordering::Acquire) {
                 match socket.read() {
                     Ok(Message::Text(raw)) => {
-                        tx.try_send(Frame {
-                            raw: raw.to_string(),
-                            received: Instant::now(),
-                        })
-                        .map_err(|error| match error {
-                            mpsc::TrySendError::Full(_) => "feed queue capacity exceeded",
-                            mpsc::TrySendError::Disconnected(_) => "feed consumer closed",
-                        })?;
+                        producer_meter.send(
+                            &tx,
+                            Frame {
+                                raw: raw.to_string(),
+                                received: Instant::now(),
+                            },
+                        )?;
                     }
                     Ok(Message::Ping(_)) => {
                         socket.flush().map_err(|_| "feed pong failed")?;
@@ -181,6 +212,13 @@ fn run() -> Result<(), PaperError> {
             }
             match rx.recv_timeout(Duration::from_millis(1)) {
                 Ok(frame) => {
+                    queue_meter.consumed();
+                    // 缓冲只吸收短时突发，不授权在积压后用过期报价产生策略订单。
+                    if frame.received.elapsed()
+                        > Duration::from_nanos(config.markets[0].risk.max_quote_age_ns)
+                    {
+                        return Err("feed queued frame stale: fail closed".into());
+                    }
                     wire_hash.update(frame.raw.as_bytes());
                     wire_hash.update(b"\n");
                     raw_frames += 1;
@@ -253,7 +291,7 @@ fn run() -> Result<(), PaperError> {
             .get(latencies.len().saturating_sub(1) * n / 100)
             .copied()
     };
-    let body = serde_json::json!({"schema_version":1,"mode":"public-live-spot-paper","success":error.is_none(),"error":error,"symbol":symbol,"duration_seconds":start.elapsed().as_secs_f64(),"quotes_committed":committed,"last_observed_exchange_update_id":normalizer.exchange_update_id(),"raw_frames_consumed":raw_frames,"raw_consumed_jsonl_sha256":kaze_quant::journal::hex(&wire_hash.finalize()),"binary_sha256":session.binary_sha256,"config_sha256":session.config_sha256,"audit_chain_sha256":session.chain_sha256(),"verified_commands":verified,"commit_max_ns":commit_max_ns,"receive_to_durable_ack":{"samples":latencies.len(),"p50_ns":percentile(50),"p95_ns":percentile(95),"p99_ns":percentile(99),"scope":"first up to 100K text frames, socket read to durable commit incl bounded queue; excludes exchange/network/kernel pre-read time and final partial batch"},"state":session.runtime().report(),"limits":"local receive timestamp; no real orders, queue position or market impact; stop/disconnect does not liquidate filled positions"});
+    let body = serde_json::json!({"schema_version":1,"mode":"public-live-spot-paper","success":error.is_none(),"error":error,"symbol":symbol,"duration_seconds":start.elapsed().as_secs_f64(),"quotes_committed":committed,"last_observed_exchange_update_id":normalizer.exchange_update_id(),"raw_frames_consumed":raw_frames,"raw_consumed_jsonl_sha256":kaze_quant::journal::hex(&wire_hash.finalize()),"binary_sha256":session.binary_sha256,"config_sha256":session.config_sha256,"audit_chain_sha256":session.chain_sha256(),"verified_commands":verified,"commit_max_ns":commit_max_ns,"feed_queue":{"capacity":FEED_QUEUE_CAPACITY,"frame_max_bytes":FRAME_MAX_BYTES,"raw_payload_capacity_bytes":FEED_QUEUE_CAPACITY*FRAME_MAX_BYTES,"pending_at_stop":queue_meter.pending.load(Ordering::Relaxed),"high_water_pending":queue_meter.high_water.load(Ordering::Relaxed),"scope":"pending includes at most one producer frame in flight; successful send high-water is an upper estimate, not latency"},"receive_to_durable_ack":{"samples":latencies.len(),"p50_ns":percentile(50),"p95_ns":percentile(95),"p99_ns":percentile(99),"scope":"first up to 100K text frames, socket read to durable commit incl bounded queue; excludes exchange/network/kernel pre-read time and final partial batch"},"state":session.runtime().report(),"limits":"local receive timestamp; no real orders, queue position or market impact; stop/disconnect does not liquidate filled positions"});
     publish_new(&report, &serde_json::to_vec_pretty(&body)?)?;
     println!("{}", serde_json::to_string(&body)?);
     if error.is_some() {
@@ -265,5 +303,36 @@ fn main() {
     if let Err(e) = run() {
         eprintln!("error: {e}");
         std::process::exit(1);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn frame(n: usize) -> Frame {
+        Frame {
+            raw: n.to_string(),
+            received: Instant::now(),
+        }
+    }
+    #[test]
+    fn bounded_burst_preserves_order_and_overflow_never_overwrites() {
+        let (tx, rx) = mpsc::sync_channel(4);
+        let meter = QueueMeter::default();
+        for n in 0..4 {
+            meter.send(&tx, frame(n)).unwrap();
+        }
+        assert_eq!(meter.pending.load(Ordering::Relaxed), 4);
+        assert!(meter.send(&tx, frame(4)).is_err());
+        assert_eq!(meter.pending.load(Ordering::Relaxed), 4);
+        for n in 0..4 {
+            assert_eq!(rx.recv().unwrap().raw, n.to_string());
+            meter.consumed();
+        }
+        assert_eq!(meter.pending.load(Ordering::Relaxed), 0);
+        assert_eq!(meter.high_water.load(Ordering::Relaxed), 4);
+        drop(rx);
+        assert!(meter.send(&tx, frame(5)).is_err());
+        assert_eq!(meter.pending.load(Ordering::Relaxed), 0);
     }
 }

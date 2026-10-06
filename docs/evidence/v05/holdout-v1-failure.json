@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "study": "gate3-independent-week-v1",
+  "screen_passed": false,
+  "completed": false,
+  "reason": "strict causal conversion rejected official source clocks; no dates substituted and no profitable result produced",
+  "protocol": {
+    "spec_sha256": "40091017e9d6418ec0bf829f71ff862f545ca2c88abfc5ee7c7223dd54abe684",
+    "frozen_utc": "2026-10-06T11:08:59.155387+00:00",
+    "binary_sha256": "401e19e7583eb08fa265393444eb3cf8554f0d843d9c1d43e1e896d8638fb2b1",
+    "spec": "configs/research-holdout-v1.json",
+    "rule": "frozen before fetching any new archive; quantity only uses training data"
+  },
+  "source_clock_failures": [
+    {
+      "archive": "BTCUSDT-bookTicker-2024-01-02.zip",
+      "source_row": 3,
+      "previous_event_ns": 1704238709666000000,
+      "transaction_ms": 1704153600008,
+      "event_ms": 1704153600014,
+      "regression_ns": 85109652000000,
+      "transaction_after_event_ms": 0
+    }
+  ]
+}

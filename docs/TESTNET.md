@@ -10,11 +10,11 @@ reports/live-paper-binary configs/binance-live-paper.json reports/live.db BTCUSD
 reports/live-paper-binary configs/binance-live-paper.json reports/live.db BTCUSDT audit reports/live-recovered.json
 ```
 
-网络功能是可选的；核心 crate 默认不加载 HTTP/WebSocket 依赖。公共行情主机固定为 `data-stream.binance.vision:443`；全部订单在本地仿真。256帧通道、8KiB帧上限、5ms/256条批次。网络读取/写入有超时，队列满、断线、非法数据或有效报价过期会持久停止。重复ID不会延长报价新鲜度。行情没有交易所时间字段，报告明确只度量 socket read 到持久确认，不能当作交易所到订单延迟。
+网络功能是可选的；核心 crate 默认不加载 HTTP/WebSocket 依赖。公共行情主机固定为 `data-stream.binance.vision:443`；全部订单在本地仿真。4096帧通道（原始payload容量<=32MiB）、8KiB帧上限、5ms/256条批次。网络读取/写入有超时，队列满、断线、非法数据或有效报价过期会持久停止。重复ID不会延长报价新鲜度。行情没有交易所时间字段，报告明确只度量 socket read 到持久确认，不能当作交易所到订单延迟。
 
 使用新会话建立每次连接，避免把中断时漏掉的行情当作连续数据。结束后取消未成交委托，持仓保留。`audit` 必须使用原二进制、相同配置/选项；更新版本前保留二进制及完整数据。报告记录实际配置、二进制、已消费原帧摘要和完整审计结果。监控采样最多100000条，最后部分批次不纳入延迟分位数。
 
-运行24小时可将600改为86400；Mac需保持唤醒和网络稳定。`success=true`只代表该次纸面运行完成，不代表订单真实性或策略盈利。首轮24小时实验在27.8分钟后断线/过载停止，失败会话恢复审计通过；尚没有全天或多日验收记录。故障诊断的具体原因进入error字段，主线程优先停止而不继续消费剩余队列。
+运行24小时可将600改为86400；Mac需保持唤醒和网络稳定。`success=true`只代表该次纸面运行完成，不代表订单真实性或策略盈利。首轮24小时实验在27.8分钟后断线/过载停止，失败会话恢复审计通过；第二轮在53.4分钟队列满停止并恢复通过；尚没有全天或多日验收记录。故障诊断的具体原因进入error字段，主线程优先停止而不继续消费剩余队列。
 
 ## 外部测试网订单
 
@@ -42,6 +42,14 @@ target/release/kaze-testnet reports/testnet.db cancel kaze-YOUR-UNIQUE-ID
 target/release/kaze-testnet reports/testnet.db reconcile
 target/release/kaze-testnet reports/testnet.db audit
 ```
+
+可复现基础验收（会发送最多4张测试网订单，每单<=20 USDT；建议独立测试网账户，期间不要并发交易）：
+
+```sh
+python3 scripts/testnet_acceptance.py --output reports/my-testnet-acceptance
+```
+
+每步在独立进程中执行；真实买卖后根据LOT_SIZE可能留有少量虚拟资产尘埃。`submit-drop-ack`显式丢弃成功提交回报，用于验证unknown恢复；不是实际断网。汇总只报告观测事实，零手续费或没有部分成交都不能假装已测。失败只尝试查询/撤销本地身份，不重发未知订单或擅自撤销外部订单。
 
 最后数字是该单USDT风险上限，不能超过100。实时交易所过滤和可用余额也会检查；动态价格带、账户级过滤由交易所最终检查。预检失败不创建意图；POST错误/超时后的意图保持未知，重复提交相同ID只查询。即使查询返回不存在，也不自动重发或删除未知意图，防止最终一致查询导致重复订单。需要人工查明后在新隔离测试会话中继续。
 

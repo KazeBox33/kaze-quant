@@ -1,0 +1,13 @@
+{
+  "attempt_success": false,
+  "error": "feed queue capacity exceeded",
+  "duration_seconds": 3201.920646583,
+  "quotes_committed": 275611,
+  "recovered_state_chain_equal": true,
+  "verified_commands": 275612,
+  "accepted_24h": false,
+  "binary_sha256": "8b3f679c9121a41ca73b591285be39ab9b21d376fe5c00231f3d126bb6b10744",
+  "report": "live-paper-24h-v04-rerun.json",
+  "recovery": "live-paper-24h-v04-rerun-recovery.json",
+  "scope": "one attempt only; no credentials, orders, notifications or aggregate-duration acceptance"
+}
