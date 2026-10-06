@@ -1,0 +1,108 @@
+[
+  {
+    "command": [
+      "scripts/cargo.sh",
+      "fmt",
+      "--check"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 0.10974454134702682,
+    "rust_tests_passed": 0
+  },
+  {
+    "command": [
+      "scripts/cargo.sh",
+      "clippy",
+      "--locked",
+      "--all-features",
+      "--all-targets",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 1.8350109169259667,
+    "rust_tests_passed": 0
+  },
+  {
+    "command": [
+      "scripts/cargo.sh",
+      "test",
+      "--locked",
+      "--all-features",
+      "--all-targets"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 30.893726292066276,
+    "rust_tests_passed": 160
+  },
+  {
+    "command": [
+      "scripts/cargo.sh",
+      "test",
+      "--locked",
+      "--all-features",
+      "--release"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 52.02557404246181,
+    "rust_tests_passed": 160
+  },
+  {
+    "command": [
+      "scripts/cargo.sh",
+      "doc",
+      "--locked",
+      "--all-features",
+      "--no-deps"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 1.3166363341733813,
+    "rust_tests_passed": 0
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/test_market_data.py"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 0.06949187535792589,
+    "rust_tests_passed": 0
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/test_research_data.py"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 0.41058787517249584,
+    "rust_tests_passed": 0
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/test_research_holdout.py"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 0.05236516613513231,
+    "rust_tests_passed": 0
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/test_event_time_data.py"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 0.11795962508767843,
+    "rust_tests_passed": 0
+  },
+  {
+    "command": [
+      "python3",
+      "scripts/test_testnet_acceptance.py"
+    ],
+    "exit_code": 0,
+    "duration_seconds": 0.05087045766413212,
+    "rust_tests_passed": 0
+  }
+]

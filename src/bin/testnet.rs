@@ -13,6 +13,24 @@ struct AcceptanceVenue<V> {
     discarded: bool,
 }
 impl<V: ExecutionVenue> ExecutionVenue for AcceptanceVenue<V> {
+    fn capabilities(&self) -> kaze_quant::external_state::VenueCapabilities {
+        self.inner.capabilities()
+    }
+    fn account_identity(
+        &mut self,
+    ) -> Result<
+        (
+            kaze_quant::external_state::ExecutionIdentity,
+            AccountObservation,
+        ),
+        VenueError,
+    > {
+        self.inner.account_identity()
+    }
+    fn account_open_orders(&mut self) -> Result<Vec<OrderObservation>, VenueError> {
+        self.inner.account_open_orders()
+    }
+
     fn validate_intent(&mut self, i: &OrderIntent) -> Result<(), VenueError> {
         self.inner.validate_intent(i)
     }
@@ -53,7 +71,7 @@ fn run() -> Result<(), PaperError> {
     let args: Vec<_> = std::env::args().skip(1).collect();
     if args.first().is_some_and(|s| s == "--help") || args.is_empty() {
         println!(
-            "Binance Spot TESTNET only; never real-money endpoint.\nUsage: kaze-testnet JOURNAL submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL submit-drop-ack INTENT.json MAX_USDT\n       kaze-testnet JOURNAL reconcile\n       kaze-testnet JOURNAL cancel CLIENT_ID\n       kaze-testnet JOURNAL audit\n       kaze-testnet market SYMBOL\nCredentials: local env or configs/testnet.credentials.env.\nsubmit-drop-ack intentionally discards an accepted response; it is NOT a wire-level fault.\nUncertain submissions are never resent, even if query returns not-found."
+            "Binance Spot TESTNET only; never real-money endpoint.\nUsage: kaze-testnet JOURNAL submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL submit-drop-ack INTENT.json MAX_USDT\n       kaze-testnet JOURNAL stream-watch SECONDS\n       kaze-testnet JOURNAL stream-submit INTENT.json MAX_USDT SECONDS\n       kaze-testnet JOURNAL ledger-init SYMBOL\n       kaze-testnet JOURNAL reconcile\n       kaze-testnet JOURNAL cancel CLIENT_ID\n       kaze-testnet JOURNAL audit\n       kaze-testnet market SYMBOL\nCredentials: local env or configs/testnet.credentials.env.\nsubmit-drop-ack intentionally discards an accepted response; it is NOT a wire-level fault.\nUncertain submissions are never resent, even if query returns not-found."
         );
         return Ok(());
     }
@@ -83,7 +101,72 @@ fn run() -> Result<(), PaperError> {
         submit_calls: 0,
         discarded: false,
     };
+    let mut stream_report = serde_json::Value::Null;
     let result = match args[1].as_str() {
+        "stream-watch" if args.len() == 3 => {
+            let seconds = args[2]
+                .parse::<u64>()
+                .map_err(|_| "invalid stream duration")?;
+            stream_pilot(&mut journal, &mut venue, None, seconds, &mut stream_report)
+        }
+        "stream-submit" if args.len() == 5 => {
+            use std::io::Read;
+            let mut bytes = Vec::new();
+            std::fs::File::open(&args[2])?
+                .take(8193)
+                .read_to_end(&mut bytes)?;
+            if bytes.len() > 8192 {
+                return Err("intent exceeds 8 KiB".into());
+            }
+            let i: OrderIntent = serde_json::from_slice(&bytes)?;
+            let cap = decimal::parse(&args[3])?;
+            if cap > 100 * decimal::SCALE {
+                return Err("pilot cap must be <=100 USDT".into());
+            }
+            i.validate(cap)?;
+            let seconds = args[4]
+                .parse::<u64>()
+                .map_err(|_| "invalid stream duration")?;
+            stream_pilot(
+                &mut journal,
+                &mut venue,
+                Some((&i, cap)),
+                seconds,
+                &mut stream_report,
+            )
+        }
+
+        "ledger-init" if args.len() == 3 => {
+            let caps = venue.capabilities();
+            if !caps.account_identity
+                || !caps.account_open_orders
+                || !caps.original_currency_fees
+                || !caps.spot_limit_gtc
+            {
+                return Err("venue lacks required ledger capabilities".into());
+            }
+            if !venue
+                .account_open_orders()
+                .map_err(|e| PaperError(e.to_string()))?
+                .is_empty()
+            {
+                return Err("baseline requires no open exchange orders".into());
+            }
+            let info = venue
+                .inner
+                .market_snapshot(&args[2])
+                .map_err(|e| PaperError(e.to_string()))?;
+            let i = &info["exchange_info"]["symbols"][0];
+            let binding: kaze_quant::external_state::InstrumentBinding = serde_json::from_value(
+                serde_json::json!({"symbol":i["symbol"],"base_asset":i["baseAsset"],"quote_asset":i["quoteAsset"]}),
+            )?;
+            let (identity, account) = venue
+                .account_identity()
+                .map_err(|e| PaperError(e.to_string()))?;
+            journal.bind_account(&identity, &account, &[binding])?;
+            journal.reconcile(&mut venue)
+        }
+
         "submit" | "submit-drop-ack" if args.len() == 4 => {
             use std::io::Read;
             let mut bytes = Vec::new();
@@ -105,12 +188,94 @@ fn run() -> Result<(), PaperError> {
         _ => Err("invalid action/arguments".into()),
     };
     let mut audit = journal.audit()?;
+    audit["private_stream_pilot"] = stream_report;
     audit["pilot_transport"] = serde_json::json!({
         "submit_calls":venue.submit_calls,
         "accepted_ack_discarded":venue.discarded,
         "fault_scope":"application response suppression, not wire-level packet loss"
     });
     println!("{}", serde_json::to_string_pretty(&audit)?);
+    result
+}
+/// 有界人工验收；网络与 SQLite 共用一个写入者，不宣称连续实盘节点。
+fn stream_pilot(
+    j: &mut ExecutionJournal,
+    v: &mut AcceptanceVenue<BinanceTestnet>,
+    intent: Option<(&OrderIntent, i128)>,
+    seconds: u64,
+    report: &mut serde_json::Value,
+) -> Result<(), PaperError> {
+    if !(5..=300).contains(&seconds) {
+        return Err("stream pilot duration must be 5..=300 seconds".into());
+    }
+    if j.execution_identity()?.is_none() {
+        return Err("run ledger-init on a fresh journal before private stream".into());
+    }
+    j.mark_execution_gap("private stream connecting", false)?;
+    let mut stream = v
+        .inner
+        .user_stream()
+        .map_err(|e| PaperError(e.to_string()))?;
+    let start = std::time::Instant::now();
+    let mut events = 0u64;
+    let mut duplicates = 0u64;
+    let result = (|| -> Result<(), PaperError> {
+        j.reconcile(v)?;
+        if let Some((i, cap)) = intent {
+            j.submit_once(v, i, cap)?;
+        }
+        let end = start + std::time::Duration::from_secs(seconds);
+        while std::time::Instant::now() < end {
+            if let Some(e) = stream.receive().map_err(|e| PaperError(e.to_string()))? {
+                if matches!(e, kaze_quant::user_stream::UserEvent::Terminated) {
+                    return Err("private stream terminated".into());
+                }
+                let execution = matches!(e, kaze_quant::user_stream::UserEvent::Execution(_));
+                let inserted = j.ingest_user_event(&e)?;
+                events += 1;
+                if execution && !inserted {
+                    duplicates += 1;
+                }
+                if events > 10_000 {
+                    return Err("private pilot event capacity exceeded".into());
+                }
+            }
+        }
+        if let Some((i, _)) = intent {
+            let open = j
+                .orders()?
+                .into_iter()
+                .find(|o| o.intent.client_order_id == i.client_order_id)
+                .is_some_and(|o| o.observation.is_none_or(|v| !v.status.terminal()));
+            if open {
+                j.cancel_once(v, &i.client_order_id)?;
+            }
+        }
+        // 撤单 REST 返回后再消费已到达的推送；超出时间的成交仍由最终 REST 补查。
+        let drain_end = std::time::Instant::now() + std::time::Duration::from_secs(3);
+        while std::time::Instant::now() < drain_end {
+            if let Some(e) = stream.receive().map_err(|e| PaperError(e.to_string()))? {
+                if matches!(e, kaze_quant::user_stream::UserEvent::Terminated) {
+                    return Err("private stream terminated".into());
+                }
+                let execution = matches!(e, kaze_quant::user_stream::UserEvent::Execution(_));
+                let inserted = j.ingest_user_event(&e)?;
+                events += 1;
+                if execution && !inserted {
+                    duplicates += 1;
+                }
+                if events > 10_000 {
+                    return Err("private pilot event capacity exceeded".into());
+                }
+            }
+        }
+        j.reconcile(v)?;
+        Ok(())
+    })();
+    if result.is_err() {
+        j.mark_execution_gap("private pilot failed; REST recovery required", false)?;
+    }
+    *report = serde_json::json!({"authenticated_subscription":true,"success":result.is_ok(),"events_received":events,"duplicate_execution_events":duplicates,"duration_seconds":start.elapsed().as_secs_f64(),"scope":"bounded synchronous manual Testnet pilot; one optional intent, cancel open remainder, no automatic liquidation/reconnect; REST final audit, no feed latency benchmark"});
     result
 }
 fn main() {

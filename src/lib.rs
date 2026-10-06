@@ -26,3 +26,6 @@ pub mod research;
 pub mod registry;
 
 pub mod telemetry;
+
+pub mod external_state;
+pub mod user_stream;

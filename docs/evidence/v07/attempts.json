@@ -1,0 +1,25 @@
+[
+  {
+    "attempt": "a",
+    "stage": "asset baseline validation",
+    "submit_calls": 0,
+    "reason": "uppercase ASCII asset assumption rejected Unicode asset identifiers"
+  },
+  {
+    "attempt": "b",
+    "stage": "asset baseline validation",
+    "submit_calls": 0,
+    "reason": "case-sensitive ASCII broadened domain still rejected Chinese asset identifiers"
+  },
+  {
+    "attempt": "c",
+    "stage": "private stream connecting",
+    "submit_calls": 0,
+    "reason": "subscription/connect unavailable after prior authenticated read-only watch; journal remained needs_reconciliation; precise transport stage absent in that binary"
+  },
+  {
+    "attempt": "d",
+    "success": true,
+    "summary": "testnet-private.json"
+  }
+]

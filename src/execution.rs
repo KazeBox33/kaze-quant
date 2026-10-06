@@ -120,7 +120,7 @@ pub struct TrackedOrder {
 }
 
 pub struct ExecutionJournal {
-    conn: Connection,
+    pub(crate) conn: Connection,
     _lock: File,
 }
 impl ExecutionJournal {
@@ -146,7 +146,9 @@ impl ExecutionJournal {
         CREATE TABLE IF NOT EXISTS intents (id TEXT PRIMARY KEY, intent TEXT NOT NULL, phase TEXT NOT NULL, observation TEXT);
         CREATE TABLE IF NOT EXISTS observations (seq INTEGER PRIMARY KEY, id TEXT NOT NULL, body TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS trades (symbol TEXT NOT NULL, id INTEGER NOT NULL, body TEXT NOT NULL, PRIMARY KEY(symbol,id));
-        CREATE TABLE IF NOT EXISTS accounts (seq INTEGER PRIMARY KEY, body TEXT NOT NULL);")?;
+        CREATE TABLE IF NOT EXISTS accounts (seq INTEGER PRIMARY KEY, body TEXT NOT NULL);
+        CREATE INDEX IF NOT EXISTS trade_order_identity ON trades(symbol,json_extract(body,'$.orderId'));
+        CREATE UNIQUE INDEX IF NOT EXISTS venue_order_identity ON intents(json_extract(observation,'$.symbol'),json_extract(observation,'$.orderId')) WHERE observation IS NOT NULL;")?;
         let revision: Option<String> = conn
             .query_row("SELECT revision FROM execution_meta", [], |r| r.get(0))
             .optional()?;
@@ -160,6 +162,7 @@ impl ExecutionJournal {
             Some(r) if r == "binance-testnet-execution-v1" => (),
             _ => return Err("execution journal revision mismatch".into()),
         }
+        crate::external_state::create_schema(&conn)?;
         Ok(Self { conn, _lock: lock })
     }
     /// 返回 false 表示身份已存在，调用方不得再次发送。
@@ -179,6 +182,24 @@ impl ExecutionJournal {
                 return Err("client ID reused with a different intent".into());
             }
             return Ok(false);
+        }
+        let health: Option<(String, i64)> = tx
+            .query_row("SELECT health,blocked FROM external_control", [], |r| {
+                Ok((r.get(0)?, r.get(1)?))
+            })
+            .optional()?;
+        if health.is_some_and(|(h, b)| h != "ready" || b != 0) {
+            return Err("external account requires reconciliation before new intent".into());
+        }
+        if identity_bound(&tx)? {
+            let known: i64 = tx.query_row(
+                "SELECT count(*) FROM instruments WHERE symbol=?1",
+                [&intent.symbol],
+                |r| r.get(0),
+            )?;
+            if known != 1 {
+                return Err("instrument is not bound to account ledger".into());
+            }
         }
         let count: i64 = tx.query_row("SELECT count(*) FROM intents", [], |r| r.get(0))?;
         let unresolved: i64 = tx.query_row(
@@ -221,119 +242,24 @@ impl ExecutionJournal {
     }
     pub fn observe(&mut self, obs: &OrderObservation) -> Result<(), PaperError> {
         let tx = self.conn.transaction()?;
-        let (intent, old): (String, Option<String>) = tx.query_row(
-            "SELECT intent,observation FROM intents WHERE id=?1",
-            [&obs.client_order_id],
-            |r| Ok((r.get(0)?, r.get(1)?)),
-        )?;
-        let intent: OrderIntent = serde_json::from_str(&intent)?;
-        let filled = decimal::parse(&obs.executed_qty)?;
-        let quote = decimal::parse(&obs.cummulative_quote_qty)?;
-        let side = match intent.side {
-            crate::types::Side::Buy => "BUY",
-            crate::types::Side::Sell => "SELL",
-        };
-        if intent.symbol != obs.symbol
-            || obs.side != side
-            || decimal::parse(&intent.price)? != decimal::parse(&obs.price)?
-            || decimal::parse(&intent.quantity)? != decimal::parse(&obs.orig_qty)?
-            || obs.order_id == 0
-            || filled > decimal::parse(&intent.quantity)?
-            || (obs.status == VenueStatus::Filled && filled != decimal::parse(&intent.quantity)?)
-            || (obs.status == VenueStatus::New && filled != 0)
-            || (obs.status == VenueStatus::PartiallyFilled
-                && (filled == 0 || filled == decimal::parse(&intent.quantity)?))
-            || (filled == 0 && quote != 0)
-        {
-            return Err("venue observation conflicts with order intent/economics".into());
-        }
-        let filled_notional = decimal::parse(&intent.price)?
-            .checked_mul(filled)
-            .ok_or("observation notional overflow")?;
-        let reported = quote
-            .checked_mul(SCALE)
-            .ok_or("observation quote overflow")?;
-        if (intent.side == crate::types::Side::Buy && reported > filled_notional)
-            || (intent.side == crate::types::Side::Sell && reported < filled_notional)
-            || (obs.status == VenueStatus::Rejected && filled != 0)
-        {
-            return Err("venue fill economics violate limit or rejected status".into());
-        }
-        if let Some(old) = old {
-            let old: OrderObservation = serde_json::from_str(&old)?;
-            if old.order_id != obs.order_id
-                || filled < decimal::parse(&old.executed_qty)?
-                || quote < decimal::parse(&old.cummulative_quote_qty)?
-                || obs.update_time < old.update_time
-                || (old.status.terminal()
-                    && (old.status != obs.status
-                        || decimal::parse(&old.executed_qty)? != filled
-                        || decimal::parse(&old.cummulative_quote_qty)? != quote))
-            {
-                return Err("regressing or conflicting venue observation".into());
-            }
-        }
-        let json = serde_json::to_string(obs)?;
-        tx.execute(
-            "INSERT INTO observations(id,body) VALUES (?1,?2)",
-            params![obs.client_order_id, json],
-        )?;
-        tx.execute(
-            "UPDATE intents SET phase=?2,observation=?3 WHERE id=?1",
-            params![
-                obs.client_order_id,
-                if obs.status.terminal() {
-                    "terminal"
-                } else {
-                    "open"
-                },
-                json
-            ],
-        )?;
+        observe_tx(&tx, obs)?;
+        tx.execute("UPDATE external_control SET health='needs_reconciliation',reason='order evidence changed' WHERE blocked=0",[])?;
         tx.commit()?;
         Ok(())
     }
     pub fn record_trades(&mut self, trades: &[TradeObservation]) -> Result<(), PaperError> {
-        if trades.len() > 1000 {
-            return Err("trade page capacity exceeded".into());
-        }
         let tx = self.conn.transaction()?;
-        for t in trades {
-            if t.id > i64::MAX as u64
-                || t.order_id == 0
-                || decimal::parse(&t.qty)? == 0
-                || decimal::parse(&t.price)? == 0
-                || t.commission_asset.is_empty()
-                || t.commission_asset.len() > 20
-                || !t
-                    .commission_asset
-                    .bytes()
-                    .all(|b| b.is_ascii_alphanumeric())
-            {
-                return Err("invalid trade economics or identity".into());
-            }
-            decimal::parse(&t.quote_qty)?;
-            decimal::parse(&t.commission)?;
-            let json = serde_json::to_string(t)?;
-            let old: Option<String> = tx
-                .query_row(
-                    "SELECT body FROM trades WHERE symbol=?1 AND id=?2",
-                    params![t.symbol, t.id as i64],
-                    |r| r.get(0),
-                )
-                .optional()?;
-            if old.as_ref().is_some_and(|s| s != &json) {
-                return Err("conflicting duplicate trade ID".into());
-            }
-            tx.execute(
-                "INSERT OR IGNORE INTO trades VALUES (?1,?2,?3)",
-                params![t.symbol, t.id as i64, json],
-            )?;
-        }
+        record_trades_tx(&tx, trades)?;
         tx.commit()?;
         Ok(())
     }
     pub fn record_account(&mut self, a: &AccountObservation) -> Result<(), PaperError> {
+        let count: i64 = self
+            .conn
+            .query_row("SELECT count(*) FROM accounts", [], |r| r.get(0))?;
+        if count >= 100_000 {
+            return Err("account snapshot history capacity exceeded".into());
+        }
         if a.balances.len() > 4096 {
             return Err("balance capacity exceeded".into());
         }
@@ -360,41 +286,9 @@ impl ExecutionJournal {
             .query_map([], |r| r.get::<_, String>(0))?
             .map(|r| -> Result<TradeObservation, PaperError> { Ok(serde_json::from_str(&r?)?) })
             .collect::<Result<Vec<_>, _>>()?;
-        let mut problems = Vec::new();
-        for o in self.orders()? {
-            let Some(obs) = o.observation else {
-                problems.push(format!(
-                    "{}: unknown submission outcome",
-                    o.intent.client_order_id
-                ));
-                continue;
-            };
-            let selected: Vec<_> = trades
-                .iter()
-                .filter(|t| t.symbol == obs.symbol && t.order_id == obs.order_id)
-                .collect();
-            let mut quantity = 0i128;
-            let mut quote = 0i128;
-            for t in selected {
-                if t.is_buyer != (obs.side == "BUY") {
-                    return Err("trade side conflicts with order".into());
-                }
-                quantity = quantity
-                    .checked_add(decimal::parse(&t.qty)?)
-                    .ok_or("trade quantity overflow")?;
-                quote = quote
-                    .checked_add(decimal::parse(&t.quote_qty)?)
-                    .ok_or("trade quote overflow")?;
-            }
-            if quantity != decimal::parse(&obs.executed_qty)?
-                || quote != decimal::parse(&obs.cummulative_quote_qty)?
-            {
-                problems.push(format!(
-                    "{}: order/trade economics mismatch",
-                    o.intent.client_order_id
-                ));
-            }
-        }
+        let orders = self.orders()?;
+        let problems = order_trade_problems(&orders, &trades)?;
+        let mut problems = problems;
         let latest: Option<String> = self
             .conn
             .query_row(
@@ -407,13 +301,14 @@ impl ExecutionJournal {
             problems.push("account snapshot absent".into());
         }
         Ok(
-            serde_json::json!({"schema_version":1,"environment":"binance-spot-testnet","problems":problems,"orders":self.orders()?,"trades":trades,"account":latest.map(|s| serde_json::from_str::<AccountObservation>(&s)).transpose()?,"scope":"observed exchange balances and per-order trade reconciliation; no portfolio PnL or authenticated journal signatures"}),
+            serde_json::json!({"schema_version":1,"environment":"binance-spot-testnet","problems":problems,"orders":self.orders()?,"trades":trades,"account":latest.map(|s| serde_json::from_str::<AccountObservation>(&s)).transpose()?,"external_ledger":self.external_audit()?,"scope":"observed exchange balances and per-order trade reconciliation; no FX portfolio PnL or authenticated journal signatures"}),
         )
     }
 }
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum VenueError {
+    Protocol(&'static str),
     Unknown,
     Rejected(i64),
     Unavailable,
@@ -430,6 +325,17 @@ impl std::fmt::Display for VenueError {
 impl std::error::Error for VenueError {}
 /// 传输适配器只返回交易所证据；本地订单 ID 和重投政策由网关统一管理。
 pub trait ExecutionVenue {
+    fn capabilities(&self) -> crate::external_state::VenueCapabilities {
+        crate::external_state::VenueCapabilities::default()
+    }
+    fn account_identity(
+        &mut self,
+    ) -> Result<(crate::external_state::ExecutionIdentity, AccountObservation), VenueError> {
+        Err(VenueError::Unavailable)
+    }
+    fn account_open_orders(&mut self) -> Result<Vec<OrderObservation>, VenueError> {
+        Err(VenueError::Unavailable)
+    }
     fn validate_intent(&mut self, intent: &OrderIntent) -> Result<(), VenueError>;
     fn submit(&mut self, intent: &OrderIntent) -> Result<OrderObservation, VenueError>;
     fn query(&mut self, intent: &OrderIntent) -> Result<OrderObservation, VenueError>;
@@ -460,6 +366,7 @@ impl ExecutionJournal {
         cap: i128,
     ) -> Result<(), PaperError> {
         intent.validate(cap)?;
+        self.verify_account_identity(venue)?;
         // 再次收到同一意图只做查询，连 preflight 都不允许变成二次提交。
         if self
             .orders()?
@@ -488,6 +395,7 @@ impl ExecutionJournal {
         venue: &mut impl ExecutionVenue,
         id: &str,
     ) -> Result<(), PaperError> {
+        self.verify_account_identity(venue)?;
         let order = self
             .orders()?
             .into_iter()
@@ -521,6 +429,14 @@ impl ExecutionJournal {
         Ok(())
     }
     pub fn reconcile(&mut self, venue: &mut impl ExecutionVenue) -> Result<(), PaperError> {
+        self.mark_execution_gap("REST reconciliation started", false)?;
+        if let Some(expected) = self.execution_identity()? {
+            let (actual, _) = venue.account_identity().map_err(venue_error)?;
+            if actual != expected {
+                self.mark_execution_gap("account identity conflict", true)?;
+                return Err("account identity conflict".into());
+            }
+        }
         let orders = self.orders()?;
         for o in &orders {
             let obs = venue
@@ -538,11 +454,33 @@ impl ExecutionJournal {
                     o.intent.client_order_id == remote.client_order_id
                         && o.intent.symbol == remote.symbol
                 }) {
+                    self.mark_execution_gap("untracked exchange order", true)?;
                     return Err("untracked exchange order: manual reconciliation required".into());
                 }
             }
         }
-        let account = venue.account().map_err(venue_error)?;
+        let account = if let Some(expected) = self.execution_identity()? {
+            for remote in venue.account_open_orders().map_err(venue_error)? {
+                if !orders.iter().any(|o| {
+                    o.intent.symbol == remote.symbol
+                        && o.observation
+                            .as_ref()
+                            .is_some_and(|v| v.order_id == remote.order_id)
+                }) {
+                    self.mark_execution_gap("untracked exchange order", true)?;
+                    return Err("untracked exchange order: manual reconciliation required".into());
+                }
+            }
+            let (actual, snapshot) = venue.account_identity().map_err(venue_error)?;
+            if actual != expected {
+                self.mark_execution_gap("account identity conflict", true)?;
+                return Err("account identity conflict".into());
+            }
+            self.reconcile_balances(&snapshot)?;
+            snapshot
+        } else {
+            venue.account().map_err(venue_error)?
+        };
         if !account.can_trade {
             return Err("exchange account cannot trade".into());
         }
@@ -554,6 +492,259 @@ impl ExecutionJournal {
             .is_empty()
         {
             return Err("order/trade/account reconciliation incomplete".into());
+        }
+        self.mark_reconciled()?;
+        Ok(())
+    }
+}
+
+/// 单个SQL事务可同时写订单证据、成交去重和资产变动。
+pub(crate) fn observe_tx(tx: &Connection, obs: &OrderObservation) -> Result<bool, PaperError> {
+    let (intent, old): (String, Option<String>) = tx.query_row(
+        "SELECT intent,observation FROM intents WHERE id=?1",
+        [&obs.client_order_id],
+        |r| Ok((r.get(0)?, r.get(1)?)),
+    )?;
+    let intent: OrderIntent = serde_json::from_str(&intent)?;
+    let filled = decimal::parse(&obs.executed_qty)?;
+    let quote = decimal::parse(&obs.cummulative_quote_qty)?;
+    let side = match intent.side {
+        crate::types::Side::Buy => "BUY",
+        crate::types::Side::Sell => "SELL",
+    };
+    if intent.symbol != obs.symbol
+        || obs.side != side
+        || decimal::parse(&intent.price)? != decimal::parse(&obs.price)?
+        || decimal::parse(&intent.quantity)? != decimal::parse(&obs.orig_qty)?
+        || obs.order_id == 0
+        || obs.order_id > i64::MAX as u64
+        || filled > decimal::parse(&intent.quantity)?
+        || (obs.status == VenueStatus::Filled && filled != decimal::parse(&intent.quantity)?)
+        || (obs.status == VenueStatus::New && filled != 0)
+        || (obs.status == VenueStatus::PartiallyFilled
+            && (filled == 0 || filled == decimal::parse(&intent.quantity)?))
+        || (filled == 0 && quote != 0)
+    {
+        return Err("venue observation conflicts with order intent/economics".into());
+    }
+    let filled_notional = decimal::parse(&intent.price)?
+        .checked_mul(filled)
+        .ok_or("observation notional overflow")?;
+    let reported = quote
+        .checked_mul(SCALE)
+        .ok_or("observation quote overflow")?;
+    if (intent.side == crate::types::Side::Buy && reported > filled_notional)
+        || (intent.side == crate::types::Side::Sell && reported < filled_notional)
+        || (obs.status == VenueStatus::Rejected && filled != 0)
+    {
+        return Err("venue fill economics violate limit or rejected status".into());
+    }
+    if let Some(old) = &old {
+        let old: OrderObservation = serde_json::from_str(old)?;
+        if old.order_id != obs.order_id
+            || filled < decimal::parse(&old.executed_qty)?
+            || quote < decimal::parse(&old.cummulative_quote_qty)?
+            || obs.update_time < old.update_time
+            || (old.status.terminal()
+                && (old.status != obs.status
+                    || decimal::parse(&old.executed_qty)? != filled
+                    || decimal::parse(&old.cummulative_quote_qty)? != quote))
+        {
+            return Err("regressing or conflicting venue observation".into());
+        }
+    }
+    let json = serde_json::to_string(obs)?;
+    if old.as_ref().is_some_and(|old| old == &json) {
+        return Ok(false);
+    }
+    let count: i64 = tx.query_row("SELECT count(*) FROM observations", [], |r| r.get(0))?;
+    if count >= 100_000 {
+        return Err("observation capacity exceeded".into());
+    }
+    tx.execute(
+        "INSERT INTO observations(id,body) VALUES (?1,?2)",
+        params![obs.client_order_id, json],
+    )?;
+    tx.execute(
+        "UPDATE intents SET phase=?2,observation=?3 WHERE id=?1",
+        params![
+            obs.client_order_id,
+            if obs.status.terminal() {
+                "terminal"
+            } else {
+                "open"
+            },
+            json
+        ],
+    )?;
+    Ok(true)
+}
+
+pub(crate) fn canonical_trade(t: &TradeObservation) -> Result<TradeObservation, PaperError> {
+    let mut t = t.clone();
+    for value in [
+        &mut t.price,
+        &mut t.qty,
+        &mut t.quote_qty,
+        &mut t.commission,
+    ] {
+        *value = decimal::format(decimal::parse(value)?)?;
+    }
+    if decimal::parse(&t.commission)? == 0 {
+        t.commission_asset.clear();
+    }
+    Ok(t)
+}
+pub(crate) fn record_trades_tx(
+    tx: &Connection,
+    trades: &[TradeObservation],
+) -> Result<usize, PaperError> {
+    if trades.len() > 1000 {
+        return Err("trade page capacity exceeded".into());
+    }
+    let mut inserted = 0;
+    for t in trades {
+        let t = canonical_trade(t)?;
+        let fee = decimal::parse(&t.commission)?;
+        if t.id > i64::MAX as u64
+            || t.order_id == 0
+            || decimal::parse(&t.qty)? == 0
+            || decimal::parse(&t.price)? == 0
+            || (fee > 0 && t.commission_asset.is_empty())
+        {
+            return Err("invalid trade economics or identity".into());
+        }
+        if fee > 0 {
+            crate::external_state::asset(&t.commission_asset)?;
+        }
+        let json = serde_json::to_string(&t)?;
+        let old: Option<String> = tx
+            .query_row(
+                "SELECT body FROM trades WHERE symbol=?1 AND id=?2",
+                params![t.symbol, t.id as i64],
+                |r| r.get(0),
+            )
+            .optional()?;
+        if let Some(old) = old {
+            let old: TradeObservation = serde_json::from_str(&old)?;
+            if serde_json::to_string(&canonical_trade(&old)?)? != json {
+                return Err("conflicting duplicate trade ID".into());
+            }
+            continue;
+        }
+        let count: i64 = tx.query_row("SELECT count(*) FROM trades", [], |r| r.get(0))?;
+        if count >= 100_000 {
+            return Err("trade history capacity exceeded".into());
+        }
+        crate::external_state::record_trade_movement(tx, &t)?;
+        tx.execute(
+            "INSERT INTO trades VALUES (?1,?2,?3)",
+            params![t.symbol, t.id as i64, json],
+        )?;
+        if identity_bound(tx)? {
+            let body:String=tx.query_row("SELECT observation FROM intents WHERE json_extract(observation,'$.symbol')=?1 AND json_extract(observation,'$.orderId')=?2",params![t.symbol,t.order_id as i64],|r|r.get(0))?;
+            let obs: OrderObservation = serde_json::from_str(&body)?;
+            let mut stmt = tx.prepare(
+                "SELECT body FROM trades WHERE symbol=?1 AND json_extract(body,'$.orderId')=?2",
+            )?;
+            let mut qty = 0i128;
+            let mut quote = 0i128;
+            for body in stmt.query_map(params![t.symbol, t.order_id as i64], |r| {
+                r.get::<_, String>(0)
+            })? {
+                let a: TradeObservation = serde_json::from_str(&body?)?;
+                qty = qty
+                    .checked_add(decimal::parse(&a.qty)?)
+                    .ok_or("quantity overflow")?;
+                quote = quote
+                    .checked_add(decimal::parse(&a.quote_qty)?)
+                    .ok_or("quote overflow")?;
+            }
+            if qty > decimal::parse(&obs.executed_qty)?
+                || quote > decimal::parse(&obs.cummulative_quote_qty)?
+            {
+                return Err("trades exceed observed cumulative fill".into());
+            }
+        }
+        inserted += 1;
+    }
+    Ok(inserted)
+}
+
+fn identity_bound(c: &Connection) -> Result<bool, PaperError> {
+    Ok(
+        c.query_row("SELECT count(*) FROM external_control", [], |r| {
+            r.get::<_, i64>(0)
+        })? != 0,
+    )
+}
+
+/// 每笔成交只聚合一次；独立核对订单的累计数量与原始报价金额。
+/// 有序键保留稳定诊断顺序，复杂度 O((订单+成交) log 订单)，不交叉扫描全历史。
+pub fn order_trade_problems(
+    orders: &[TrackedOrder],
+    trades: &[TradeObservation],
+) -> Result<Vec<String>, PaperError> {
+    let mut sums = std::collections::BTreeMap::<(String, u64), (bool, i128, i128)>::new();
+    for t in trades {
+        let e = sums
+            .entry((t.symbol.clone(), t.order_id))
+            .or_insert((t.is_buyer, 0, 0));
+        if e.0 != t.is_buyer {
+            return Err("trade sides conflict".into());
+        }
+        e.1 =
+            e.1.checked_add(decimal::parse(&t.qty)?)
+                .ok_or("trade quantity overflow")?;
+        e.2 =
+            e.2.checked_add(decimal::parse(&t.quote_qty)?)
+                .ok_or("trade quote overflow")?;
+    }
+    let mut problems = Vec::new();
+    let mut seen = std::collections::BTreeSet::new();
+    for o in orders {
+        let Some(obs) = &o.observation else {
+            problems.push(format!(
+                "{}: unknown submission outcome",
+                o.intent.client_order_id
+            ));
+            continue;
+        };
+        let key = (obs.symbol.clone(), obs.order_id);
+        if !seen.insert(key.clone()) {
+            return Err("duplicate venue order identity".into());
+        }
+        let (buy, qty, quote) = sums.remove(&key).unwrap_or((obs.side == "BUY", 0, 0));
+        if buy != (obs.side == "BUY") {
+            return Err("trade side conflicts with order".into());
+        }
+        if qty != decimal::parse(&obs.executed_qty)?
+            || quote != decimal::parse(&obs.cummulative_quote_qty)?
+        {
+            problems.push(format!(
+                "{}: order/trade economics mismatch",
+                o.intent.client_order_id
+            ));
+        }
+    }
+    for ((symbol, id), _) in sums {
+        problems.push(format!("{symbol}/{id}: untracked trade"));
+    }
+    Ok(problems)
+}
+
+impl ExecutionJournal {
+    fn verify_account_identity(
+        &mut self,
+        venue: &mut impl ExecutionVenue,
+    ) -> Result<(), PaperError> {
+        if let Some(expected) = self.execution_identity()? {
+            self.mark_execution_gap("account identity verification", false)?;
+            let (actual, _) = venue.account_identity().map_err(venue_error)?;
+            if expected != actual {
+                self.mark_execution_gap("account identity conflict", true)?;
+                return Err("account identity conflict".into());
+            }
         }
         Ok(())
     }

@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "host": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "cpu": "Apple M5",
+  "toolchain": "cargo 1.99.0 (5f94df478 2026-08-27)",
+  "rust_version": "rustc 1.99.0 b940084d7 2026-09-28",
+  "profile": "release thin LTO, codegen-units=1",
+  "binary_sha256": "fa2160de48371da91851adfe6926e25f5574ea738857dea388f6e32d54199ea0",
+  "input": "deterministic synthetic, ten fills per order, shuffled, diagnostic mismatches declared",
+  "baseline": "independent nested scan of known BUY orders; no upstream platform",
+  "background": "archived live-paper v05 24h run active; no CPU affinity; first 10000 timing followed a brief check process, not a dedicated isolated host",
+  "workloads": [
+    {
+      "conditions": "release, deterministic synthetic shuffled trades, one warmup, seven alternating measured rounds; includes decimal parsing, allocation and diagnostics; excludes SQLite, asset replay, network, strategy; no CPU affinity, background soak running; reference supports this known-order BUY input only, not all new safety checks; not a framework benchmark",
+      "mismatches": 153,
+      "mode": "order-trade-audit-component",
+      "orders": 2000,
+      "results_equal": true,
+      "rounds": [
+        {
+          "grouped_ns": "2189083",
+          "round": 1,
+          "scan_ns": "93057834"
+        },
+        {
+          "grouped_ns": "2309333",
+          "round": 2,
+          "scan_ns": "89962250"
+        },
+        {
+          "grouped_ns": "2155792",
+          "round": 3,
+          "scan_ns": "88896709"
+        },
+        {
+          "grouped_ns": "2348750",
+          "round": 4,
+          "scan_ns": "93313125"
+        },
+        {
+          "grouped_ns": "2227959",
+          "round": 5,
+          "scan_ns": "90672250"
+        },
+        {
+          "grouped_ns": "2299334",
+          "round": 6,
+          "scan_ns": "87721709"
+        },
+        {
+          "grouped_ns": "2113375",
+          "round": 7,
+          "scan_ns": "88985833"
+        }
+      ],
+      "schema_version": 1,
+      "trades": 20000,
+      "median_scan_ms": 89.96225,
+      "median_grouped_ms": 2.227959,
+      "median_speedup": 40.37877267938952
+    },
+    {
+      "conditions": "release, deterministic synthetic shuffled trades, one warmup, seven alternating measured rounds; includes decimal parsing, allocation and diagnostics; excludes SQLite, asset replay, network, strategy; no CPU affinity, background soak running; reference supports this known-order BUY input only, not all new safety checks; not a framework benchmark",
+      "mismatches": 769,
+      "mode": "order-trade-audit-component",
+      "orders": 10000,
+      "results_equal": true,
+      "rounds": [
+        {
+          "grouped_ns": "13378583",
+          "round": 1,
+          "scan_ns": "2481551459"
+        },
+        {
+          "grouped_ns": "14956583",
+          "round": 2,
+          "scan_ns": "2535329167"
+        },
+        {
+          "grouped_ns": "12883500",
+          "round": 3,
+          "scan_ns": "2439291375"
+        },
+        {
+          "grouped_ns": "14580583",
+          "round": 4,
+          "scan_ns": "2409278084"
+        },
+        {
+          "grouped_ns": "13001416",
+          "round": 5,
+          "scan_ns": "2407624125"
+        },
+        {
+          "grouped_ns": "16337458",
+          "round": 6,
+          "scan_ns": "2421254083"
+        },
+        {
+          "grouped_ns": "15356459",
+          "round": 7,
+          "scan_ns": "2656770709"
+        }
+      ],
+      "schema_version": 1,
+      "trades": 100000,
+      "median_scan_ms": 2439.291375,
+      "median_grouped_ms": 14.580583,
+      "median_speedup": 167.29724559024834
+    }
+  ]
+}

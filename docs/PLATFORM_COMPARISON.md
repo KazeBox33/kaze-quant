@@ -87,3 +87,7 @@ vn.py这个核心EventEngine快照使用未设置maxsize的Queue；我们的实�
 ## 代码复用与许可来源
 
 本轮没有复制任何上游源码进入执行内核。vn.py核心/所读CTA与Algo子项目快照为MIT；保留许可与署名后可评估局部复用或独立Python网关桥接，但具体依赖还要核对。ABU仓库LICENSE为GPLv3，本轮仅分析职责与行为并独立设计，不能把其Python代码机械翻译成Rust后直接当作MIT原创。NautilusTrader为LGPLv3、LEAN为Apache-2.0、所读HftBacktest LICENSE为MIT；未来实际引入模块时逐项记录版本、许可、修改与依赖。源码哈希清单用于调研追溯，不代表我们已将这些库集成。
+
+## 实施记录：第一步外部执行基础
+
+已引入账户/venue身份与能力声明、期初原币资产账本、私有执行回报与REST核对、乱序/重复/外部活动阻断和审计身份聚合。实现与实际通过范围见[EXTERNAL_LEDGER](EXTERNAL_LEDGER.md)。这是单Spot测试网有界验收，尚非持续策略节点；连续重连/私有历史高水位/真实部分成交仍缺。性能仅对自己的原审计扫描作同负载对照，没有新增跨框架性能胜出结论。

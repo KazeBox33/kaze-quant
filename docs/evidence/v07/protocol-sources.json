@@ -1,0 +1,12 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/binance/binance-spot-api-docs/b45e91d9824b6d523e8c9656de4efd1083c261e7/testnet/web-socket-api.md",
+    "sha256": "758bbf8c134bc6fe7d0e93df1904784024fc8bd8c37961373e27fb6b51ff29a3",
+    "bytes": 269725
+  },
+  {
+    "url": "https://raw.githubusercontent.com/binance/binance-spot-api-docs/b45e91d9824b6d523e8c9656de4efd1083c261e7/testnet/user-data-stream.md",
+    "sha256": "9996743b209cd192d9bb1556a0a0d140928627ed51408f1e9053b2c43a7cbce1",
+    "bytes": 13211
+  }
+]

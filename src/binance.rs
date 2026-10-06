@@ -9,6 +9,39 @@ use sha2::Sha256;
 use std::io::Read;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 const BASE: &str = "https://testnet.binance.vision/api/v3";
+const PRIVATE_WS: &str = "wss://ws-api.testnet.binance.vision/ws-api/v3";
+
+/// 单写入者的有界验收流，不自动重连，不保存包含密钥的订阅请求。
+pub struct TestnetUserStream {
+    socket: tungstenite::WebSocket<tungstenite::stream::MaybeTlsStream<std::net::TcpStream>>,
+    subscription: u64,
+}
+impl TestnetUserStream {
+    pub fn receive(&mut self) -> Result<Option<crate::user_stream::UserEvent>, VenueError> {
+        use tungstenite::{Error, Message};
+        match self.socket.read() {
+            Ok(Message::Text(text)) => {
+                crate::user_stream::parse_event(text.as_bytes(), self.subscription)
+                    .map(Some)
+                    .map_err(|_| VenueError::Unavailable)
+            }
+            Ok(Message::Ping(_)) => {
+                self.socket.flush().map_err(|_| VenueError::Unavailable)?;
+                Ok(None)
+            }
+            Ok(Message::Pong(_)) => Ok(None),
+            Err(Error::Io(e))
+                if matches!(
+                    e.kind(),
+                    std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
+                ) =>
+            {
+                Ok(None)
+            }
+            _ => Err(VenueError::Unavailable),
+        }
+    }
+}
 
 pub struct BinanceTestnet {
     client: Client,
@@ -16,6 +49,74 @@ pub struct BinanceTestnet {
     secret: String,
 }
 impl BinanceTestnet {
+    pub fn user_stream(&self) -> Result<TestnetUserStream, VenueError> {
+        use tungstenite::{Message, protocol::WebSocketConfig};
+        let config = WebSocketConfig::default()
+            .max_message_size(Some(65536))
+            .max_frame_size(Some(65536));
+        use std::net::{TcpStream, ToSocketAddrs};
+        let addresses = ("ws-api.testnet.binance.vision", 443)
+            .to_socket_addrs()
+            .map_err(|_| VenueError::Protocol("private DNS failed"))?;
+        let tcp = addresses
+            .take(4)
+            .find_map(|a| TcpStream::connect_timeout(&a, Duration::from_secs(2)).ok())
+            .ok_or(VenueError::Protocol("private TCP connect failed"))?;
+        tcp.set_read_timeout(Some(Duration::from_secs(2)))
+            .map_err(|_| VenueError::Unavailable)?;
+        tcp.set_write_timeout(Some(Duration::from_secs(5)))
+            .map_err(|_| VenueError::Unavailable)?;
+        let (mut socket, _) =
+            tungstenite::client_tls_with_config(PRIVATE_WS, tcp, Some(config), None)
+                .map_err(|_| VenueError::Protocol("private TLS/WebSocket handshake failed"))?;
+        let time = self.request(reqwest::Method::GET, "/time", &[], false)?["serverTime"]
+            .as_u64()
+            .ok_or(VenueError::Unavailable)?;
+        let signed = format!("apiKey={}&recvWindow=5000&timestamp={time}", self.key);
+        let mut mac = Hmac::<Sha256>::new_from_slice(self.secret.as_bytes())
+            .map_err(|_| VenueError::Unavailable)?;
+        mac.update(signed.as_bytes());
+        let request = serde_json::json!({"id":"kaze-private-v1","method":"userDataStream.subscribe.signature","params":{"apiKey":self.key,"recvWindow":5000,"timestamp":time,"signature":hex(&mac.finalize().into_bytes())}});
+        socket
+            .send(Message::Text(request.to_string().into()))
+            .map_err(|_| VenueError::Unavailable)?;
+        let deadline = std::time::Instant::now() + Duration::from_secs(12);
+        while std::time::Instant::now() < deadline {
+            match socket.read() {
+                Ok(Message::Text(t)) => {
+                    let v: Value = serde_json::from_slice(t.as_bytes())
+                        .map_err(|_| VenueError::Unavailable)?;
+                    if v["id"] != "kaze-private-v1" {
+                        return Err(VenueError::Protocol(
+                            "private subscription response identity conflict",
+                        ));
+                    }
+                    if v["status"] != 200 {
+                        return Err(VenueError::Rejected(
+                            v["error"]["code"].as_i64().unwrap_or(0),
+                        ));
+                    }
+                    let subscription = v["result"]["subscriptionId"]
+                        .as_u64()
+                        .ok_or(VenueError::Unavailable)?;
+                    return Ok(TestnetUserStream {
+                        socket,
+                        subscription,
+                    });
+                }
+                Ok(Message::Ping(_)) => {
+                    socket.flush().map_err(|_| VenueError::Unavailable)?;
+                }
+                Err(tungstenite::Error::Io(e))
+                    if matches!(
+                        e.kind(),
+                        std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
+                    ) => {}
+                _ => return Err(VenueError::Unavailable),
+            }
+        }
+        Err(VenueError::Unavailable)
+    }
     pub fn from_env() -> Result<Self, crate::paper::PaperError> {
         let (key, secret) = credentials()?;
         let client = Client::builder()
@@ -128,6 +229,41 @@ fn units(v: &Value) -> Result<i128, VenueError> {
     decimal::parse(v.as_str().ok_or(VenueError::Unavailable)?).map_err(|_| VenueError::Unavailable)
 }
 impl ExecutionVenue for BinanceTestnet {
+    fn capabilities(&self) -> crate::external_state::VenueCapabilities {
+        crate::external_state::VenueCapabilities {
+            spot_limit_gtc: true,
+            account_identity: true,
+            account_open_orders: true,
+            original_currency_fees: true,
+            private_stream: true,
+        }
+    }
+    fn account_identity(
+        &mut self,
+    ) -> Result<(crate::external_state::ExecutionIdentity, AccountObservation), VenueError> {
+        use sha2::Digest;
+        let value = self.request(reqwest::Method::GET, "/account", &[], true)?;
+        let uid = value["uid"].as_u64().ok_or(VenueError::Unavailable)?;
+        let mut hash = Sha256::new();
+        hash.update(b"kaze-account-v1:binance-spot-testnet:");
+        hash.update(uid.to_string().as_bytes());
+        let identity = crate::external_state::ExecutionIdentity {
+            venue: "binance-spot-testnet".into(),
+            account_hash: hex(&hash.finalize()),
+        };
+        let account = serde_json::from_value(value).map_err(|_| VenueError::Unknown)?;
+        Ok((identity, account))
+    }
+    fn account_open_orders(&mut self) -> Result<Vec<OrderObservation>, VenueError> {
+        let orders: Vec<OrderObservation> =
+            serde_json::from_value(self.request(reqwest::Method::GET, "/openOrders", &[], true)?)
+                .map_err(|_| VenueError::Unknown)?;
+        if orders.len() > 10000 {
+            return Err(VenueError::Unavailable);
+        }
+        Ok(orders)
+    }
+
     fn validate_intent(&mut self, intent: &OrderIntent) -> Result<(), VenueError> {
         let info = self.request(
             reqwest::Method::GET,

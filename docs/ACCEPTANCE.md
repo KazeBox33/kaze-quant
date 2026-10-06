@@ -110,3 +110,7 @@ v4独立声明离线重建：每个UTC秒选最早的交易所事件，平局按
 新增固定内存全样本统计与最慢分钟摘要，修复末批遗漏、提交前最老报价检查和退出阶段错误吞没；旧全天二进制继续独立运行，不能替代新版本全天验收。[设计与实测](TELEMETRY.md)。新120秒公开行情/纸面负载12151报价、六次模拟成交，12152命令独立进程恢复全部一致；receive至durable ACK p99区间25.165824–25.690111ms；统计器82240字节。费用/净损益如实为0.00516810/−0.00509270 USDT，没有收益门槛通过。[运行](evidence/v06/live-paper-load.json)、[恢复](evidence/v06/live-paper-load-recovery.json)。
 
 本地142项Rust debug/release、15项Python、fmt/clippy/严格rustdoc通过。本轮代码提交b29dc7c的[Linux/macOS CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37464111653)均全部通过；[身份](evidence/v06/ci.json)与[完整步骤](evidence/v06/ci-jobs.json)已公开，托管runner不等于目标生产机器或全天验收。[本地来源身份](evidence/v06/validation-mac.json)。与vn.py、ABU、NautilusTrader、LEAN、HftBacktest等的能力取舍与可测量目标见[平台比较](PLATFORM_COMPARISON.md)，尚无vn.py/ABU同条件性能对照。
+
+## 外部执行与资产基础增量
+
+新增18项Rust测试，当前本机debug/release合计各160项、原15项Python检查通过。真实私有Testnet3次POST（1撤销、2成交），6私有执行事件、2成交，原币费用和全部资产变化匹配，独立进程恢复与6次已捕获事件再投递一致。详情、失败记录和限定范围见[EXTERNAL_LEDGER](EXTERNAL_LEDGER.md)。这是有界手工测试网能力；真实部分成交、物理断流补洞、持续策略节点、新版本24h与alpha仍未通过。自身审计组件有合成同负载改善证据，不是与vn.py/ABU/Nautilus完整比较。

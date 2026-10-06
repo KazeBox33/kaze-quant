@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "environment": "binance-spot-testnet",
+  "binary_sha256": "35dc9d08dd91b84a78689efb27415fe6809c57f12f7198c23babf8bb2930f1a3",
+  "success": true,
+  "steps": [
+    {
+      "action": "ledger-init",
+      "exit_code": 0,
+      "duration_seconds": 2.094333582557738
+    },
+    {
+      "action": "stream-watch",
+      "exit_code": 0,
+      "duration_seconds": 13.23661279026419
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "duration_seconds": 0.2819085419178009
+    },
+    {
+      "action": "stream-submit",
+      "exit_code": 0,
+      "duration_seconds": 18.87166916579008
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "duration_seconds": 1.5413691671565175
+    },
+    {
+      "action": "stream-submit",
+      "exit_code": 0,
+      "duration_seconds": 17.975116040557623
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "duration_seconds": 1.5316830426454544
+    },
+    {
+      "action": "stream-submit",
+      "exit_code": 0,
+      "duration_seconds": 19.751133375801146
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "duration_seconds": 2.2149808751419187
+    },
+    {
+      "action": "audit",
+      "exit_code": 0,
+      "duration_seconds": 0.02024245820939541
+    }
+  ],
+  "submitted_orders": 3,
+  "filled_orders": 2,
+  "canceled_orders": 1,
+  "private_pilots": [
+    {
+      "authenticated_subscription": true,
+      "duplicate_execution_events": 0,
+      "duration_seconds": 14.9166175,
+      "events_received": 4,
+      "scope": "bounded synchronous manual Testnet pilot; one optional intent, cancel open remainder, no automatic liquidation/reconnect; REST final audit, no feed latency benchmark",
+      "success": true
+    },
+    {
+      "authenticated_subscription": true,
+      "duplicate_execution_events": 0,
+      "duration_seconds": 14.003969375,
+      "events_received": 3,
+      "scope": "bounded synchronous manual Testnet pilot; one optional intent, cancel open remainder, no automatic liquidation/reconnect; REST final audit, no feed latency benchmark",
+      "success": true
+    },
+    {
+      "authenticated_subscription": true,
+      "duplicate_execution_events": 0,
+      "duration_seconds": 15.833823166,
+      "events_received": 3,
+      "scope": "bounded synchronous manual Testnet pilot; one optional intent, cancel open remainder, no automatic liquidation/reconnect; REST final audit, no feed latency benchmark",
+      "success": true
+    }
+  ],
+  "private_execution_events": 6,
+  "unique_trades": 2,
+  "fee_units_1e8": {
+    "BTC": 17,
+    "USDT": 1378932
+  },
+  "all_asset_deltas_match": true,
+  "fresh_process_equal": true,
+  "movement_replay_equal": true,
+  "actual_partial_fill_observed": false,
+  "private_fill_reports": 2,
+  "private_statuses": [
+    "CANCELED",
+    "FILLED",
+    "NEW"
+  ],
+  "scope": "three bounded virtual orders; no network fault injection, mainnet, production longevity, queue/alpha claim; original accounts remain local"
+}
