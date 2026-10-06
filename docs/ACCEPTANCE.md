@@ -6,7 +6,7 @@
 
 | 门槛 | 已完成证据 | 尚未满足 | 结论 |
 |---|---|---|---|
-| 交易所执行可靠性 | 意图先持久化、一次发送、超时/不存在不重发、重启、部分成交累计量、终态冲突、撤单未知结果、成交去重和余额观测测试 | 无密钥实际订单记录；尚需测试网真实成交/撤单、网络故障后的恢复核对、费用与余额变化；无私有回报流、完整组合账本或策略自动外部路由 | 未通过 |
+| 交易所执行可靠性 | 意图先持久化、一次发送、超时/不存在不重发、重启、部分成交累计量、终态冲突、撤单未知结果、成交去重和余额观测测试 | 测试网公开time/exchangeInfo/bookTicker实际HTTP200，但无签名订单记录；尚需测试网真实成交/撤单、网络故障后的恢复核对、费用与余额变化；无私有回报流、完整组合账本或策略自动外部路由 | 未通过 |
 | 持续纸面运行与公平比较 | 10分钟行情运行及恢复；5分钟真实行情运行产生27张纸面订单、13次成交及独立进程全量审计；百万真实报价3轮；固定上游Barter组件比较 | 24小时首轮在27.8分钟后断线/过载停止；新会话重新测试。多日运行、故障原因诊断和目标Linux硬件验证仍需补充 | 部分完成 |
 | 独立成本策略验证 | 六个整日BTC/ETH数据集，训练选参/测试冻结，3种成本情景，输入/参数/结果哈希 | 筛选失败；成交不足、费用后亏损和风控拒单。没有独立于开发选择的新留出集、统计优势或未来稳定收益证据 | 未通过 |
 
@@ -24,7 +24,7 @@
 
 优化是借用JSON字符串字段，移除每帧5次临时String分配；输出仍逐条校验。优化前一次基线Kaze23.764ms、Barter23.496ms，Kaze当时略慢。[优化前原始记录](evidence/v04/barter-comparison-before-borrow.json)、最终三次原始记录：[1](evidence/v04/barter-final-v04-1.json)、[2](evidence/v04/barter-final-v04-2.json)、[3](evidence/v04/barter-final-v04-3.json)。
 
-两者输出类型/契约不同：Kaze提供整数、符号/更新ID/数值检查和本地接收时间；Barter构造Decimal、UTC时间及订阅元数据。输入预加载，计时不含网络、撮合、策略、风控或持久化，不能据此宣称整套交易引擎胜过Barter。两项订单属性也不是完整框架故障对照。实际Barter优势仍包括适配器生态、异步实时框架和成熟组件覆盖；Kaze当前突出方向是本地确定性审计、事务恢复、自定义策略状态与可核对的成本实验。
+两者输出类型/契约不同：Kaze借用未转义ASCII字段（含反斜杠转义的合法JSON字符串会拒绝），实际官方输入均属于此域；Kaze提供整数、符号/更新ID/数值检查和本地接收时间；Barter构造Decimal、UTC时间及订阅元数据。输入预加载，计时不含网络、撮合、策略、风控或持久化，不能据此宣称整套交易引擎胜过Barter。两项订单属性也不是完整框架故障对照。实际Barter优势仍包括适配器生态、异步实时框架和成熟组件覆盖；Kaze当前突出方向是本地确定性审计、事务恢复、自定义策略状态与可核对的成本实验。
 
 本机未绑核，后台另有公开实时纸面行情持久化运行，未控制温度/系统活动；不挑最大速度样本作标题。脚本保留上游源码、比较二进制、Kaze相关源文件和输入摘要。复现见 [比较说明](../benchmarks/barter-comparison/README.md)。
 
@@ -63,7 +63,7 @@ BTC固定0.01BTC单量在3月超过500USDT风险上限，导致交易被阻止�
 
 ## 工程验证与来源
 
-本地131项Rust测试在debug/release通过，6项Python转换测试通过；fmt、all-features/all-targets clippy -D warnings及严格rustdoc通过。测试包含可信策略工厂的每个切分点恢复、非法/非规范状态回滚、未知版本拒绝，及订单未知结果不重发。机器/结果身份见 [验证环境](evidence/v04/validation-mac.json)。核心提交dac7309的 [Linux/macOS Rust CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37448290078) 已全部success；包含完整检查、策略重投、网络程序构建检查和备份恢复，身份见[CI记录](evidence/v04/ci.json)。托管runner不等于目标Linux生产机器。
+本地131项Rust测试在debug/release通过，6项Python转换测试通过；fmt、all-features/all-targets clippy -D warnings及严格rustdoc通过。测试包含可信策略工厂的每个切分点恢复、非法/非规范状态回滚、未知版本拒绝，及订单未知结果不重发。机器/结果身份见 [验证环境](evidence/v04/validation-mac.json)。核心提交dac7309的 [Linux/macOS Rust CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37448290078) 已全部success；包含完整检查、策略重投、网络程序构建检查和备份恢复，身份见[CI记录](evidence/v04/ci.json)。诊断修复64ff845的[最终Linux/macOS CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37449934255)也全部success，详见[最终CI记录](evidence/v04/diagnostics-ci.json)。托管runner不等于目标Linux生产机器。
 
 借鉴并注明来源：[NautilusTrader对账](https://nautilustrader.io/docs/latest/concepts/live/)、[HftBacktest成交与队列边界](https://hftbacktest.readthedocs.io/en/latest/order_fill.html)、[Freqtrade未来数据检查](https://www.freqtrade.io/en/stable/lookahead-analysis/)、[Binance官方REST订单/撤单协议](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md)。当前未复制它们的完整队列模型、回报流或框架。
 
@@ -85,3 +85,5 @@ target/release/kaze-research reports/new-plan.json reports/new-research.json
 ## 本版本跨平台存储实验
 
 同一2000命令合成负载、3轮、release，Linux托管runner逐条文件WAL中位471.156ms，SQLite FULL 256/批中位9.626ms；macOS托管runner对应1454.047ms、24.039ms。原始stdout CSV：[Linux](evidence/v04/store-2000-ci-linux.csv)、[macOS](evidence/v04/store-2000-ci-macos.csv)，任务步骤见[ci-jobs.json](evidence/v04/ci-jobs.json)。这是同步批量化与跨平台同语义运行的证据；硬件/虚拟化/文件系统不同，每轮256模式仅8次事务，不能推导稳定尾延迟或未来生产机器SLA，也不是Barter比较。
+
+测试网公开API连通与当前BTCUSDT过滤条件已经实测：[公共连通记录](evidence/v04/testnet-public-connectivity.json)。这不需要密钥，也不证明账户权限、订单接受、成交或撤单。诊断新二进制另外完成[30秒实时冒烟](evidence/v04/live-paper-diagnostics-smoke.json)与[独立进程恢复](evidence/v04/live-paper-diagnostics-smoke-recovery.json)，2803条报价、状态与链一致；这段时间不计入新24小时会话。

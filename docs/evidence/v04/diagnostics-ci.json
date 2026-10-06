@@ -1,0 +1,18 @@
+{
+  "source_commit": "64ff8456e7d040f4b9cc4afc85b78ab5a348ef7b",
+  "run_id": 37449934255,
+  "run_url": "https://github.com/KazeBox33/kaze-quant/actions/runs/37449934255",
+  "jobs": [
+    {
+      "id": 112223772136,
+      "name": "check (macos-latest)",
+      "conclusion": "success"
+    },
+    {
+      "id": 112223772418,
+      "name": "check (ubuntu-latest)",
+      "conclusion": "success"
+    }
+  ],
+  "scope": "final live diagnostics code; full Linux/macOS workflow and all steps passed"
+}

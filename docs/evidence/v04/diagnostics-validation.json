@@ -12,5 +12,17 @@
     "quotes": 177130,
     "verified_recovered_commands": 177131
   },
-  "soak_rerun": "pending; never concatenate sessions to count 24h"
+  "soak_rerun": "pending; never concatenate sessions to count 24h",
+  "public_live_smoke": {
+    "quotes": 2803,
+    "duration_seconds": 30,
+    "state_chain_restored_equal": true
+  },
+  "strict_rustdoc": "all-features -D warnings passed",
+  "source_commit": "64ff8456e7d040f4b9cc4afc85b78ab5a348ef7b",
+  "cross_platform_ci": {
+    "run_id": 37449934255,
+    "linux": "success",
+    "macos": "success"
+  }
 }
