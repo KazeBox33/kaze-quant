@@ -42,7 +42,7 @@ target/release/kaze-testnet reports/new-history.db monitor 120
 target/release/kaze-testnet reports/new-history.db monitor-gap 90
 # 故障验收会发出一笔虚拟买单，失败只查原意图，不重发。
 python3 scripts/history_acceptance.py --binary target/release/kaze-testnet --directory reports/new-history-pilot
-cargo run --locked --release --example history_recovery_bench
+cargo run --locked --release --all-features --example history_recovery_bench
 ```
 
 ## 证据与解释范围
@@ -60,3 +60,9 @@ cargo run --locked --release --example history_recovery_bench
 本机最终七轮结果：200订单/成交中位旧路径23.024ms、新路径10.974ms（2.10×）；2000订单/成交49.491ms→21.976ms（2.25×），各轮经济投影一致。这是当前二进制内部的恢复算法比较，不能称为超过vn.py或Barter；原始轮次/硬件/二进制哈希保存在上述JSON。SQL规划修复之外的完整组件开销仍随历史规模增长，没有常数时间全审计承诺。
 
 最终二进制只读重连观察91.642秒、2个新连接代次、1次主动消费者中断/自动重订阅、5轮REST核对（35次数据请求）、0新增POST，无私有执行事件。这证明该有界静默连接的ping处理/周期补查/重连路径，不是间隙新成交证明或全天运行。另一个漏收成交试验提供实际成交补回。两份记录与本地验证使用同一二进制哈希。整个阶段共3笔独立小额虚拟买入（前两次为中间构建），见[尝试记录](evidence/v08/pilot-attempts.json)。
+
+代码提交`115b727386624396901da1699e5ddef7d41f7cbe`的[CI37501360696](https://github.com/KazeBox33/kaze-quant/actions/runs/37501360696)Ubuntu/macOS全部步骤成功；本地179项Rust debug/release和15项Python已通过。[CI身份](evidence/v08/ci.json)、[逐步骤记录](evidence/v08/ci-jobs.json)、[归档与ZIP哈希](evidence/v08/ci-artifacts.json)公开。
+
+同代码、同样的7轮交替合成负载，2000订单/成交：[Linux](evidence/v08/history-recovery-ci-linux.json)中位111.897→38.674ms（2.89×），[macOS runner](evidence/v08/history-recovery-ci-macos.json)99.125→34.048ms（2.91×）。每轮经济投影一致且REST数据操作4004→7。200条及所有原始轮次也在文件中。两端[Linux系统](evidence/v08/ci-linux-host.txt)/[编译器](evidence/v08/ci-linux-rustc.txt)、[macOS系统](evidence/v08/ci-macos-host.txt)/[编译器](evidence/v08/ci-macos-rustc.txt)随原始归档保留；托管机器/文件系统有差异，不能跨硬件排名或推导目标生产SLA。该数据扩大了自身恢复算法优化的跨平台证据，尚未提供任何上游完整平台对照。
+
+构建条件补充：本机基准以`--all-features`构建（network开启），CI基准命令为`cargo run --locked --release --example history_recovery_bench`（默认无network）；恢复/模拟场所代码不依赖network。每份结果内部两算法共享同一构建与数据；没有将跨机器/feature结果作为严格逐机性能排名。

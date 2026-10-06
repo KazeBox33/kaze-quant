@@ -1,0 +1,99 @@
+{
+  "cases": [
+    {
+      "cursor_median_ms": 8.034542,
+      "cursor_ms": [
+        10.974167,
+        10.410667,
+        4.792249999999999,
+        8.034542,
+        5.840833,
+        11.567292,
+        5.857416
+      ],
+      "cursor_rest_source_operations": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "economic_equality_every_round": true,
+      "legacy_median_ms": 17.389625,
+      "legacy_ms": [
+        17.389625,
+        17.323459,
+        18.616417,
+        13.867042,
+        13.185042,
+        25.775209,
+        22.734333
+      ],
+      "legacy_rest_source_operations": [
+        404,
+        404,
+        404,
+        404,
+        404,
+        404,
+        404
+      ],
+      "median_speedup": 2.1643579683820184,
+      "orders": 200,
+      "rounds": 7,
+      "symbols": 1,
+      "trades": 200
+    },
+    {
+      "cursor_median_ms": 34.048042,
+      "cursor_ms": [
+        46.809416,
+        34.646207999999994,
+        34.048042,
+        49.98675,
+        27.223750000000003,
+        26.306083,
+        32.539083000000005
+      ],
+      "cursor_rest_source_operations": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        7,
+        7
+      ],
+      "economic_equality_every_round": true,
+      "legacy_median_ms": 99.12474999999999,
+      "legacy_ms": [
+        84.012041,
+        114.082084,
+        99.12474999999999,
+        183.138625,
+        87.009,
+        69.453166,
+        120.006416
+      ],
+      "legacy_rest_source_operations": [
+        4004,
+        4004,
+        4004,
+        4004,
+        4004,
+        4004,
+        4004
+      ],
+      "median_speedup": 2.9113201281882812,
+      "orders": 2000,
+      "rounds": 7,
+      "symbols": 1,
+      "trades": 2000
+    }
+  ],
+  "profile": "release thin LTO, codegen-units=1",
+  "schema_version": 1,
+  "scope": "self comparison, complete local recovery including SQLite WAL/FULL and full order/trade/asset audits; indexed mock venue, synthetic terminal history preload outside timing; no transport, signing clock GET, upstream platform or latency percentiles; cursor path also has stronger failure atomicity"
+}

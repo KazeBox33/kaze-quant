@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "code_sha": "115b727386624396901da1699e5ddef7d41f7cbe",
+  "run_id": 37501360696,
+  "status": "completed",
+  "conclusion": "success",
+  "html_url": "https://github.com/KazeBox33/kaze-quant/actions/runs/37501360696",
+  "jobs": [
+    {
+      "id": 112398898822,
+      "name": "check (macos-latest)",
+      "conclusion": "success",
+      "html_url": "https://github.com/KazeBox33/kaze-quant/actions/runs/37501360696/job/112398898822"
+    },
+    {
+      "id": 112398899359,
+      "name": "check (ubuntu-latest)",
+      "conclusion": "success",
+      "html_url": "https://github.com/KazeBox33/kaze-quant/actions/runs/37501360696/job/112398899359"
+    }
+  ],
+  "scope": "exact published source Linux/macOS CI; no mainnet, alpha, target production machine or 24h acceptance"
+}
