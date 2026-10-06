@@ -112,7 +112,7 @@ cargo run --locked --release --bin kaze-quant -- \
 
 ## 验证与特色
 
-131 个 Rust 测试与 6 个行情转换测试覆盖手算守恒、边界、逐事件对照、多资产隔离、风控、恢复、重复投递、损坏日志和强制终止进程。命令如下，测试证据及适用边界见 [VALIDATION](docs/VALIDATION.md)：
+142 个 Rust 测试与 15 个 Python 数据/研究/验收测试覆盖手算守恒、边界、逐事件对照、多资产隔离、风控、恢复、重复投递、损坏日志和强制终止进程。命令如下，测试证据及适用边界见 [VALIDATION](docs/VALIDATION.md)：
 
 ```sh
 cargo fmt --check
@@ -136,6 +136,8 @@ cargo run --locked --release --example store_bench -- 2000
 - [运行契约](docs/CONTRACT.md)：时间、整数、冻结、成交与审计规则。
 - [运行手册](docs/OPERATIONS.md)：协议、恢复、停止、容量、部署与排障。
 - [学习路线](docs/LEARNING.md)：从 Rust 所有权到执行与性能。
+- [平台对比与路线](docs/PLATFORM_COMPARISON.md)：vn.py、ABU及其他引擎的可借鉴能力、当前差距与验收目标。
+- [全程延迟统计](docs/TELEMETRY.md)：固定内存、误差区间、时效检查和故障收尾。
 - [调研与取舍](docs/RESEARCH.md)：NautilusTrader、Barter、HftBacktest 与官方资料。
 - [版本变化](CHANGELOG.md)。
 

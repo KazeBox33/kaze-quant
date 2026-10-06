@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "validated_utc": "2026-10-06T12:32:51.162172+00:00",
+  "rust_tests_debug": 142,
+  "rust_tests_release": 142,
+  "python_tests": 15,
+  "fmt": "passed",
+  "clippy_all_features_all_targets_deny_warnings": "passed",
+  "rustdoc_deny_warnings": "passed",
+  "hardware": "Apple M5",
+  "os": "macOS 26.5.2 arm64",
+  "rustc": "1.99.0 (b940084d7 2026-09-28)",
+  "source_sha256": {
+    "src/telemetry.rs": "87add4b5d1c17584c50b570a8817c11c0a88f951c9b7ac239916ee2cec5ab3bb",
+    "examples/telemetry_bench.rs": "93b2d54b7426d850bc3d95b3ed576e8a95dcc18e972dfd3dc45f2f33b58cdb59",
+    "src/bin/live_paper.rs": "aabcfcb39d4480a12a3ad3e933bdef9a4d7e883521782c2bc4bee9b9bf99d55e",
+    "tests/telemetry.rs": "67e55034d3534d7083daf64c8aa9391a6edefbf5dbdcd0dc224b11d014072210",
+    "configs/live-telemetry-load.json": "f67a7899b92f9567c2cee4dbd1f77c458cfa5fbe15fec2d21eae5a1f8eb067c0"
+  },
+  "limits": "Local checks; GitHub CI will be recorded for the new code commit separately. Existing 24h run uses its older archived binary.",
+  "live_binary_sha256": "1a9bf4e097bfd1b3dff26367fc3ff5cfacfd4f35b0133370c66fedd1dee4fa36"
+}

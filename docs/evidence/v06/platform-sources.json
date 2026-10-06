@@ -1,0 +1,187 @@
+{
+  "retrieved_utc": "2026-10-06",
+  "projects": [
+    {
+      "repo": "vnpy/vnpy",
+      "ref": "master",
+      "sources": [
+        {
+          "path": "vnpy/event/engine.py",
+          "url": "https://raw.githubusercontent.com/vnpy/vnpy/c6e231caf32b7fc97e6459817fff66458cf7e7c4/vnpy/event/engine.py",
+          "sha256": "570058908186cbe80ba3407a5682bfb6748cea3242ce94f63fe8b15a0ea7cdc2",
+          "bytes": 4314
+        },
+        {
+          "path": "vnpy/trader/gateway.py",
+          "url": "https://raw.githubusercontent.com/vnpy/vnpy/c6e231caf32b7fc97e6459817fff66458cf7e7c4/vnpy/trader/gateway.py",
+          "sha256": "6b2821d7c9d35f51c0266aeed9314217f207cf026a173c7f8c3458244a24d0d0",
+          "bytes": 7798
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/vnpy/vnpy/c6e231caf32b7fc97e6459817fff66458cf7e7c4/LICENSE",
+          "sha256": "81294e5bcba945564df8586f1d789b016001b7b43eb4de97736679dd882cf191",
+          "bytes": 1087
+        }
+      ],
+      "sha": "c6e231caf32b7fc97e6459817fff66458cf7e7c4",
+      "commit_date": "2026-10-06T09:38:50Z"
+    },
+    {
+      "repo": "vnpy/vnpy_ctastrategy",
+      "ref": "main",
+      "sources": [
+        {
+          "path": "vnpy_ctastrategy/template.py",
+          "url": "https://raw.githubusercontent.com/vnpy/vnpy_ctastrategy/7a8768de9784dda35a7b261a7ade1dbfbff50919/vnpy_ctastrategy/template.py",
+          "sha256": "6fd1d64133ccde02a527adc4a0865c5cf96defa035ae254e18f2c6242e81737e",
+          "bytes": 13789
+        },
+        {
+          "path": "vnpy_ctastrategy/backtesting.py",
+          "url": "https://raw.githubusercontent.com/vnpy/vnpy_ctastrategy/7a8768de9784dda35a7b261a7ade1dbfbff50919/vnpy_ctastrategy/backtesting.py",
+          "sha256": "e8743c2310777f91eba121557ebac1036cd5843afbbd7cdeb54dc6ed8dff155e",
+          "bytes": 42693
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/vnpy/vnpy_ctastrategy/7a8768de9784dda35a7b261a7ade1dbfbff50919/LICENSE",
+          "sha256": "81294e5bcba945564df8586f1d789b016001b7b43eb4de97736679dd882cf191",
+          "bytes": 1087
+        }
+      ],
+      "sha": "7a8768de9784dda35a7b261a7ade1dbfbff50919",
+      "commit_date": "2026-10-05T14:22:15Z"
+    },
+    {
+      "repo": "vnpy/vnpy_algotrading",
+      "ref": "main",
+      "sources": [
+        {
+          "path": "vnpy_algotrading/algos/twap_algo.py",
+          "url": "https://raw.githubusercontent.com/vnpy/vnpy_algotrading/bee959dc464749f7cce66e766249ccdbb2d4869a/vnpy_algotrading/algos/twap_algo.py",
+          "sha256": "6d344c4d4379f072b9454aafccd2199df307735646ded4e20c293b1eff18c1e9",
+          "bytes": 2599
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/vnpy/vnpy_algotrading/bee959dc464749f7cce66e766249ccdbb2d4869a/LICENSE",
+          "sha256": "48d3942a8bdafaa59f36481584c8623d1ef2749fb66af9ec94ae680a2795aa96",
+          "bytes": 1089
+        }
+      ],
+      "sha": "bee959dc464749f7cce66e766249ccdbb2d4869a",
+      "commit_date": "2026-10-05T14:24:20Z"
+    },
+    {
+      "repo": "bbfamily/abu",
+      "ref": "master",
+      "sources": [
+        {
+          "path": "readme.md",
+          "url": "https://raw.githubusercontent.com/bbfamily/abu/d602d847677e4c2b77b0a122df30816ea68b5710/readme.md",
+          "sha256": "534a3e4bb6bd5d97e3392d85100fbfb6ebded12e1df54f86bbfa89c243b6ac22",
+          "bytes": 27320
+        },
+        {
+          "path": "abupy/FactorBuyBu/ABuFactorBuyBase.py",
+          "url": "https://raw.githubusercontent.com/bbfamily/abu/d602d847677e4c2b77b0a122df30816ea68b5710/abupy/FactorBuyBu/ABuFactorBuyBase.py",
+          "sha256": "4cf0afaedcd39158f30e17e63c1932a3cc9f4a6fbb27eed2537c18e20e6601d0",
+          "bytes": 21803
+        },
+        {
+          "path": "abupy/AlphaBu/ABuPickTimeMaster.py",
+          "url": "https://raw.githubusercontent.com/bbfamily/abu/d602d847677e4c2b77b0a122df30816ea68b5710/abupy/AlphaBu/ABuPickTimeMaster.py",
+          "sha256": "504c7ef17d62d9027103af7e186b97f1b80ebd4b3f6e1c2fd5d44846656d5653",
+          "bytes": 5536
+        },
+        {
+          "path": "abupy/MetricsBu/ABuMetricsBase.py",
+          "url": "https://raw.githubusercontent.com/bbfamily/abu/d602d847677e4c2b77b0a122df30816ea68b5710/abupy/MetricsBu/ABuMetricsBase.py",
+          "sha256": "18950b367ab56b1ab1524af6186ebdbfeed8f4d1c72e78649062b564ec214110",
+          "bytes": 27368
+        },
+        {
+          "path": "abupy/UmpBu/ABuUmpBase.py",
+          "url": "https://raw.githubusercontent.com/bbfamily/abu/d602d847677e4c2b77b0a122df30816ea68b5710/abupy/UmpBu/ABuUmpBase.py",
+          "sha256": "1965a56f88e491e20dea54491599d4c6d7cc7fd56528531fb88f8d34d15a6634",
+          "bytes": 9265
+        },
+        {
+          "path": "abupy/BetaBu/ABuPositionBase.py",
+          "url": "https://raw.githubusercontent.com/bbfamily/abu/d602d847677e4c2b77b0a122df30816ea68b5710/abupy/BetaBu/ABuPositionBase.py",
+          "sha256": "33171400caedd0f643b558e39f41c84b45446eb2f83c50a0b52770df6cda860d",
+          "bytes": 3305
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/bbfamily/abu/d602d847677e4c2b77b0a122df30816ea68b5710/LICENSE",
+          "sha256": "6c354b4139799ba2a9409adb77b26a7944937f0dd43f39788f1ce5e75b62ed2f",
+          "bytes": 35130
+        }
+      ],
+      "sha": "d602d847677e4c2b77b0a122df30816ea68b5710",
+      "commit_date": "2026-01-24T09:00:29Z"
+    },
+    {
+      "repo": "nautechsystems/nautilus_trader",
+      "ref": "develop",
+      "sources": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/develop/README.md",
+          "sha256": "4283d8b5efe5ea2e0d00c3cf332d5bcc90454fb319d8a2ddc701ca71d1dadc94",
+          "bytes": 37852
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/develop/LICENSE",
+          "sha256": "ee907919ec88c9c017b1f8b608db20960b6598aefcc4fe58820bde955d65ed3c",
+          "bytes": 7651
+        }
+      ],
+      "pin_error": "HTTP Error 403: rate limit exceeded"
+    },
+    {
+      "repo": "QuantConnect/Lean",
+      "ref": "master",
+      "sources": [
+        {
+          "path": "readme.md",
+          "url": "https://raw.githubusercontent.com/QuantConnect/Lean/master/readme.md",
+          "sha256": "c93d2d649740ffdbfeca35ee5035eff668dc1f0a6b97873756addb70f4f4b91e",
+          "bytes": 11001
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/QuantConnect/Lean/master/LICENSE",
+          "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba",
+          "bytes": 10737
+        }
+      ],
+      "pin_error": "HTTP Error 403: rate limit exceeded"
+    },
+    {
+      "repo": "nkaz001/hftbacktest",
+      "ref": "master",
+      "sources": [
+        {
+          "path": "README.md",
+          "error": "HTTP Error 404: Not Found"
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/nkaz001/hftbacktest/master/LICENSE",
+          "sha256": "b40367c13dfa67c617d6e8037d45581496d9f0429a3274ab19f117404b519a5a",
+          "bytes": 1079
+        }
+      ],
+      "pin_error": "HTTP Error 403: rate limit exceeded"
+    }
+  ],
+  "notes": [
+    "Only vn.py core/CTA/Algo and ABU commit refs were pinned; other refs are mutable with file hashes recorded.",
+    "HftBacktest README path returned 404; simulation findings use official documentation instead.",
+    "Source files are held in local research scratch space; no upstream code is copied into KazeQuant."
+  ]
+}

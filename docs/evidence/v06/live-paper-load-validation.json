@@ -1,0 +1,19 @@
+{
+  "checks": {
+    "success": true,
+    "state_equal": true,
+    "chain_equal": true,
+    "binary_equal": true,
+    "all_committed_quotes_counted": true,
+    "bucket_counts_equal": true,
+    "full_history_count_equal": true,
+    "no_worker_failure": true
+  },
+  "accepted_120_second_smoke": true,
+  "accepted_24h": false,
+  "scope": "Public live quotes and local paper orders only; not alpha or venue order acceptance",
+  "binary_sha256": "1a9bf4e097bfd1b3dff26367fc3ff5cfacfd4f35b0133370c66fedd1dee4fa36",
+  "config_sha256": "11007c12f9a3188faae6b9aca4b2d8db13b72ae3be3a1233657e74db3e9edbba",
+  "raw_local_report_sha256": "51a2d04b85235f9e111960ddc9180bdf98276a88cf2e4a2f67c2dd4b810095e9",
+  "published_json_format": "Whitespace compacted only; all fields and buckets retained"
+}

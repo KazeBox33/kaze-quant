@@ -24,3 +24,5 @@ pub mod feed;
 pub mod research;
 
 pub mod registry;
+
+pub mod telemetry;

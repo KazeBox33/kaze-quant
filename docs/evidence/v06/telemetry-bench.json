@@ -1,0 +1,64 @@
+{
+  "collector_bytes": 16432,
+  "conditions": "release, one warmup, seven measured rounds, preloaded deterministic input, no affinity, background jobs may exist; report query outside timing; excludes pipeline timestamp reads/other collectors/strategy/network/durability",
+  "mode": "scalar-latency-histogram-component",
+  "rounds": [
+    {
+      "elapsed_ns": "4113458",
+      "ns_per_observation": 4.113458,
+      "observations": 1000000,
+      "round": 1
+    },
+    {
+      "elapsed_ns": "4645792",
+      "ns_per_observation": 4.645792,
+      "observations": 1000000,
+      "round": 2
+    },
+    {
+      "elapsed_ns": "4408375",
+      "ns_per_observation": 4.408375,
+      "observations": 1000000,
+      "round": 3
+    },
+    {
+      "elapsed_ns": "4138083",
+      "ns_per_observation": 4.138083,
+      "observations": 1000000,
+      "round": 4
+    },
+    {
+      "elapsed_ns": "3818875",
+      "ns_per_observation": 3.818875,
+      "observations": 1000000,
+      "round": 5
+    },
+    {
+      "elapsed_ns": "3471833",
+      "ns_per_observation": 3.471833,
+      "observations": 1000000,
+      "round": 6
+    },
+    {
+      "elapsed_ns": "3174417",
+      "ns_per_observation": 3.174417,
+      "observations": 1000000,
+      "round": 7
+    }
+  ],
+  "schema_version": 1,
+  "environment": {
+    "cpu": "Apple M5",
+    "os": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "architecture": "arm64",
+    "compiler": "rustc 1.99.0 (b940084d7 2026-09-28)",
+    "utc": "2026-10-06T12:03:36.799005+00:00",
+    "background": "frozen previous-version 24h public paper plus new active paper smoke; no affinity or thermal isolation"
+  },
+  "median_ns_per_observation": 4.113458,
+  "source_sha256": {
+    "src/telemetry.rs": "87add4b5d1c17584c50b570a8817c11c0a88f951c9b7ac239916ee2cec5ab3bb",
+    "examples/telemetry_bench.rs": "93b2d54b7426d850bc3d95b3ed576e8a95dcc18e972dfd3dc45f2f33b58cdb59"
+  },
+  "binary_sha256": "11704299ea0fc31a2489dc5f2449274e6ed444df8f4fbd7f8f2dfb36c90b52c9"
+}

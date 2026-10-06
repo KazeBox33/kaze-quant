@@ -4,6 +4,7 @@ use kaze_quant::feed::FeedNormalizer;
 use kaze_quant::paper::{Command, Envelope, PaperError};
 use kaze_quant::storage::publish_new;
 use kaze_quant::store::{SqliteSession, StoreOptions};
+use kaze_quant::telemetry::{LiveLatency, QuoteTiming, validate_commit_window};
 use sha2::{Digest, Sha256};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::path::PathBuf;
@@ -47,6 +48,56 @@ impl QueueMeter {
 struct Frame {
     raw: String,
     received: Instant,
+}
+fn elapsed_ns(start: Instant, at: Instant) -> Result<u64, PaperError> {
+    u64::try_from(at.duration_since(start).as_nanos())
+        .map_err(|_| "monotonic receive time overflow".into())
+}
+/// 检查整批时效后才触碰SQLite；统计只发生于实际确认之后。
+fn commit_pending(
+    session: &mut SqliteSession,
+    batch: &[Envelope],
+    timings: &[QuoteTiming],
+    start: Instant,
+    max_age_ns: u64,
+    latency: &mut LiveLatency,
+) -> Result<u128, PaperError> {
+    if batch.len() != timings.len() {
+        return Err("live batch timing count conflicts".into());
+    }
+    let before = Instant::now();
+    let begin_ns = elapsed_ns(start, before)?;
+    validate_commit_window(timings, begin_ns, max_age_ns)?;
+    session.execute_batch(batch)?;
+    let ack = Instant::now();
+    latency.observe_commit(timings, begin_ns, elapsed_ns(start, ack)?)?;
+    Ok(ack.duration_since(before).as_nanos())
+}
+fn terminal_error(
+    outcome: Result<(), PaperError>,
+    worker_panicked: bool,
+    worker_failure: Option<String>,
+    committed_quotes: u64,
+    risk_halted: bool,
+) -> Option<String> {
+    outcome
+        .err()
+        .map(|e| e.to_string())
+        .or_else(|| {
+            if worker_panicked {
+                Some("feed worker panicked: fail closed".into())
+            } else {
+                worker_failure
+            }
+        })
+        .or_else(|| risk_halted.then(|| "paper risk halt latched".into()))
+        .or_else(|| {
+            (committed_quotes == 0).then(|| "live run confirmed no quotes: fail closed".into())
+        })
+}
+/// 只忽略主动关闭接收者引起的错误；真实网络/过载故障在收尾阶段也必须保留。
+fn expected_shutdown_error(error: &PaperError, stopped: bool) -> bool {
+    stopped && error.0 == "feed consumer closed"
 }
 fn run() -> Result<(), PaperError> {
     let args: Vec<_> = std::env::args().skip(1).collect();
@@ -181,7 +232,7 @@ fn run() -> Result<(), PaperError> {
             Ok(())
         })();
         if let Err(error) = result
-            && !stopped.load(Ordering::Acquire)
+            && !expected_shutdown_error(&error, stopped.load(Ordering::Acquire))
         {
             let _ = failure_tx.try_send(error.to_string());
             failure.store(true, Ordering::Release);
@@ -192,8 +243,7 @@ fn run() -> Result<(), PaperError> {
     let mut deadline = start + Duration::from_millis(5);
     let mut last_frame = start;
     let mut committed = 0u64;
-    let mut latencies = Vec::new();
-    let mut error = None;
+    let mut latency = LiveLatency::default();
     let mut commit_max_ns = 0u128;
     let mut wire_hash = Sha256::new();
     let mut raw_frames = 0u64;
@@ -213,6 +263,7 @@ fn run() -> Result<(), PaperError> {
             match rx.recv_timeout(Duration::from_millis(1)) {
                 Ok(frame) => {
                     queue_meter.consumed();
+                    let dequeued = Instant::now();
                     // 缓冲只吸收短时突发，不授权在积压后用过期报价产生策略订单。
                     if frame.received.elapsed()
                         > Duration::from_nanos(config.markets[0].risk.max_quote_age_ns)
@@ -222,7 +273,8 @@ fn run() -> Result<(), PaperError> {
                     wire_hash.update(frame.raw.as_bytes());
                     wire_hash.update(b"\n");
                     raw_frames += 1;
-                    let ns = u64::try_from(epoch + frame.received.duration_since(start).as_nanos())
+                    let received_ns = elapsed_ns(start, frame.received)?;
+                    let ns = u64::try_from(epoch + received_ns as u128)
                         .map_err(|_| "receive time overflow")?;
                     if let Some(quote) = normalizer.normalize(&frame.raw, ns)? {
                         last_frame = frame.received;
@@ -233,7 +285,10 @@ fn run() -> Result<(), PaperError> {
                             seq: session.runtime().processed() + batch.len() as u64 + 1,
                             command: Command::Quote { market: 0, quote },
                         });
-                        arrivals.push(frame.received);
+                        arrivals.push(QuoteTiming {
+                            received_ns,
+                            dequeued_ns: elapsed_ns(start, dequeued)?,
+                        });
                     }
                 }
                 Err(mpsc::RecvTimeoutError::Disconnected) => {
@@ -246,17 +301,16 @@ fn run() -> Result<(), PaperError> {
                 Err(mpsc::RecvTimeoutError::Timeout) => (),
             }
             if !batch.is_empty() && (batch.len() == 256 || Instant::now() >= deadline) {
-                let before = Instant::now();
-                session.execute_batch(&batch)?;
-                let ack = Instant::now();
-                commit_max_ns = commit_max_ns.max(ack.duration_since(before).as_nanos());
+                commit_max_ns = commit_max_ns.max(commit_pending(
+                    &mut session,
+                    &batch,
+                    &arrivals,
+                    start,
+                    config.markets[0].risk.max_quote_age_ns,
+                    &mut latency,
+                )?);
                 committed += batch.len() as u64;
-                // 直方图的有界采样：最多10万条，避免监控成为无限内存历史。
-                for arrived in arrivals.drain(..) {
-                    if latencies.len() < 100_000 {
-                        latencies.push(ack.duration_since(arrived).as_nanos());
-                    }
-                }
+                arrivals.clear();
                 batch.clear();
                 if session.runtime().halted(0).is_some() {
                     return Err("paper risk halt latched".into());
@@ -264,14 +318,39 @@ fn run() -> Result<(), PaperError> {
             }
         }
         if !batch.is_empty() {
-            session.execute_batch(&batch)?;
+            commit_max_ns = commit_max_ns.max(commit_pending(
+                &mut session,
+                &batch,
+                &arrivals,
+                start,
+                config.markets[0].risk.max_quote_age_ns,
+                &mut latency,
+            )?);
             committed += batch.len() as u64;
         }
         Ok(())
     })();
+    let observation_duration_seconds = start.elapsed().as_secs_f64();
     stop.store(true, Ordering::Release);
-    if let Err(e) = outcome {
-        error = Some(e.to_string());
+    drop(rx);
+    // 必须先收尾工作线程，再判定成功；末批确认期间发生的故障与panic不能被Finish覆盖。
+    let worker_panicked = producer.join().is_err();
+    let worker_failure = if failed.load(Ordering::Acquire) {
+        failure_rx
+            .try_recv()
+            .ok()
+            .or_else(|| Some("feed worker failed without remaining detail".into()))
+    } else {
+        None
+    };
+    let error = terminal_error(
+        outcome,
+        worker_panicked,
+        worker_failure.clone(),
+        committed,
+        session.runtime().halted(0).is_some(),
+    );
+    if error.is_some() {
         session.execute_batch(&[Envelope {
             seq: session.runtime().processed() + 1,
             command: Command::Halt {},
@@ -282,16 +361,9 @@ fn run() -> Result<(), PaperError> {
             command: Command::Finish {},
         }])?;
     }
-    drop(rx);
-    let _ = producer.join();
     let verified = session.verify_full()?;
-    latencies.sort_unstable();
-    let percentile = |n: usize| {
-        latencies
-            .get(latencies.len().saturating_sub(1) * n / 100)
-            .copied()
-    };
-    let body = serde_json::json!({"schema_version":1,"mode":"public-live-spot-paper","success":error.is_none(),"error":error,"symbol":symbol,"duration_seconds":start.elapsed().as_secs_f64(),"quotes_committed":committed,"last_observed_exchange_update_id":normalizer.exchange_update_id(),"raw_frames_consumed":raw_frames,"raw_consumed_jsonl_sha256":kaze_quant::journal::hex(&wire_hash.finalize()),"binary_sha256":session.binary_sha256,"config_sha256":session.config_sha256,"audit_chain_sha256":session.chain_sha256(),"verified_commands":verified,"commit_max_ns":commit_max_ns,"feed_queue":{"capacity":FEED_QUEUE_CAPACITY,"frame_max_bytes":FRAME_MAX_BYTES,"raw_payload_capacity_bytes":FEED_QUEUE_CAPACITY*FRAME_MAX_BYTES,"pending_at_stop":queue_meter.pending.load(Ordering::Relaxed),"high_water_pending":queue_meter.high_water.load(Ordering::Relaxed),"scope":"pending includes at most one producer frame in flight; successful send high-water is an upper estimate, not latency"},"receive_to_durable_ack":{"samples":latencies.len(),"p50_ns":percentile(50),"p95_ns":percentile(95),"p99_ns":percentile(99),"scope":"first up to 100K text frames, socket read to durable commit incl bounded queue; excludes exchange/network/kernel pre-read time and final partial batch"},"state":session.runtime().report(),"limits":"local receive timestamp; no real orders, queue position or market impact; stop/disconnect does not liquidate filled positions"});
+    let telemetry = latency.report();
+    let body = serde_json::json!({"schema_version":2,"mode":"public-live-spot-paper","success":error.is_none(),"error":error,"symbol":symbol,"duration_seconds":start.elapsed().as_secs_f64(),"observation_duration_seconds":observation_duration_seconds,"worker_panicked":worker_panicked,"worker_failure":worker_failure,"quotes_committed":committed,"last_observed_exchange_update_id":normalizer.exchange_update_id(),"raw_frames_consumed":raw_frames,"raw_consumed_jsonl_sha256":kaze_quant::journal::hex(&wire_hash.finalize()),"binary_sha256":session.binary_sha256,"config_sha256":session.config_sha256,"audit_chain_sha256":session.chain_sha256(),"verified_commands":verified,"commit_max_ns":commit_max_ns,"feed_queue":{"capacity":FEED_QUEUE_CAPACITY,"frame_max_bytes":FRAME_MAX_BYTES,"raw_payload_capacity_bytes":FEED_QUEUE_CAPACITY*FRAME_MAX_BYTES,"pending_at_stop":queue_meter.pending.load(Ordering::Relaxed),"high_water_pending":queue_meter.high_water.load(Ordering::Relaxed),"scope":"pending includes at most one producer frame in flight; successful send high-water is an upper estimate, not latency"},"receive_to_durable_ack":telemetry["receive_to_durable_ack"],"telemetry":telemetry,"state":session.runtime().report(),"limits":"local receive timestamp; no real orders, queue position or market impact; stop/disconnect does not liquidate filled positions"});
     publish_new(&report, &serde_json::to_vec_pretty(&body)?)?;
     println!("{}", serde_json::to_string(&body)?);
     if error.is_some() {
@@ -334,5 +406,118 @@ mod tests {
         drop(rx);
         assert!(meter.send(&tx, frame(5)).is_err());
         assert_eq!(meter.pending.load(Ordering::Relaxed), 0);
+    }
+    #[test]
+    fn shutdown_failure_and_worker_panic_cannot_be_success() {
+        assert_eq!(
+            terminal_error(Ok(()), false, Some("feed disconnected".into()), 1, false).as_deref(),
+            Some("feed disconnected")
+        );
+        assert_eq!(
+            terminal_error(Ok(()), true, None, 1, false).as_deref(),
+            Some("feed worker panicked: fail closed")
+        );
+        assert_eq!(
+            terminal_error(
+                Err("risk halt".into()),
+                true,
+                Some("late fault".into()),
+                1,
+                false
+            )
+            .as_deref(),
+            Some("risk halt")
+        );
+        assert!(terminal_error(Ok(()), false, None, 1, false).is_none());
+        // 最后部分批次触发风控也不能被正常Finish掩盖。
+        assert_eq!(
+            terminal_error(Ok(()), false, None, 1, true).as_deref(),
+            Some("paper risk halt latched")
+        );
+    }
+    #[test]
+    fn stale_pending_batch_does_not_change_durable_state_or_latency() {
+        static NEXT: AtomicUsize = AtomicUsize::new(0);
+        let path = std::env::temp_dir().join(format!(
+            "kaze-live-guard-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        std::fs::create_dir(&path).unwrap();
+        let config: PaperConfig =
+            serde_json::from_str(include_str!("../../configs/binance-live-passive.json")).unwrap();
+        let db = path.join("guard.db");
+        {
+            use kaze_quant::types::{Price, Quote};
+            let mut session = SqliteSession::open(&db, config, StoreOptions::default()).unwrap();
+            let before = session.runtime().report();
+            let batch = [Envelope {
+                seq: 1,
+                command: Command::Quote {
+                    market: 0,
+                    quote: Quote {
+                        sequence: 1,
+                        timestamp_ns: 1,
+                        bid: Price::new(100).unwrap(),
+                        ask: Price::new(110).unwrap(),
+                        bid_quantity: 1,
+                        ask_quantity: 1,
+                    },
+                },
+            }];
+            let timings = [QuoteTiming {
+                received_ns: 0,
+                dequeued_ns: 0,
+            }];
+            let mut latency = LiveLatency::default();
+            let start = Instant::now() - Duration::from_secs(2);
+            assert!(
+                commit_pending(
+                    &mut session,
+                    &batch,
+                    &timings,
+                    start,
+                    1_000_000_000,
+                    &mut latency
+                )
+                .is_err()
+            );
+            assert_eq!(session.runtime().report(), before);
+            assert_eq!(session.verify_full().unwrap(), 0);
+            assert_eq!(latency.receive_to_ack.samples(), 0);
+            let start = Instant::now();
+            commit_pending(
+                &mut session,
+                &batch,
+                &timings,
+                start,
+                10_000_000_000,
+                &mut latency,
+            )
+            .unwrap();
+            assert_eq!(session.verify_full().unwrap(), 1);
+            assert_eq!(latency.receive_to_ack.samples(), 1);
+            assert_eq!(latency.commit.samples(), 1);
+        }
+        std::fs::remove_dir_all(path).unwrap();
+    }
+    #[test]
+    fn planned_consumer_close_is_the_only_ignored_shutdown_error() {
+        assert!(expected_shutdown_error(
+            &"feed consumer closed".into(),
+            true
+        ));
+        assert!(!expected_shutdown_error(
+            &"feed consumer closed".into(),
+            false
+        ));
+        for message in [
+            "feed queue capacity exceeded",
+            "feed connection closed",
+            "feed handshake failed",
+        ] {
+            assert!(!expected_shutdown_error(&message.into(), true));
+        }
+        assert!(terminal_error(Ok(()), false, None, 0, false).is_some());
     }
 }
