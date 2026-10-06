@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "environment": "binance-spot-testnet",
+  "binary_sha256": "35dc9d08dd91b84a78689efb27415fe6809c57f12f7198c23babf8bb2930f1a3",
+  "private_subscription_and_rest_ready_before_kill": true,
+  "kill_returncode": -9,
+  "fresh_process_requires_reconciliation": true,
+  "orders_trades_assets_equal": true,
+  "rest_all_assets_match": true,
+  "new_order_posts": 0,
+  "scope": "actual SIGKILL of our bounded read-only private-stream process after authenticated startup; no order was generated during gap; not physical wire drop or gap-fill trade delivery proof"
+}

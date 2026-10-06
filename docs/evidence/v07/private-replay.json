@@ -1,1 +1,11 @@
-{"audit_and_assets_equal":true,"duplicate_events":6,"mode":"captured-private-execution-replay","new_events":0,"schema_version":1,"scope":"local re-delivery of persisted events, no physical packet duplication or authentication-signature proof"}
+{
+  "audit_and_assets_equal": true,
+  "duplicate_events": 6,
+  "mode": "captured-private-execution-replay",
+  "new_events": 0,
+  "schema_version": 1,
+  "scope": "local re-delivery of persisted events, no physical packet duplication or authentication-signature proof",
+  "replay_binary_sha256": "38d8d2a071dec72945ae336fd49162e3e9a1eed3f5e6bc21d46c2c24dfdf67cf",
+  "original_testnet_binary_sha256": "35dc9d08dd91b84a78689efb27415fe6809c57f12f7198c23babf8bb2930f1a3",
+  "code_sha": "b6e338199ec33e199e3dba09e5d29665811f4e2f"
+}

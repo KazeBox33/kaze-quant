@@ -10,7 +10,7 @@
 |---|---|---|---|
 | [vn.py / VeighNa](https://github.com/vnpy/vnpy) | Python事件驱动交易平台；独立gateway/app生态、CTA/组合/价差/执行算法及桌面工具 | 网关能力声明、策略生命周期/回报、目标持仓和执行算法、运维可见性 | 我们只有一个外部测试网、CLI和独立预算现货模型，没有国内期货/股票规则与GUI生态 |
 | [ABU](https://github.com/bbfamily/abu) | Python量化研究体系；买卖因子、选股、仓位、监督过滤、并行择时与绩效分析 | 信号/仓位/过滤分离，研究实验编排、解释性报告 | 我们策略/统计/数据研究工具少，独立周数据转换仍失败，不能说研究更成熟 |
-| [NautilusTrader](https://github.com/nautechsystems/nautilus_trader) | Rust核心加Python接口、事件驱动回测/实盘、执行与组合对账 | 同一策略核心、明确外部命令未知状态、启动/运行对账、类型化资产模型 | 我们无统一组合账本、私有回报流、连续实盘节点；它是最接近的系统架构参照 |
+| [NautilusTrader](https://github.com/nautechsystems/nautilus_trader) | Rust核心加Python接口、事件驱动回测/实盘、执行与组合对账 | 同一策略核心、明确外部命令未知状态、启动/运行对账、类型化资产模型 | 已补受限Spot原币账本与有界私有流，仍缺组合估值/连续实盘节点；它是最接近的系统架构参照 |
 | [LEAN](https://github.com/QuantConnect/Lean) | C#/Python多资产算法引擎；研究/回测/实盘与算法框架 | universe→alpha→portfolio→risk→execution职责拆分、交易日历与资产规则 | 我们不能把独立资产预算当成共享资金组合，也未支持企业行动/保证金 |
 | [HftBacktest](https://github.com/nkaz001/hftbacktest) | 市场回放、部分成交/队列位置与行情/下单/回报延迟模型 | 真实L2+逐笔成交驱动的队列模型、实测延迟校准 | 我们的DeltaBudget只是保守L1预算，不能声称知道外部排队/冲击 |
 | [Freqtrade](https://github.com/freqtrade/freqtrade) | 加密货币策略工具；提供lookahead/recursive等诊断 | 对已触发信号做切片对照、指标预热/递归稳定性检查 | 当前严格前缀接口减少直接未来读取，但可信策略仍可能使用外部信息，不能宣称消除所有偏差 |
@@ -47,7 +47,7 @@ vn.py这个核心EventEngine快照使用未设置maxsize的Queue；我们的实�
 
 ## 更可信的仿真与外部对账
 
-[NautilusTrader实时契约](https://nautilustrader.io/docs/latest/concepts/live/)明确共享策略代码与外部执行差异、未解决提交、启动与运行对账。我们已有意图先持久化、同client ID仅一次POST、unknown只查询，以及两轮真实测试网基础核对；下一步做私有事件消费/REST补洞、三币种费用账本、订单与余额一致性、高水位和外部活动识别。事件重复/乱序/断流不得重复入账；历史不完整必须停止核算并标记未知，不自动创造余额调整。
+[NautilusTrader实时契约](https://nautilustrader.io/docs/latest/concepts/live/)明确共享策略代码与外部执行差异、未解决提交、启动与运行对账。我们已有意图先持久化、同client ID仅一次POST、unknown只查询，以及两轮真实测试网基础核对；本阶段已补有界私有事件消费、三币种费用账本及订单/全资产核对；下一步补历史游标、连续高水位/缺口恢复和外部活动分类。事件重复/乱序/断流不得重复入账；历史不完整必须停止核算并标记未知，不自动创造余额调整。
 
 [HftBacktest成交/队列文档](https://hftbacktest.readthedocs.io/en/latest/order_fill.html)明确回放不能改变市场，有些成交假设仍不现实；[延迟文档](https://hftbacktest.readthedocs.io/en/latest/latency_models.html)分开feed、entry、response。先录制合法Spot L2快照/增量+逐笔成交，验证衔接与重建，再实现保守队列/部分成交/撤单回报模型。使用测试网不能校准主网真实成交概率；L1更新ID不能冒充连续深度序号。
 
@@ -65,7 +65,7 @@ vn.py这个核心EventEngine快照使用未设置maxsize的Queue；我们的实�
 |---|---|---|
 | CPU效率 | 固定1M真实报价/同策略/订单规模/成交规则，预热+至少7轮；CPU-only目标吞吐中位≥参照1.5倍且RSS更低，公开raw与变化范围 | 只有固定Barter组件对照；未运行vn.py/ABU/Nautilus完整对照 |
 | 持久尾延迟 | 独立列出无持久化、同类durable ACK模式；固定输入速率/突发/热状态，目标新实现p99上界较自己的冻结基线改善≥20%，不增加丢失/重复 | 新全样本区间统计已实现；没有新旧同负载改善证据 |
-| 恢复与安全 | 下单前/后崩溃、丢ACK、重复乱序成交、撤单未知、断流；已确认命令0丢失、0重复经济事件/重复POST，状态链核对 | 纸面恢复与受限Testnet基础已有；私有流、完整组合和真实部分成交缺口仍在 |
+| 恢复与安全 | 下单前/后崩溃、丢ACK、重复乱序成交、撤单未知、断流；已确认命令0丢失、0重复经济事件/重复POST，状态链核对 | 纸面恢复、受限Testnet原币账本/有界私有流已有；连续缺口恢复、完整组合和真实部分成交仍缺 |
 | 仿真可信度 | 同L2/逐笔输入、不同队列/费用/延迟场景，报告成交概率/偏差，不以PnL更高当更好 | 当前仅L1限价/共享量/DeltaBudget/成本压力 |
 | 研究可复现性 | manifest固定日期/哈希/代码/候选，训练选择后独立测试；失败保留，不根据测试收益重选 | 流程已有，六日筛选未通过、独立周转换失败，没有合格alpha |
 | 可用性 | 新机器10分钟跑出demo、接策略、停止、恢复、读拒单原因；Mac/Linux同契约，文档与运行样例匹配 | CLI/教学样例已有，Python SDK/运营界面/生产Linux长测待做 |

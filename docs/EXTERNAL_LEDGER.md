@@ -71,3 +71,9 @@ cargo run --locked --release --example private_event_replay -- reports/my-extern
 ```
 
 当前本机160项Rust测试在debug/release通过、15项原有Python数据/验收测试通过，fmt/严格clippy/rustdoc通过；新增有界Python验收脚本同时在真实测试网完整运行。精确代码SHA的Linux/macOS CI另外记录，不能拿旧版本CI证明本阶段。实际PARTIALLY_FILLED仍未观测，本阶段也没有完成新版本24h、物理断流、连续自动重连或策略盈利验收。
+
+额外实际进程故障：认证私有订阅及RESTReady后，对本次只读观察子进程发送SIGKILL（返回-9）。新进程强制待核对，订单/成交/资产投影相等，REST再次核对全部资产成功，新增POST为0。[原始结果](evidence/v07/private-process-kill.json)。期间没有生成订单或成交，所以这证明启动后崩溃恢复边界，不证明断流期间成交已补齐；后者仍需单独实验。
+
+本阶段代码提交为`b6e338199ec33e199e3dba09e5d29665811f4e2f`；CI只认同一SHA，后续证据文档提交不改变核心二进制。
+
+精确代码提交的[CI运行37473198292](https://github.com/KazeBox33/kaze-quant/actions/runs/37473198292)已完成：Ubuntu/macOS两个job均success，含fmt、严格clippy、debug/release测试、rustdoc、Python检查、CLI回放/恢复/备份及存储实验。原始[运行记录](evidence/v07/ci.json)和[job记录](evidence/v07/ci-jobs.json)固定到同一SHA；文档补充提交不代替代码验证。
