@@ -68,5 +68,11 @@
     "continuous": "24h passive public stream in progress; not passed",
     "strategy": "screen failed; no independently validated alpha"
   },
-  "testnet_credentials_available": false
+  "testnet_credentials_available": false,
+  "cross_platform_ci": {
+    "source_commit": "dac73096746a27510f0afcd9f9d2f0ea21e99b69",
+    "run_id": 37448290078,
+    "linux": "success",
+    "macos": "success"
+  }
 }

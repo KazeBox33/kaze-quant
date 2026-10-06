@@ -61,7 +61,7 @@ BTC固定0.01BTC单量在3月超过500USDT风险上限，导致交易被阻止�
 
 ## 工程验证与来源
 
-本地131项Rust测试在debug/release通过，6项Python转换测试通过；fmt、all-features/all-targets clippy -D warnings及严格rustdoc通过。测试包含可信策略工厂的每个切分点恢复、非法/非规范状态回滚、未知版本拒绝，及订单未知结果不重发。机器/结果身份见 [验证环境](evidence/v04/validation-mac.json)。Linux/macOS新CI的结果以对应提交Actions为准，不将旧版本CI当作本版本验证。
+本地131项Rust测试在debug/release通过，6项Python转换测试通过；fmt、all-features/all-targets clippy -D warnings及严格rustdoc通过。测试包含可信策略工厂的每个切分点恢复、非法/非规范状态回滚、未知版本拒绝，及订单未知结果不重发。机器/结果身份见 [验证环境](evidence/v04/validation-mac.json)。核心提交dac7309的 [Linux/macOS Rust CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37448290078) 已全部success；包含完整检查、策略重投、网络程序构建检查和备份恢复，身份见[CI记录](evidence/v04/ci.json)。托管runner不等于目标Linux生产机器。
 
 借鉴并注明来源：[NautilusTrader对账](https://nautilustrader.io/docs/latest/concepts/live/)、[HftBacktest成交与队列边界](https://hftbacktest.readthedocs.io/en/latest/order_fill.html)、[Freqtrade未来数据检查](https://www.freqtrade.io/en/stable/lookahead-analysis/)、[Binance官方REST订单/撤单协议](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md)。当前未复制它们的完整队列模型、回报流或框架。
 
@@ -79,3 +79,7 @@ target/release/kaze-research reports/new-plan.json reports/new-research.json
 ```
 
 完整策略模板见[STRATEGIES](STRATEGIES.md)，公开实时/测试网使用及密钥本地配置见[TESTNET](TESTNET.md)。
+
+## 本版本跨平台存储实验
+
+同一2000命令合成负载、3轮、release，Linux托管runner逐条文件WAL中位471.156ms，SQLite FULL 256/批中位9.626ms；macOS托管runner对应1454.047ms、24.039ms。原始stdout CSV：[Linux](evidence/v04/store-2000-ci-linux.csv)、[macOS](evidence/v04/store-2000-ci-macos.csv)，任务步骤见[ci-jobs.json](evidence/v04/ci-jobs.json)。这是同步批量化与跨平台同语义运行的证据；硬件/虚拟化/文件系统不同，每轮256模式仅8次事务，不能推导稳定尾延迟或未来生产机器SLA，也不是Barter比较。

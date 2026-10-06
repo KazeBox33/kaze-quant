@@ -1,0 +1,18 @@
+{
+  "source_commit": "dac73096746a27510f0afcd9f9d2f0ea21e99b69",
+  "run_id": 37448290078,
+  "run_url": "https://github.com/KazeBox33/kaze-quant/actions/runs/37448290078",
+  "jobs": [
+    {
+      "id": 112218332326,
+      "name": "check (macos-latest)",
+      "conclusion": "success"
+    },
+    {
+      "id": 112218332744,
+      "name": "check (ubuntu-latest)",
+      "conclusion": "success"
+    }
+  ],
+  "capture": "GitHub Actions job status and all steps verified; fmt/clippy/debug/release/doc, Python fixtures, durable strategy retry, network binary help, backup recovery and storage evidence upload; hosted runners are not target production hardware"
+}

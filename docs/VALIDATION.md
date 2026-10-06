@@ -1,6 +1,6 @@
 # 0.4 交付验证
 
-本地131项Rust测试（debug/release）、6项Python测试以及严格静态/文档检查通过。新增真实实时成交与恢复、固定版本Barter组件对比和整日成本研究；三个生产门槛尚未全部通过。完整原始证据与边界见 [0.4验收](ACCEPTANCE.md)。下方保留的0.3/0.2数据属于各自二进制。
+本地131项Rust测试（debug/release）、6项Python测试以及严格静态/文档检查通过。新增真实实时成交与恢复、固定版本Barter组件对比和整日成本研究；三个生产门槛尚未全部通过。完整原始证据与边界见 [0.4验收](ACCEPTANCE.md)。核心提交dac7309的[Linux/macOS CI](https://github.com/KazeBox33/kaze-quant/actions/runs/37448290078)已全部success。下方保留的0.3/0.2数据属于各自二进制。
 
 ---
 
