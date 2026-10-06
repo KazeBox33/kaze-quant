@@ -1,0 +1,324 @@
+   Compiling kaze-quant v0.4.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.54s
+     Running unittests src/lib.rs (target/debug/deps/kaze_quant-82601fbbb52343af)
+
+running 2 tests
+test binance::tests::cancelled_remote_client_id_is_bound_only_by_known_venue_id ... ok
+test journal::fault_tests::failed_write_does_not_apply_and_permanently_poisons_writer ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running unittests src/bin/live_paper.rs (target/debug/deps/kaze_live_paper-1c2239b49b862270)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/paper.rs (target/debug/deps/kaze_paper-856153ae7214d648)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/kaze_quant-ed064568e8c28138)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/research.rs (target/debug/deps/kaze_research-7477603af8e33967)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/run.rs (target/debug/deps/kaze_run-f996868d08b23aed)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/testnet.rs (target/debug/deps/kaze_testnet-f14b2a5dbe7fee81)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/book.rs (target/debug/deps/book-916c87cc76359486)
+
+running 8 tests
+test book_capacity_allows_replacement_and_deletion ... ok
+test malformed_depth_updates_leave_book_and_clock_unchanged ... ok
+test deleting_best_promotes_next_level_and_empty_side_removes_quote ... ok
+test book_builds_best_quote_and_replaces_existing_levels ... ok
+test depth_quote_adapter_drives_engine_with_no_same_event_fill ... ok
+test locked_book_is_allowed_and_zero_sequence_is_not ... ok
+test absent_delete_is_idempotent_and_consumes_sequence ... ok
+test seeded_order_book_matches_independent_btree_model ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/book_feed.rs (target/debug/deps/book_feed-47819bda36c2a792)
+
+running 5 tests
+test shared_sequence_frame_validates_final_spread_not_intermediate_state ... ok
+test full_capacity_delete_and_insert_in_same_frame_and_empty_side ... ok
+test frame_timestamp_sequence_and_limits_fail_before_commit ... ok
+test gap_hides_quote_until_valid_new_snapshot ... ok
+test failed_frame_and_snapshot_leave_depth_and_clock_unchanged ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/checkpoint.rs (target/debug/deps/checkpoint-53d4526ea6702915)
+
+running 6 tests
+test compacted_partial_orders_keep_fifo_reservations_and_monotonic_ids ... ok
+test hostile_snapshot_numbers_return_errors_instead_of_panicking ... ok
+test hostile_execution_counters_cannot_overflow_after_restore ... ok
+test unit_scales_are_explicit_and_invalid_metadata_is_rejected ... ok
+test corrupt_strategy_window_is_rejected_even_with_valid_engine ... ok
+test every_split_preserves_warm_strategy_and_subsequent_execution ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/cli.rs (target/debug/deps/cli-86b1613b273cee4a)
+
+running 5 tests
+test cli_bad_input_never_publishes_completion_marker ... ok
+test cli_rejects_unknown_flags_and_invalid_fees ... ok
+test cli_supports_momentum_and_latency ... ok
+test cli_refuses_to_overwrite_completed_results ... ok
+test cli_emits_verified_summary_and_trace ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.53s
+
+     Running tests/engine.rs (target/debug/deps/engine-a9771514762a4f90)
+
+running 25 tests
+test invalid_engine_configuration_is_rejected ... ok
+test fee_rounding_is_per_fill ... ok
+test ioc_partial_fill_then_cancel_and_release ... ok
+test cancel_is_idempotent_and_finish_releases_resources ... ok
+test frozen_cash_prevents_double_spending ... ok
+test equal_timestamps_with_increasing_sequences_are_supported ... ok
+test conservative_fee_reserve_covers_many_tiny_fills ... ok
+test compaction_keeps_submission_priority ... ok
+test ioc_non_crossing_or_zero_liquidity_cancels ... ok
+test capacities_are_enforced_and_cancel_frees_active_slot ... ok
+test fifo_and_shared_liquidity_across_orders ... ok
+test ioc_waits_for_configured_latency ... ok
+test latency_overflow_rejects_without_state_corruption ... ok
+test latency_boundary_is_inclusive ... ok
+test malformed_quote_is_atomic ... ok
+test maximum_price_quantity_and_cash_stay_in_bounds ... ok
+test no_market_rejects_without_reserving ... ok
+test non_crossing_limit_does_not_fill ... ok
+test partial_fills_release_only_filled_reservations ... ok
+test pending_buys_count_toward_position_limit ... ok
+test round_trip_conservation_and_bid_marked_drawdown ... ok
+test sell_reservation_prevents_overselling ... ok
+test validated_price_and_quantity_boundaries ... ok
+test zero_latency_still_requires_a_later_quote ... ok
+test seeded_mixed_actions_match_history_reference_exactly ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/execution.rs (target/debug/deps/execution-617899a994162675)
+
+running 10 tests
+test decimal_is_exact_and_rejects_lossy_inputs ... ok
+test one_writer_lock_protects_journal ... ok
+test conflicting_intent_and_unresolved_orders_block_new_ids ... ok
+test venue_economics_cannot_exceed_buy_limit ... ok
+test cumulative_regression_identity_and_terminal_resurrection_are_rejected ... ok
+test not_found_is_not_permission_to_resubmit ... ok
+test duplicate_trades_do_not_double_count_fees_and_conflicts_roll_back ... ok
+test prepared_but_unsent_crash_fails_closed ... ok
+test timeout_and_restart_never_repeat_submission ... ok
+test cancel_timeout_resolves_using_query_and_external_orders_block ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/execution_model.rs (target/debug/deps/execution_model-2f7c5176402264b5)
+
+running 4 tests
+test unchanged_snapshot_does_not_replenish_consumed_liquidity ... ok
+test slippage_obeys_limit_and_hand_calculated_round_trip ... ok
+test slipped_price_over_bound_cancels_without_panicking_or_filling ... ok
+test invalid_budget_checkpoint_is_rejected ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/feed.rs (target/debug/deps/feed-68d9bb99d8ffa366)
+
+running 4 tests
+test l1_ids_can_skip_but_cannot_regress ... ok
+test duplicate_frame_updates_observed_clock_without_advancing_quote_sequence ... ok
+test duplicate_id_cannot_hide_changed_prices_or_malformed_decimals ... ok
+test malformed_frame_does_not_advance_state ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/journal.rs (target/debug/deps/journal-4c636511d6a53c9a)
+
+running 9 tests
+test invalid_command_does_not_write_and_valid_same_id_can_be_retried ... ok
+test command_capacity_and_closed_session_remain_enforced_after_restart ... ok
+test complete_checksum_corruption_is_not_truncated_or_ignored ... ok
+test invalid_frame_length_is_quarantined_without_large_allocation ... ok
+test only_one_writer_can_open_a_session ... ok
+test retries_across_restart_never_repeat_fills_or_callbacks ... ok
+test manifest_config_change_or_partial_header_blocks_recovery ... ok
+test restart_reconstructs_strategies_orders_accounts_and_every_receipt ... ok
+test incomplete_last_frame_is_preserved_and_only_its_suffix_is_repaired ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.22s
+
+     Running tests/paper.rs (target/debug/deps/paper-bacc18a4fcd53b13)
+
+running 15 tests
+test action_overflow_halts_before_applying_any_signal_even_if_strategy_ignores_error ... ok
+test custom_batch_strategy_shares_liquidity_and_receives_execution_callbacks ... ok
+test finish_seals_session_and_operator_halt_is_irreversible ... ok
+test drawdown_trip_preserves_filled_position_and_releases_rest ... ok
+test history_capacity_rejects_without_consuming_ids_or_engine_metrics ... ok
+test mean_reversion_warms_window_and_executes_on_next_quote ... ok
+test bad_quote_and_unknown_market_do_not_advance_clock_or_state ... ok
+test duplicate_or_gap_commands_are_atomic_in_memory ... ok
+test budgets_routing_and_fees_follow_hand_ledger ... ok
+test no_market_is_a_business_rejection ... ok
+test passive_config_rejects_unknown_variant_fields ... ok
+test order_notional_price_collar_and_grid_are_checked ... ok
+test config_and_wire_types_fail_on_invalid_bounds_and_typos ... ok
+test quote_gap_cancels_before_new_quote_can_fill_resting_order ... ok
+test watchdog_boundary_and_cross_asset_timeout_are_deterministic ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/paper_cli.rs (target/debug/deps/paper_cli-8316f6511b70926d)
+
+running 4 tests
+test reporting_never_overwrites_and_eof_is_not_a_finish ... ok
+test jsonl_demo_and_resume_are_identical_and_report_uses_string_money ... ok
+test oversized_or_bad_command_is_not_acked_and_never_publishes_report ... ok
+test killed_process_recovers_durable_ack_and_retries_safely ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s
+
+     Running tests/registry.rs (target/debug/deps/registry-84450e87b3775d38)
+
+running 5 tests
+test identity_and_parameter_size_are_bounded ... ok
+test unknown_factory_version_and_malformed_state_fail_closed ... ok
+test custom_registered_strategy_survives_every_checkpoint ... ok
+test invalid_custom_post_state_never_commits_candidate ... ok
+test sqlite_custom_state_is_atomic_and_full_replay_verifies ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.26s
+
+     Running tests/replay.rs (target/debug/deps/replay-d5e75de6267f59b0)
+
+running 9 tests
+test parsing_accepts_crlf_and_final_line_without_newline ... ok
+test trace_surfaces_write_failures ... ok
+test replay_rejects_empty_and_out_of_order_inputs ... ok
+test replay_stops_when_order_history_is_full ... ok
+test invalid_header_and_oversized_line_are_rejected ... ok
+test parsing_rejects_invalid_fields_and_ends_after_error ... ok
+test demo_has_hand_calculated_cash_fees_and_drawdown ... ok
+test deterministic_replay_produces_byte_identical_trace ... ok
+test rolling_mean_matches_independent_full_window_sum ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/research.rs (target/debug/deps/research-9a5d99d4f3ebb753)
+
+running 5 tests
+test holdout_accounts_start_flat_and_fee_penalty_is_explicit ... ok
+test malformed_tail_is_not_hidden_by_fold_end ... ok
+test selection_is_training_only_and_ties_keep_declared_order ... ok
+test boundary_is_strict_and_training_never_reads_holdout ... ok
+test strategy_state_survives_restore_at_every_split ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/run_cli.rs (target/debug/deps/run_cli-165f903eeb858985)
+
+running 4 tests
+test csv_quote_input_and_report_no_clobber ... ok
+test idle_stdin_flushes_before_eof_and_kill_recovery_preserves_ack ... ok
+test bad_batch_emits_no_ack_and_does_not_publish_report ... ok
+test demo_restart_full_audit_and_report_match_independent_cli ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.07s
+
+     Running tests/store.rs (target/debug/deps/store-05e26bf501faff01)
+
+running 11 tests
+test invalid_late_command_rolls_back_whole_candidate_and_sequence ... ok
+test hot_history_remains_bounded_and_ids_never_reuse_beyond_legacy_capacity ... ok
+test duplicates_inside_and_after_restart_never_reapply ... ok
+test online_backup_restores_identical_state_and_never_overwrites ... ok
+test mid_history_damage_requires_full_audit_and_is_never_silently_repaired ... ok
+test disk_write_failure_keeps_memory_unchanged_and_poisoned_until_recovery ... ok
+test reader_pinned_wal_applies_backpressure_then_resumes ... ok
+test exclusive_writer_and_manifest_changes_are_rejected ... ok
+test checkpoint_corruption_and_rehashed_invalid_state_are_rejected ... ok
+test real_sqlite_full_rolls_back_and_recovers_last_confirmed_batch ... ok
+test batches_restart_and_full_audit_match_every_reference_receipt ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.00s
+
+     Running unittests examples/bench.rs (target/debug/examples/bench-19cde9e57cd6606a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/book_bench.rs (target/debug/examples/book_bench-120748813073fe50)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/book_to_engine.rs (target/debug/examples/book_to_engine-cd9618c89551b26f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/custom_strategy.rs (target/debug/examples/custom_strategy-c2bfb49a8abf148c)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/durable_strategy.rs (target/debug/examples/durable_strategy-31eb367e4912d17b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/first_trade.rs (target/debug/examples/first_trade-57fc5037c1c52a9d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/paper_bench.rs (target/debug/examples/paper_bench-f4c0cf812e4dcc83)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/real_reference.rs (target/debug/examples/real_reference-8587795e27285cda)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/store_bench.rs (target/debug/examples/store_bench-6142714dc2c87a7a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-06",
+  "source": "src/bin/live_paper.rs",
+  "source_sha256": "badfe95b8399a88b004ce1740f91a19d411426ba637edb5d94b096ddab7c9301",
+  "debug_tests": 131,
+  "release_tests": 131,
+  "clippy": "all-features/all-targets -D warnings passed",
+  "change": "bounded first-failure reason before Release flag; queue full/closed and websocket IO/TLS/protocol/capacity/close reported separately",
+  "previous_24h_attempt": {
+    "success": false,
+    "duration_seconds": 1666.000676,
+    "quotes": 177130,
+    "verified_recovered_commands": 177131
+  },
+  "soak_rerun": "pending; never concatenate sessions to count 24h"
+}

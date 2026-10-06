@@ -79,6 +79,8 @@ fn run() -> Result<(), PaperError> {
         FeedNormalizer::new(symbol.clone(), config.markets[0].units.clone(), 0, 0)?;
     let (tx, rx) = mpsc::sync_channel::<Frame>(256);
     let failed = Arc::new(AtomicBool::new(false));
+    // 单个终止原因有界保存，先发布原因再置位；主线程不再把网络失败与过载混为一谈。
+    let (failure_tx, failure_rx) = mpsc::sync_channel::<String>(1);
     let stop = Arc::new(AtomicBool::new(false));
     let failure = failed.clone();
     let stopped = stop.clone();
@@ -114,7 +116,10 @@ fn run() -> Result<(), PaperError> {
                             raw: raw.to_string(),
                             received: Instant::now(),
                         })
-                        .map_err(|_| "feed queue full/closed")?;
+                        .map_err(|error| match error {
+                            mpsc::TrySendError::Full(_) => "feed queue capacity exceeded",
+                            mpsc::TrySendError::Disconnected(_) => "feed consumer closed",
+                        })?;
                     }
                     Ok(Message::Ping(_)) => {
                         socket.flush().map_err(|_| "feed pong failed")?;
@@ -126,12 +131,28 @@ fn run() -> Result<(), PaperError> {
                             e.kind(),
                             std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock
                         ) => {}
-                    Err(_) => return Err("feed transport failed".into()),
+                    Err(tungstenite::Error::Io(error)) => {
+                        return Err(PaperError(format!("feed transport IO: {:?}", error.kind())));
+                    }
+                    Err(tungstenite::Error::Capacity(_)) => {
+                        return Err("feed message/frame capacity exceeded".into());
+                    }
+                    Err(tungstenite::Error::Protocol(_)) => {
+                        return Err("feed websocket protocol failed".into());
+                    }
+                    Err(tungstenite::Error::Tls(_)) => return Err("feed TLS failed".into()),
+                    Err(
+                        tungstenite::Error::ConnectionClosed | tungstenite::Error::AlreadyClosed,
+                    ) => return Err("feed connection closed".into()),
+                    Err(_) => return Err("feed transport failed (other class)".into()),
                 }
             }
             Ok(())
         })();
-        if result.is_err() && !stopped.load(Ordering::Acquire) {
+        if let Err(error) = result
+            && !stopped.load(Ordering::Acquire)
+        {
+            let _ = failure_tx.try_send(error.to_string());
             failure.store(true, Ordering::Release);
         }
     });
@@ -148,7 +169,11 @@ fn run() -> Result<(), PaperError> {
     let outcome = (|| -> Result<(), PaperError> {
         while start.elapsed() < Duration::from_secs(seconds) {
             if failed.load(Ordering::Acquire) {
-                return Err("feed disconnect/overload: fail closed".into());
+                return Err(PaperError(
+                    failure_rx
+                        .try_recv()
+                        .unwrap_or_else(|_| "feed worker failed without detail".into()),
+                ));
             }
             if last_frame.elapsed() > Duration::from_nanos(config.markets[0].risk.max_quote_age_ns)
             {
@@ -174,7 +199,11 @@ fn run() -> Result<(), PaperError> {
                     }
                 }
                 Err(mpsc::RecvTimeoutError::Disconnected) => {
-                    return Err("feed worker closed".into());
+                    return Err(PaperError(
+                        failure_rx
+                            .try_recv()
+                            .unwrap_or_else(|_| "feed worker closed without detail".into()),
+                    ));
                 }
                 Err(mpsc::RecvTimeoutError::Timeout) => (),
             }
@@ -184,7 +213,7 @@ fn run() -> Result<(), PaperError> {
                 let ack = Instant::now();
                 commit_max_ns = commit_max_ns.max(ack.duration_since(before).as_nanos());
                 committed += batch.len() as u64;
-                // 直方图的有界采样：最多100万条，避免监控成为无限内存历史。
+                // 直方图的有界采样：最多10万条，避免监控成为无限内存历史。
                 for arrived in arrivals.drain(..) {
                     if latencies.len() < 100_000 {
                         latencies.push(ack.duration_since(arrived).as_nanos());

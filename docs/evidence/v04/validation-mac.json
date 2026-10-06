@@ -65,7 +65,7 @@
   "live_binary_note": "retained pre-final registered-state validation / exchange-only cancellation changes; identity in each raw report is authoritative",
   "gate_status": {
     "exchange": "pending actual credentialed testnet orders",
-    "continuous": "24h passive public stream in progress; not passed",
+    "continuous": "first 24h attempt failed after 1666 seconds; recovered and audited 177131 commands; distinct new session rerun pending",
     "strategy": "screen failed; no independently validated alpha"
   },
   "testnet_credentials_available": false,
