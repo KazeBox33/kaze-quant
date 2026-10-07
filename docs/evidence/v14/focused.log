@@ -1,0 +1,82 @@
+   Compiling kaze-quant v0.4.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.34s
+     Running tests/engine.rs (target/debug/deps/engine-badb8ea59875ba4e)
+
+running 25 tests
+test fee_rounding_is_per_fill ... ok
+test equal_timestamps_with_increasing_sequences_are_supported ... ok
+test frozen_cash_prevents_double_spending ... ok
+test conservative_fee_reserve_covers_many_tiny_fills ... ok
+test cancel_is_idempotent_and_finish_releases_resources ... ok
+test capacities_are_enforced_and_cancel_frees_active_slot ... ok
+test invalid_engine_configuration_is_rejected ... ok
+test fifo_and_shared_liquidity_across_orders ... ok
+test compaction_keeps_submission_priority ... ok
+test ioc_non_crossing_or_zero_liquidity_cancels ... ok
+test ioc_partial_fill_then_cancel_and_release ... ok
+test ioc_waits_for_configured_latency ... ok
+test latency_boundary_is_inclusive ... ok
+test latency_overflow_rejects_without_state_corruption ... ok
+test malformed_quote_is_atomic ... ok
+test maximum_price_quantity_and_cash_stay_in_bounds ... ok
+test no_market_rejects_without_reserving ... ok
+test non_crossing_limit_does_not_fill ... ok
+test partial_fills_release_only_filled_reservations ... ok
+test pending_buys_count_toward_position_limit ... ok
+test round_trip_conservation_and_bid_marked_drawdown ... ok
+test sell_reservation_prevents_overselling ... ok
+test validated_price_and_quantity_boundaries ... ok
+test zero_latency_still_requires_a_later_quote ... ok
+test seeded_mixed_actions_match_history_reference_exactly ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.02s
+
+     Running tests/execution_model.rs (target/debug/deps/execution_model-20ec6251c1f36243)
+
+running 4 tests
+test slipped_price_over_bound_cancels_without_panicking_or_filling ... ok
+test slippage_obeys_limit_and_hand_calculated_round_trip ... ok
+test invalid_budget_checkpoint_is_rejected ... ok
+test unchanged_snapshot_does_not_replenish_consumed_liquidity ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/store.rs (target/debug/deps/store-6416a862c1f2bf43)
+
+running 11 tests
+test invalid_late_command_rolls_back_whole_candidate_and_sequence ... ok
+test hot_history_remains_bounded_and_ids_never_reuse_beyond_legacy_capacity ... ok
+test duplicates_inside_and_after_restart_never_reapply ... ok
+test disk_write_failure_keeps_memory_unchanged_and_poisoned_until_recovery ... ok
+test online_backup_restores_identical_state_and_never_overwrites ... ok
+test mid_history_damage_requires_full_audit_and_is_never_silently_repaired ... ok
+test reader_pinned_wal_applies_backpressure_then_resumes ... ok
+test exclusive_writer_and_manifest_changes_are_rejected ... ok
+test checkpoint_corruption_and_rehashed_invalid_state_are_rejected ... ok
+test real_sqlite_full_rolls_back_and_recovers_last_confirmed_batch ... ok
+test batches_restart_and_full_audit_match_every_reference_receipt ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.55s
+
+     Running tests/target.rs (target/debug/deps/target-d6e8b3e13a2a12d1)
+
+running 16 tests
+test manual_order_is_not_silently_adopted_or_cancelled_by_composition ... ok
+test missed_slice_times_and_working_partial_order_never_create_burst_children ... ok
+test expired_child_is_cancelled_and_replaced_only_on_later_quote ... ok
+test invalid_context_zero_budget_position_cap_dust_and_single_slice_are_bounded ... ok
+test cooldown_does_not_cancel_own_working_order_or_block_exit ... ok
+test grid_and_twap_integer_remainder_are_exact_and_never_fill_same_quote ... ok
+test cash_sizing_includes_per_unit_fee_and_platform_capacity_rejection_clears_proposal ... ok
+test repeated_target_and_partial_fills_do_not_duplicate_pending_exposure ... ok
+test pending_cancel_survives_strategy_restore_without_replacement_permission ... ok
+test research_warmup_seeds_indicators_but_never_transfers_training_positions ... ok
+test malformed_parameters_and_engine_child_corruption_fail_closed ... ok
+test spread_gate_cancels_pending_buys_and_does_not_block_risk_reduction ... ok
+test target_reversal_cancels_remaining_before_selling_actual_partial_position ... ok
+test signal_prefixes_and_every_checkpoint_produce_identical_causal_decisions ... ok
+test failed_transaction_rolls_back_partial_fill_and_child_progress_together ... ok
+test sqlite_batch_retries_restarts_and_failed_write_keep_identical_parent_child_receipts ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.78s
+

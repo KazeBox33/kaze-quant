@@ -1,0 +1,86 @@
+{
+  "config_file_sha256": "d6621fe113f80b7aa7f8a2c41de4cc11ae2ea2232318a50a4b35628b83a2b820",
+  "digest_rule": "u64 LE receipt length + serde JSON bytes in sequence order",
+  "elapsed_ns": 977485750,
+  "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+  "receipt_sha256": "68ca0327c072b373fc35e9f14a63f39ec9977a24a45c49305f7fe96712941fe1",
+  "state": {
+    "clock_ns": 1704073538913000000,
+    "closed": false,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "991267247884",
+        "equity_minor": "999816587884",
+        "fees_minor": "232692916",
+        "halted": null,
+        "market": 0,
+        "metrics": {
+          "accepted": 741,
+          "cancelled": 7,
+          "fills": 734,
+          "max_drawdown_minor": "206941799",
+          "orders_examined": 6025,
+          "peak_equity_minor": "1000022569683",
+          "quotes": 1000000,
+          "rejected": 0
+        },
+        "pnl_minor": "-183412116",
+        "position_units": 200,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "strategy_decision": {
+          "action": "None",
+          "authorized_lots": 200,
+          "exposure_bps": 10000,
+          "order_id": null,
+          "parent_id": 326,
+          "position_lots": 200,
+          "projected_lots": 200,
+          "quote_sequence": 1000000,
+          "reason": "aligned",
+          "target_lots": 200,
+          "timestamp_ns": 1704073538913000000
+        },
+        "strategy_diagnostics": {
+          "atr_units": 1095,
+          "closed_bars": 6337,
+          "distance_units": 2190,
+          "exposure": true,
+          "faulted": false,
+          "last_closed": {
+            "close": 42746700,
+            "high": 42746700,
+            "low": 42741900,
+            "observations": 483,
+            "open": 42741900,
+            "start_ns": 1704073537000000000
+          },
+          "missing_buckets": 1,
+          "pending": {
+            "close": 42746700,
+            "high": 42746700,
+            "low": 42746700,
+            "observations": 34,
+            "open": 42746700,
+            "start_ns": 1704073538000000000
+          },
+          "ready": true,
+          "requested_target_lots": 200,
+          "scope": "long-only paper signal and ATR distance sizing; no installed stop loss, exchange candle volume, future data, external venue route or alpha proof",
+          "source": "observed bid OHLC, not traded-volume candles",
+          "trend_mean_units": 42741125
+        },
+        "symbol": "BTCUSDT-QUOTE",
+        "units": {
+          "currency": "USDT",
+          "money_scale": 100000000,
+          "quantity_scale": 100000
+        }
+      }
+    ],
+    "processed": 1000000,
+    "schema_version": 1
+  },
+  "timing": "CSV decode + shared paper core + receipt serialization/hash + retention; no SQLite; final audit excluded"
+}

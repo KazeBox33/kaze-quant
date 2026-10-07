@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-07T15:13:46.583350+00:00",
+  "legacy_commit": "f7a9e9d165f81590e2e5d63dd564884dd483a9f9",
+  "rust_tests": {
+    "test-debug": 253,
+    "test-release": 253
+  },
+  "python_tests": 15,
+  "new_tests": 6,
+  "hardware": "Apple M5/macOS26.5.2 arm64/Rust1.99.0 LLVM23.1.1",
+  "profile": "release thin LTO/codegenunits1; component examples default features on both versions; paper frozen all-features on both versions; no CPU affinity/thermal control; all performance tasks sequential after compilation/tests",
+  "sources": {
+    "src/order_store.rs": "fef146f9d960ae732047f9e7a9dd61d876b8138d0d9d7082c1cd3563618209da",
+    "src/engine.rs": "6d862eaab8819ba1d6f77717e60ee9513fcf4329cecc2c73885de41881f8ff6b",
+    "src/target.rs": "b0d3338a4d230e4d9f7ef1f95f400a8a6da7b887547622cc029da3b73a35b303",
+    "src/lib.rs": "80128c1c3255b2a70aaee1b9152244a56dc37618103cbecbaf6a642316ecde7d",
+    "tests/order_store.rs": "644eeb543f51fe93f15d311c2eff4370dfe1c4dee70cd5335e6abbf03ce80593",
+    "examples/order_store_bench.rs": "318b1ddc8792bf1266ea5372db183b5a21983db6bb670e4a1a0bc09abad11a7d",
+    "examples/order_store_replay.rs": "01b8366fde4c62367ca56da2391807dcd9ef393cbe3bf4604753391154cc4c0a",
+    "scripts/order_store_bench.py": "4e7a7629af736d980c60a7c9f70628af68fb908b40a9853787828e2576240877",
+    "Cargo.toml": "f41c47be0af4d925701d08ec8b64550b138bdfa42124a0d0b267f381a79f5f9a",
+    "Cargo.lock": "d104b92739708b74713c8a8eeab0e0298c9e3cda2dbc5dcd85f2c3eee97a39ba",
+    "configs/btc-bar-atr-v1.json": "d6621fe113f80b7aa7f8a2c41de4cc11ae2ea2232318a50a4b35628b83a2b820"
+  },
+  "binaries": {
+    "order-store-v13-final": "c700c336480f05847b018c9c043e7b6facb40bb9b2a09a24f08e55647a10805a",
+    "order-store-v14": "05a678dd9dc52054219813c08655e9495bec36040b8c949c3ede44ba4f6530e8",
+    "order-replay-v13": "1cfc1f1b5ba1a976e59d38f8737ebdbf15685fa617e249e15ecb8e62f7293cd6",
+    "order-replay-v14": "345f98bfb13bfdd35d2c560eef7f68aed0693e47c1f457dcfb5ae47b1915c5bf",
+    "paper-v13": "25e4f7a39be5c225413de008d5835afe590bf684b2acfa667a268359a52e8661",
+    "paper-v14": "fea1a32daf92e722bc21045e164b312d08bc571a745320005ddeb541377ffbe1",
+    "target-v13": "0f0d1dd8bc0f87e582466c0d8b5fbf4af25634f9f15f24dd5ff90b861283fd30",
+    "target-v14": "fb0912ff5fe04bf9affbdbd15be4f4b92785f65b43ee51a639fb511f2029d3e1"
+  },
+  "failures_retained": [
+    "initial test-only enum constructor compile error",
+    "initial three test fixture failures because active cap exceeded configured history cap; corrected fixture to 8",
+    "GitHub browser/gh device authorization HTTP500 and direct CLI token polling timeout; publication status recorded separately"
+  ],
+  "scope": "synthetic core and unchanged public paper strategy; no orders sent, mainnet, upstream full-platform comparison, new 24h, nonzero live fee or partial fill claim"
+}

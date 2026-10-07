@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "features": [
+    {
+      "name": "reusable slots and unique ID index",
+      "before": "ordered Vec binary search",
+      "after": "HashMap average O(1) and bounded reusable slots; no stale ID aliasing",
+      "measured_modes": [
+        "lookup"
+      ],
+      "cost": "hash table memory and small-table slowdown; average rather than worst-case constant time"
+    },
+    {
+      "name": "stable active/history chains",
+      "before": "O(A) cancel retain and second per-quote retain",
+      "after": "constant-link removal, O(log T) terminal insertion; no reorder",
+      "measured_modes": [
+        "cancel",
+        "quote"
+      ],
+      "cost": "larger slot metadata; noncrossing synthetic quote case only"
+    },
+    {
+      "name": "ordered terminal index",
+      "before": "O(R) retain and index rebuild even zero removal",
+      "after": "zero-removal O(1), k removals O(k log T), oldest submitted terminal semantics",
+      "measured_modes": [
+        "churn"
+      ],
+      "cost": "BTreeSet allocation/index update; no all-zero-allocation claim"
+    },
+    {
+      "name": "portable economic snapshot and explicit orders view",
+      "before": "borrowed contiguous slice and Vec clone",
+      "after": "allocation-free ordered borrowed view; snapshot still full sorted Vec; ID corruption rejected",
+      "measured_modes": [
+        "snapshot"
+      ],
+      "cost": "API breaking v0.5; ordinal lookup O(n); snapshot small slowdown, no incremental checkpoint"
+    }
+  ],
+  "component_results": [
+    {
+      "mode": "cancel",
+      "orders": 128,
+      "operations": 128,
+      "median_ns": {
+        "old": 7291,
+        "new": 8042
+      },
+      "new_over_old_time": 1.1030037031957207,
+      "speed_ratio": 0.9066152698333748,
+      "process_peak_rss_bytes": {
+        "old": 1998848,
+        "new": 2048000
+      }
+    },
+    {
+      "mode": "cancel",
+      "orders": 4096,
+      "operations": 4096,
+      "median_ns": {
+        "old": 2228542,
+        "new": 85791
+      },
+      "new_over_old_time": 0.03849646988928187,
+      "speed_ratio": 25.976407781702044,
+      "process_peak_rss_bytes": {
+        "old": 9191424,
+        "new": 9912320
+      }
+    },
+    {
+      "mode": "cancel",
+      "orders": 32768,
+      "operations": 32768,
+      "median_ns": {
+        "old": 132737083,
+        "new": 843000
+      },
+      "new_over_old_time": 0.0063509004488218265,
+      "speed_ratio": 157.45798695136418,
+      "process_peak_rss_bytes": {
+        "old": 60751872,
+        "new": 66191360
+      }
+    },
+    {
+      "mode": "churn",
+      "orders": 128,
+      "operations": 10000,
+      "median_ns": {
+        "old": 1625250,
+        "new": 327292
+      },
+      "new_over_old_time": 0.20137948007998768,
+      "speed_ratio": 4.965749239211469,
+      "process_peak_rss_bytes": {
+        "old": 1998848,
+        "new": 2064384
+      }
+    },
+    {
+      "mode": "churn",
+      "orders": 4096,
+      "operations": 10000,
+      "median_ns": {
+        "old": 75345958,
+        "new": 370666
+      },
+      "new_over_old_time": 0.004919520699438184,
+      "speed_ratio": 203.27183502128602,
+      "process_peak_rss_bytes": {
+        "old": 9224192,
+        "new": 9748480
+      }
+    },
+    {
+      "mode": "churn",
+      "orders": 32768,
+      "operations": 10000,
+      "median_ns": {
+        "old": 693792584,
+        "new": 332333
+      },
+      "new_over_old_time": 0.0004790091558545688,
+      "speed_ratio": 2087.642767946608,
+      "process_peak_rss_bytes": {
+        "old": 60784640,
+        "new": 63815680
+      }
+    },
+    {
+      "mode": "lookup",
+      "orders": 128,
+      "operations": 1000000,
+      "median_ns": {
+        "old": 5503459,
+        "new": 5852667
+      },
+      "new_over_old_time": 1.0634524578088072,
+      "speed_ratio": 0.9403335265785666,
+      "process_peak_rss_bytes": {
+        "old": 1998848,
+        "new": 2031616
+      }
+    },
+    {
+      "mode": "lookup",
+      "orders": 4096,
+      "operations": 1000000,
+      "median_ns": {
+        "old": 11294750,
+        "new": 6191542
+      },
+      "new_over_old_time": 0.5481787556165475,
+      "speed_ratio": 1.8242224634832487,
+      "process_peak_rss_bytes": {
+        "old": 9191424,
+        "new": 9601024
+      }
+    },
+    {
+      "mode": "lookup",
+      "orders": 32768,
+      "operations": 1000000,
+      "median_ns": {
+        "old": 48780375,
+        "new": 9813500
+      },
+      "new_over_old_time": 0.2011772152223102,
+      "speed_ratio": 4.970741835226983,
+      "process_peak_rss_bytes": {
+        "old": 60751872,
+        "new": 63864832
+      }
+    },
+    {
+      "mode": "quote",
+      "orders": 128,
+      "operations": 1000,
+      "median_ns": {
+        "old": 428875,
+        "new": 316625
+      },
+      "new_over_old_time": 0.7382687263188574,
+      "speed_ratio": 1.354520331622582,
+      "process_peak_rss_bytes": {
+        "old": 2015232,
+        "new": 2031616
+      }
+    },
+    {
+      "mode": "quote",
+      "orders": 4096,
+      "operations": 1000,
+      "median_ns": {
+        "old": 14305209,
+        "new": 10042667
+      },
+      "new_over_old_time": 0.7020286806015906,
+      "speed_ratio": 1.4244432280787565,
+      "process_peak_rss_bytes": {
+        "old": 9191424,
+        "new": 9601024
+      }
+    },
+    {
+      "mode": "quote",
+      "orders": 32768,
+      "operations": 1000,
+      "median_ns": {
+        "old": 116528125,
+        "new": 86265750
+      },
+      "new_over_old_time": 0.7402998203223471,
+      "speed_ratio": 1.3508040560709205,
+      "process_peak_rss_bytes": {
+        "old": 60751872,
+        "new": 63848448
+      }
+    },
+    {
+      "mode": "snapshot",
+      "orders": 128,
+      "operations": 100,
+      "median_ns": {
+        "old": 1870209,
+        "new": 1889458
+      },
+      "new_over_old_time": 1.010292432557003,
+      "speed_ratio": 0.989812422398381,
+      "process_peak_rss_bytes": {
+        "old": 2211840,
+        "new": 2195456
+      }
+    },
+    {
+      "mode": "snapshot",
+      "orders": 4096,
+      "operations": 100,
+      "median_ns": {
+        "old": 55158792,
+        "new": 55939250
+      },
+      "new_over_old_time": 1.0141492946401,
+      "speed_ratio": 0.9860481146958531,
+      "process_peak_rss_bytes": {
+        "old": 10076160,
+        "new": 10584064
+      }
+    },
+    {
+      "mode": "snapshot",
+      "orders": 32768,
+      "operations": 100,
+      "median_ns": {
+        "old": 509982041,
+        "new": 520755208
+      },
+      "new_over_old_time": 1.0211246007386365,
+      "speed_ratio": 0.9793124162091913,
+      "process_peak_rss_bytes": {
+        "old": 473907200,
+        "new": 475987968
+      }
+    }
+  ],
+  "end_to_end": {
+    "memory": {
+      "old": 994477417,
+      "new": 978736500
+    },
+    "memory_new_over_old": 0.9841716697323455,
+    "durable": {
+      "old": 2158755709,
+      "new": 2085956417
+    },
+    "durable_new_over_old": 0.9662771976947208
+  },
+  "correctness": {
+    "new_tests": 6,
+    "steps": 40000,
+    "events": 16693,
+    "separate_legacy_binary": true,
+    "all_steps_equal": true,
+    "each_version_durable_full_audit": true,
+    "tests": {
+      "test-debug": 253,
+      "test-release": 253
+    }
+  },
+  "limits": "synthetic core and unchanged public paper strategy; no orders sent, mainnet, upstream full-platform comparison, new 24h, nonzero live fee or partial fill claim"
+}

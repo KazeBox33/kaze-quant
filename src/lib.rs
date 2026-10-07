@@ -7,6 +7,7 @@ pub mod bar_strategy;
 pub mod bars;
 pub mod book;
 pub mod engine;
+mod order_store;
 pub mod replay;
 pub mod strategy;
 pub mod types;

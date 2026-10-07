@@ -1,4 +1,6 @@
 use crate::account::{Account, fee};
+use crate::order_store::OrderStore;
+pub use crate::order_store::{Orders, OrdersIter};
 use crate::types::*;
 
 /// 引擎只发出值事件，不拥有日志文件或历史事件集合。
@@ -103,9 +105,7 @@ pub enum ScanPolicy {
 pub struct Engine {
     config: EngineConfig,
     account: Account,
-    orders: Vec<Order>,
-    /// 连续索引保持提交顺序；终结订单稳定压缩，禁止 swap_remove 改变优先级。
-    active: Vec<usize>,
+    orders: OrderStore,
     quote: Option<Quote>,
     metrics: Metrics,
     policy: ScanPolicy,
@@ -126,8 +126,7 @@ impl Engine {
         config.validate()?;
         Ok(Self {
             account: Account::new(config.initial_cash),
-            orders: Vec::with_capacity(config.max_orders),
-            active: Vec::with_capacity(config.max_active_orders),
+            orders: OrderStore::new(),
             quote: None,
             metrics: Metrics {
                 peak_equity: config.initial_cash,
@@ -153,15 +152,14 @@ impl Engine {
     pub fn last_quote(&self) -> Option<Quote> {
         self.quote
     }
-    pub fn orders(&self) -> &[Order] {
-        &self.orders
+    pub fn orders(&self) -> Orders<'_> {
+        self.orders.view()
     }
     pub fn active_count(&self) -> usize {
-        self.active.len()
+        self.orders.active_len()
     }
     pub fn order(&self, id: OrderId) -> Option<&Order> {
-        let index = self.orders.binary_search_by_key(&id.0, |o| o.id.0).ok()?;
-        self.orders.get(index)
+        self.orders.find(id).map(|i| self.orders.get(i))
     }
     pub fn equity(&self) -> i128 {
         self.quote
@@ -216,24 +214,23 @@ impl Engine {
             });
         self.quote = Some(q);
         self.metrics.quotes += 1;
-        // 没有终结/拒绝历史时，所有记录均活跃，可直接连续扫描。
-        // 一旦存在非活跃历史，切换到索引，避免间接访问成为密集负载的成本。
-        if self.policy == ScanPolicy::History || self.active.len() == self.orders.len() {
-            for index in 0..self.orders.len() {
-                self.metrics.orders_examined = self.metrics.orders_examined.saturating_add(1);
-                self.try_execute(index, q, &mut bid_available, &mut ask_available, sink);
-            }
+        // 在执行前保存下个槽位；成交/IOC 可解除当前活跃链接，不改变后续优先级。
+        let mut cursor = if self.policy == ScanPolicy::History {
+            self.orders.first()
         } else {
-            for slot in 0..self.active.len() {
-                let index = self.active[slot];
-                self.metrics.orders_examined = self.metrics.orders_examined.saturating_add(1);
-                self.try_execute(index, q, &mut bid_available, &mut ask_available, sink);
-            }
+            self.orders.first_active()
+        };
+        while let Some(index) = cursor {
+            cursor = if self.policy == ScanPolicy::History {
+                self.orders.next(index)
+            } else {
+                self.orders.next_active(index)
+            };
+            self.metrics.orders_examined = self.metrics.orders_examined.saturating_add(1);
+            self.try_execute(index, q, &mut bid_available, &mut ask_available, sink);
         }
         self.liquidity_bid_remaining = bid_available;
         self.liquidity_ask_remaining = ask_available;
-        // retain 不分配，不打乱相对顺序；终结记录仍保留在 orders 中。
-        self.active.retain(|&i| self.orders[i].status.is_active());
         let equity = self.equity();
         self.metrics.peak_equity = self.metrics.peak_equity.max(equity);
         self.metrics.max_drawdown = self
@@ -252,7 +249,7 @@ impl Engine {
         ask_available: &mut u64,
         sink: &mut impl EventSink,
     ) {
-        let order = &self.orders[index];
+        let order = self.orders.get(index);
         if !order.status.is_active()
             || order.submitted_sequence >= q.sequence
             || order.eligible_at_ns > q.timestamp_ns
@@ -294,7 +291,7 @@ impl Engine {
                 timestamp_ns: q.timestamp_ns,
             };
             self.account.apply(fill, order.reserved_per_unit);
-            let order = &mut self.orders[index];
+            let order = self.orders.get_mut(index);
             order.remaining -= quantity;
             order.status = if order.remaining == 0 {
                 OrderStatus::Filled
@@ -304,9 +301,12 @@ impl Engine {
             *available -= quantity;
             self.metrics.fills += 1;
             sink.emit(Event::Fill(fill));
+            if !self.orders.get(index).status.is_active() {
+                self.orders.deactivate(index);
+            }
         }
-        if self.orders[index].status.is_active()
-            && self.orders[index].request.time_in_force == TimeInForce::ImmediateOrCancel
+        if self.orders.get(index).status.is_active()
+            && self.orders.get(index).request.time_in_force == TimeInForce::ImmediateOrCancel
         {
             self.cancel_index(index, sink);
         }
@@ -341,7 +341,7 @@ impl Engine {
             Some(RejectReason::NoMarket)
         } else if eligible.is_none() {
             Some(RejectReason::TimestampOverflow)
-        } else if self.active.len() >= self.config.max_active_orders {
+        } else if self.orders.active_len() >= self.config.max_active_orders {
             Some(RejectReason::ActiveOrderLimit)
         } else {
             match request.side {
@@ -360,8 +360,7 @@ impl Engine {
                 _ => None,
             }
         };
-        let index = self.orders.len();
-        self.orders.push(Order {
+        self.orders.insert(Order {
             id,
             request,
             remaining: quantity,
@@ -389,7 +388,6 @@ impl Engine {
             }
             Side::Sell => self.account.reserved_sell += quantity,
         }
-        self.active.push(index);
         self.metrics.accepted += 1;
         sink.emit(Event::Accepted {
             order_id: id,
@@ -400,70 +398,47 @@ impl Engine {
     }
 
     fn cancel_index(&mut self, index: usize, sink: &mut impl EventSink) {
-        let order = &mut self.orders[index];
+        let order = self.orders.get_mut(index);
         self.account
             .release(order.request.side, order.remaining, order.reserved_per_unit);
         order.status = OrderStatus::Cancelled;
+        let id = order.id;
+        self.orders.deactivate(index);
         self.metrics.cancelled += 1;
         sink.emit(Event::Cancelled {
-            order_id: order.id,
+            order_id: id,
             sequence: self.quote.map_or(0, |q| q.sequence),
         });
     }
     pub fn cancel(&mut self, id: OrderId, sink: &mut impl EventSink) -> bool {
-        let Some(order) = self.order(id) else {
+        let Some(index) = self.orders.find(id) else {
             return false;
         };
-        if !order.status.is_active() {
+        if !self.orders.get(index).status.is_active() {
             return false;
         }
-        let index = self
-            .orders
-            .binary_search_by_key(&id.0, |o| o.id.0)
-            .expect("validated existing order");
         self.cancel_index(index, sink);
-        self.active.retain(|&i| i != index);
         debug_assert!(self.check_invariants().is_ok());
         true
     }
-    /// 回放结束撤销所有未成交订单，释放冻结资源；持仓仍按最终 bid 估值。
+    /// 回放结束撤单，释放冻结；按原提交顺序发出事件。
     pub fn finish(&mut self, sink: &mut impl EventSink) {
-        for slot in 0..self.active.len() {
-            self.cancel_index(self.active[slot], sink);
+        while let Some(index) = self.orders.first_active() {
+            self.cancel_index(index, sink);
         }
-        self.active.clear();
         debug_assert!(self.check_invariants().is_ok());
     }
-
-    /// 冷路径归档：保留全部活跃订单和最新 terminal_budget 个终态记录。
-    /// ID 永不复用；账户累计项与FIFO顺序保持不变，审计历史由持久层拥有。
+    /// 回收最早提交的终态记录，不移动存活订单；ID 永不复用。
     pub fn compact_terminal_orders(&mut self, terminal_budget: usize) -> usize {
-        let terminal_count = self.orders.len() - self.active.len();
-        let mut discard = terminal_count.saturating_sub(terminal_budget);
-        let removed = discard;
+        let removed = self.orders.compact(terminal_budget);
         self.archived_orders += removed as u64;
-        self.orders.retain(|o| {
-            if !o.status.is_active() && discard > 0 {
-                discard -= 1;
-                false
-            } else {
-                true
-            }
-        });
-        self.active.clear();
-        self.active.extend(
-            self.orders
-                .iter()
-                .enumerate()
-                .filter_map(|(i, o)| o.status.is_active().then_some(i)),
-        );
         debug_assert!(self.check_invariants().is_ok());
         removed
     }
     pub fn snapshot(&self) -> EngineSnapshot {
         EngineSnapshot {
             account: self.account.clone(),
-            orders: self.orders.clone(),
+            orders: self.orders.view().to_vec(),
             quote: self.quote,
             metrics: self.metrics,
             next_order_id: self.next_order_id,
@@ -477,17 +452,23 @@ impl Engine {
         if state.orders.len() > config.max_orders {
             return Err("snapshot exceeds history capacity");
         }
-        let active = state
-            .orders
-            .iter()
-            .enumerate()
-            .filter_map(|(i, o)| o.status.is_active().then_some(i))
-            .collect();
+        // 先验证外部 ID，再构造内部索引；损坏快照不能触发重复 ID assert。
+        if state.orders.windows(2).any(|p| p[0].id.0 >= p[1].id.0)
+            || state
+                .orders
+                .iter()
+                .any(|o| o.id.0 == 0 || o.id.0 >= state.next_order_id)
+        {
+            return Err("order identity ordering invalid");
+        }
+        let mut orders = OrderStore::new();
+        for order in state.orders {
+            orders.insert(order);
+        }
         let engine = Self {
             config,
             account: state.account,
-            orders: state.orders,
-            active,
+            orders,
             quote: state.quote,
             metrics: state.metrics,
             policy: ScanPolicy::Active,
@@ -556,22 +537,9 @@ impl Engine {
         {
             return Err("account or metrics bounds invalid");
         }
-        if self
-            .orders
-            .windows(2)
-            .any(|pair| pair[0].id.0 >= pair[1].id.0)
-            || self
-                .orders
-                .iter()
-                .any(|o| o.id.0 == 0 || o.id.0 >= self.next_order_id)
-        {
-            return Err("order identity ordering invalid");
-        }
+        self.orders.validate()?;
         if let Some(q) = self.quote {
             q.validate()?;
-        }
-        if self.active.iter().any(|&i| i >= self.orders.len()) {
-            return Err("active index out of bounds");
         }
         if self.account.cash < 0
             || self.account.reserved_cash < 0
@@ -591,17 +559,7 @@ impl Engine {
             return Err("cash conservation failed");
         }
         let (mut cash, mut buy, mut sell, mut count) = (0, 0, 0, 0);
-        let mut last_index = None;
-        for &i in &self.active {
-            if last_index.is_some_and(|last| last >= i) {
-                return Err("active order sequence invalid");
-            }
-            last_index = Some(i);
-            if !self.orders[i].status.is_active() {
-                return Err("terminal order in active index");
-            }
-        }
-        for order in &self.orders {
+        for order in self.orders.view().iter() {
             let expected_reserve = if order.request.side == Side::Buy {
                 i128::from(order.request.limit.units())
                     + fee(i128::from(order.request.limit.units()), self.config.fee_bps)
@@ -640,7 +598,7 @@ impl Engine {
                 }
             }
         }
-        if count != self.active.len() || count > self.config.max_active_orders {
+        if count != self.orders.active_len() || count > self.config.max_active_orders {
             return Err("active index count invalid");
         }
         if cash != self.account.reserved_cash

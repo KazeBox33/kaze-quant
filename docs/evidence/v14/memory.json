@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "median_ns": {
+    "old": 994477417,
+    "new": 978736500
+  },
+  "new_over_old_time": 0.9841716697323455,
+  "runs": [
+    {
+      "round": 0,
+      "version": "old",
+      "elapsed_ns": 992509042,
+      "binary_sha256": "0f0d1dd8bc0f87e582466c0d8b5fbf4af25634f9f15f24dd5ff90b861283fd30"
+    },
+    {
+      "round": 0,
+      "version": "new",
+      "elapsed_ns": 978924916,
+      "binary_sha256": "fb0912ff5fe04bf9affbdbd15be4f4b92785f65b43ee51a639fb511f2029d3e1"
+    },
+    {
+      "round": 1,
+      "version": "new",
+      "elapsed_ns": 976293292,
+      "binary_sha256": "fb0912ff5fe04bf9affbdbd15be4f4b92785f65b43ee51a639fb511f2029d3e1"
+    },
+    {
+      "round": 1,
+      "version": "old",
+      "elapsed_ns": 994018917,
+      "binary_sha256": "0f0d1dd8bc0f87e582466c0d8b5fbf4af25634f9f15f24dd5ff90b861283fd30"
+    },
+    {
+      "round": 2,
+      "version": "old",
+      "elapsed_ns": 994796916,
+      "binary_sha256": "0f0d1dd8bc0f87e582466c0d8b5fbf4af25634f9f15f24dd5ff90b861283fd30"
+    },
+    {
+      "round": 2,
+      "version": "new",
+      "elapsed_ns": 977485750,
+      "binary_sha256": "fb0912ff5fe04bf9affbdbd15be4f4b92785f65b43ee51a639fb511f2029d3e1"
+    },
+    {
+      "round": 3,
+      "version": "new",
+      "elapsed_ns": 982670375,
+      "binary_sha256": "fb0912ff5fe04bf9affbdbd15be4f4b92785f65b43ee51a639fb511f2029d3e1"
+    },
+    {
+      "round": 3,
+      "version": "old",
+      "elapsed_ns": 995671625,
+      "binary_sha256": "0f0d1dd8bc0f87e582466c0d8b5fbf4af25634f9f15f24dd5ff90b861283fd30"
+    },
+    {
+      "round": 4,
+      "version": "old",
+      "elapsed_ns": 994477417,
+      "binary_sha256": "0f0d1dd8bc0f87e582466c0d8b5fbf4af25634f9f15f24dd5ff90b861283fd30"
+    },
+    {
+      "round": 4,
+      "version": "new",
+      "elapsed_ns": 978736500,
+      "binary_sha256": "fb0912ff5fe04bf9affbdbd15be4f4b92785f65b43ee51a639fb511f2029d3e1"
+    },
+    {
+      "round": 5,
+      "version": "new",
+      "elapsed_ns": 982606000,
+      "binary_sha256": "fb0912ff5fe04bf9affbdbd15be4f4b92785f65b43ee51a639fb511f2029d3e1"
+    },
+    {
+      "round": 5,
+      "version": "old",
+      "elapsed_ns": 1000650042,
+      "binary_sha256": "0f0d1dd8bc0f87e582466c0d8b5fbf4af25634f9f15f24dd5ff90b861283fd30"
+    },
+    {
+      "round": 6,
+      "version": "old",
+      "elapsed_ns": 991162083,
+      "binary_sha256": "0f0d1dd8bc0f87e582466c0d8b5fbf4af25634f9f15f24dd5ff90b861283fd30"
+    },
+    {
+      "round": 6,
+      "version": "new",
+      "elapsed_ns": 978542208,
+      "binary_sha256": "fb0912ff5fe04bf9affbdbd15be4f4b92785f65b43ee51a639fb511f2029d3e1"
+    }
+  ],
+  "final_state": {
+    "clock_ns": 1704073538913000000,
+    "closed": false,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "991267247884",
+        "equity_minor": "999816587884",
+        "fees_minor": "232692916",
+        "halted": null,
+        "market": 0,
+        "metrics": {
+          "accepted": 741,
+          "cancelled": 7,
+          "fills": 734,
+          "max_drawdown_minor": "206941799",
+          "orders_examined": 6025,
+          "peak_equity_minor": "1000022569683",
+          "quotes": 1000000,
+          "rejected": 0
+        },
+        "pnl_minor": "-183412116",
+        "position_units": 200,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "strategy_decision": {
+          "action": "None",
+          "authorized_lots": 200,
+          "exposure_bps": 10000,
+          "order_id": null,
+          "parent_id": 326,
+          "position_lots": 200,
+          "projected_lots": 200,
+          "quote_sequence": 1000000,
+          "reason": "aligned",
+          "target_lots": 200,
+          "timestamp_ns": 1704073538913000000
+        },
+        "strategy_diagnostics": {
+          "atr_units": 1095,
+          "closed_bars": 6337,
+          "distance_units": 2190,
+          "exposure": true,
+          "faulted": false,
+          "last_closed": {
+            "close": 42746700,
+            "high": 42746700,
+            "low": 42741900,
+            "observations": 483,
+            "open": 42741900,
+            "start_ns": 1704073537000000000
+          },
+          "missing_buckets": 1,
+          "pending": {
+            "close": 42746700,
+            "high": 42746700,
+            "low": 42746700,
+            "observations": 34,
+            "open": 42746700,
+            "start_ns": 1704073538000000000
+          },
+          "ready": true,
+          "requested_target_lots": 200,
+          "scope": "long-only paper signal and ATR distance sizing; no installed stop loss, exchange candle volume, future data, external venue route or alpha proof",
+          "source": "observed bid OHLC, not traded-volume candles",
+          "trend_mean_units": 42741125
+        },
+        "symbol": "BTCUSDT-QUOTE",
+        "units": {
+          "currency": "USDT",
+          "money_scale": 100000000,
+          "quantity_scale": 100000
+        }
+      }
+    ],
+    "processed": 1000000,
+    "schema_version": 1
+  },
+  "receipt_sha256": "68ca0327c072b373fc35e9f14a63f39ec9977a24a45c49305f7fe96712941fe1",
+  "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+  "config_sha256": "d6621fe113f80b7aa7f8a2c41de4cc11ae2ea2232318a50a4b35628b83a2b820",
+  "scope": "own v13/v14 identical public million-quote ATR paper configuration, CSV/core/receipt hash/retention; no SQLite/network/upstream ranking; seven alternating rounds"
+}

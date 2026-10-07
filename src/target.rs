@@ -571,11 +571,7 @@ impl CompositionStrategy {
     pub fn validate_execution(&self, e: &Engine) -> Result<(), &'static str> {
         self.validate_state(&self.config)?;
         if let Some(ch) = &self.child {
-            let o = e
-                .orders()
-                .iter()
-                .find(|o| o.id == ch.id)
-                .ok_or("target child absent in engine")?;
+            let o = e.order(ch.id).ok_or("target child absent in engine")?;
             if !o.status.is_active()
                 || o.remaining != ch.remaining
                 || o.request != ch.request

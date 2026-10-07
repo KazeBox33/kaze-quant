@@ -1,0 +1,48 @@
+   Compiling kaze-quant v0.5.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.04s
+     Running unittests src/lib.rs (target/debug/deps/kaze_quant-b823f223694235c6)
+
+running 6 tests
+test order_store::tests::oldest_submission_evicted_even_when_it_terminates_last ... ok
+test order_store::tests::corrupt_links_indices_and_free_lists_fail_independent_audit ... ok
+test telemetry::tests::capacity_failure_preserves_histogram ... ok
+test continuous::tests::overflow_protocol_and_panic_survive_stop_and_join ... ok
+test order_store::tests::slots_reuse_without_growing_lifetime_memory_or_reordering ... ok
+test journal::fault_tests::failed_write_does_not_apply_and_permanently_poisons_writer ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+     Running tests/order_store.rs (target/debug/deps/order_store-7492bfa26279952e)
+
+running 3 tests
+test ioc_removal_and_finish_keep_fifo_without_skipping_adjacent_nodes ... FAILED
+test reused_low_slot_fills_after_older_high_slot_and_stale_id_cannot_cancel_it ... FAILED
+test duplicate_or_unordered_snapshot_ids_are_rejected_without_panicking ... FAILED
+
+failures:
+
+---- ioc_removal_and_finish_keep_fifo_without_skipping_adjacent_nodes stdout ----
+
+thread 'ioc_removal_and_finish_keep_fifo_without_skipping_adjacent_nodes' (75921578) panicked at tests/order_store.rs:30:6:
+called `Result::unwrap()` on an `Err` value: "max_active_orders must be in 1..=max_orders"
+
+---- reused_low_slot_fills_after_older_high_slot_and_stale_id_cannot_cancel_it stdout ----
+
+thread 'reused_low_slot_fills_after_older_high_slot_and_stale_id_cannot_cancel_it' (75921579) panicked at tests/order_store.rs:30:6:
+called `Result::unwrap()` on an `Err` value: "max_active_orders must be in 1..=max_orders"
+
+---- duplicate_or_unordered_snapshot_ids_are_rejected_without_panicking stdout ----
+
+thread 'duplicate_or_unordered_snapshot_ids_are_rejected_without_panicking' (75921577) panicked at tests/order_store.rs:30:6:
+called `Result::unwrap()` on an `Err` value: "max_active_orders must be in 1..=max_orders"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    duplicate_or_unordered_snapshot_ids_are_rejected_without_panicking
+    ioc_removal_and_finish_keep_fifo_without_skipping_adjacent_nodes
+    reused_low_slot_fills_after_older_high_slot_and_stale_id_cannot_cancel_it
+
+test result: FAILED. 0 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test order_store`

@@ -2,7 +2,7 @@
 
 [![Rust checks](https://github.com/KazeBox33/kaze-quant/actions/workflows/ci.yml/badge.svg)](https://github.com/KazeBox33/kaze-quant/actions/workflows/ci.yml)
 
-用 Rust 构建的确定性量化回放与纸面交易平台。执行内核与持久化边界分离，价格和账务使用整数，项目代码禁止 `unsafe`。当前版本 **0.4.0** 增加版本化策略注册、SMA交叉、walk-forward研究、公开实时纸面交易、滑点/流动性压力模型，以及独立的 Binance Spot Testnet 订单网关。核心继续支持多资产独立预算、事务确认、检查点、有限热历史、去重、全量审计和备份。
+用 Rust 构建的确定性量化回放与纸面交易平台。执行内核与持久化边界分离，价格和账务使用整数，项目代码禁止 `unsafe`。当前版本 **0.5.0** 增加版本化策略注册、SMA交叉、walk-forward研究、公开实时纸面交易、滑点/流动性压力模型，以及独立的 Binance Spot Testnet 订单网关。核心继续支持多资产独立预算、事务确认、检查点、有限热历史、去重、全量审计和备份。
 
 这是可运行、有故障验证的回放/纸面平台，测试网接口只能使用虚拟资产。新增单账户 Testnet 原币资产账本、私有执行回报与 REST 核对，见 [外部账本](docs/EXTERNAL_LEDGER.md)。新账本支持持久 REST 历史游标、原子漏收成交恢复和只读私有流重连，见 [历史恢复](docs/HISTORY_RECOVERY.md)。当前没有真实资金端点、自动实盘策略路由、完整组合估值或通过盈利准入的策略。三个门槛的逐项状态见 [验收记录](docs/ACCEPTANCE.md)，不能把代码完成或组件跑分快误读为真钱上线许可。
 
@@ -11,6 +11,8 @@
 新增[原币净目标编译](docs/NET_TARGET.md)：只读生成父计划、费用预留/净量区间与hold/资金/dust诊断；每项能力对应原始数据和前后变化，见[逐功能数据](docs/FEATURE_SCORECARD.md)。连续策略到外部净目标的自动协调仍待实现。
 
 新增[持久净目标执行](docs/NET_EXECUTION.md)：一份不可变目标与父计划同事务提交，每片依据原币手续费/净量/free资源准入，重启不重置预算，毛量完成与净目标满足独立报告。支持有界测试网接口和本地故障验收，连续信号更新/共享账户策略服务仍待实现。
+
+新增[订单热路径重构](docs/ENGINE_V14.md)：可复用槽位、ID索引、提交顺序链与终态索引，保持原经济检查点；Rust订单视图API迁移和下一阶段底层路线见设计文档。每项性能收益、内存成本和公开数据回归继续记录在[逐功能数据](docs/FEATURE_SCORECARD.md)。
 
 ## 五分钟运行
 

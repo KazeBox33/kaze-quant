@@ -65,6 +65,10 @@ jobs:
           cargo build --locked --release --bin kaze-run
           target/release/kaze-run --config configs/bar-atr-demo.json --input data/bar-atr-demo.jsonl --db reports/ci-bar.db --finish --verify-full --report reports/ci-bar.json
           target/release/kaze-run --config configs/bar-atr-demo.json --db reports/ci-bar.db --recover-only --verify-full --report reports/ci-bar-recovery.json
+      - name: Slot storage matches frozen legacy economic checkpoints
+        run: |
+          cargo run --locked --release --example order_store_replay > reports/ci-orders.jsonl
+          python3 -c 'import json,pathlib; load=lambda p:[json.loads(s) for s in pathlib.Path(p).read_text().splitlines()]; assert load("reports/ci-orders.jsonl")==load("docs/evidence/v14/replay-old.jsonl")'
       - name: Immutable net target survives crash and enforces original fee budget
         run: |
           cargo build --locked --release --example net_execution_demo
@@ -88,6 +92,7 @@ jobs:
             reports/ci-net-target.json
             reports/ci-bar.json
             reports/ci-bar-recovery.json
+            reports/ci-orders.jsonl
             reports/ci-net-execution-crash/summary.json
             reports/ci-net-execution.json
             reports/ci-net-budget.json
