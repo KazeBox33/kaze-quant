@@ -130,7 +130,7 @@ pub struct PaperRuntime {
 }
 impl PaperRuntime {
     pub fn new(config: PaperConfig) -> Result<Self, PaperError> {
-        Self::new_with_registry(config, Arc::new(StrategyRegistry::default()))
+        Self::new_with_registry(config, Arc::new(StrategyRegistry::standard()))
     }
     pub fn new_with_registry(
         config: PaperConfig,
@@ -185,7 +185,7 @@ impl PaperRuntime {
             processed: 0,
             actions: ActionBuffer::new(64)?,
             retention: None,
-            registry: Arc::new(StrategyRegistry::default()),
+            registry: Arc::new(StrategyRegistry::standard()),
         })
     }
     pub fn config(&self) -> &PaperConfig {
@@ -509,7 +509,7 @@ impl PaperRuntime {
         })
     }
     pub fn restore(config: PaperConfig, state: PaperSnapshot) -> Result<Self, PaperError> {
-        Self::restore_with_registry(config, state, Arc::new(StrategyRegistry::default()))
+        Self::restore_with_registry(config, state, Arc::new(StrategyRegistry::standard()))
     }
     pub fn restore_with_registry(
         config: PaperConfig,
@@ -617,6 +617,7 @@ impl PaperRuntime {
                     active_orders: m.engine.active_count(),
                     metrics: m.engine.metrics().into(),
                     strategy_decision: m.strategy.decision().cloned(),
+                    strategy_diagnostics: m.strategy.diagnostics(),
                 })
                 .collect(),
         }
@@ -652,6 +653,8 @@ pub struct MarketReport {
     pub metrics: MetricReport,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub strategy_decision: Option<crate::target::Decision>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub strategy_diagnostics: Option<serde_json::Value>,
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct MetricReport {

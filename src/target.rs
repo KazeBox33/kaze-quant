@@ -304,6 +304,18 @@ impl CompositionStrategy {
         action
     }
     pub fn decide(&mut self, v: StrategyView<'_>, c: Constraints) -> Action {
+        self.decide_impl(v, c, None)
+    }
+    /// 可信策略扩展提供整数目标；执行仍共享同一资源/TWAP/回报状态机。
+    pub fn decide_target(&mut self, v: StrategyView<'_>, c: Constraints, target: u64) -> Action {
+        self.decide_impl(v, c, Some(target))
+    }
+    fn decide_impl(
+        &mut self,
+        v: StrategyView<'_>,
+        c: Constraints,
+        target_override: Option<u64>,
+    ) -> Action {
         // 所有下单成功/拒绝必须反馈后才能再次规划；PaperRuntime 同步执行此握手。
         if self.proposal.is_some() {
             return Action::None;
@@ -339,17 +351,25 @@ impl CompositionStrategy {
         if let Some(p) = &self.parent {
             d.authorized_lots = self.authorized(p, c.quantity_step, v.quote.timestamp_ns);
         }
-        let Some(exposure) = self.signal(v.quote) else {
+        let Some(exposure) = target_override
+            .map(|t| if t == 0 { 0 } else { 10000 })
+            .or_else(|| self.signal(v.quote))
+        else {
             return self.finish(d, DecisionReason::Warmup, Action::None);
         };
         d.exposure_bps = exposure;
         let per_unit =
             i128::from(v.quote.ask.units()) + fee(i128::from(v.quote.ask.units()), c.fee_bps);
-        let base = match self.config.sizing {
-            SizingConfig::FixedLots { lots } => i128::from(lots),
-            SizingConfig::CashBudget { budget_minor } => budget_minor / per_unit,
+        self.exposure_bps = exposure;
+        let raw = if let Some(target) = target_override {
+            target.min(c.max_position)
+        } else {
+            let base = match self.config.sizing {
+                SizingConfig::FixedLots { lots } => i128::from(lots),
+                SizingConfig::CashBudget { budget_minor } => budget_minor / per_unit,
+            };
+            (base * i128::from(exposure) / 10000).min(i128::from(c.max_position)) as u64
         };
-        let raw = (base * i128::from(exposure) / 10000).min(i128::from(c.max_position)) as u64;
         let mut target = raw / c.quantity_step * c.quantity_step;
         let spread = u128::from(v.quote.ask.units() - v.quote.bid.units()) * 10000
             > u128::from(v.quote.bid.units()) * u128::from(self.config.max_spread_bps);

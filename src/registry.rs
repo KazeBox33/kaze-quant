@@ -18,6 +18,13 @@ pub struct StrategyRegistry {
     factories: BTreeMap<(String, u32), StrategyFactory>,
 }
 impl StrategyRegistry {
+    /// CLI的标准注册表；Default仍为空，调用方可显式构造自己的可信工厂集合。
+    pub fn standard() -> Self {
+        let mut r = Self::default();
+        r.register("bar-atr", 1, crate::bar_strategy::factory)
+            .expect("unique standard strategy");
+        r
+    }
     pub fn register(
         &mut self,
         name: &str,

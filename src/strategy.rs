@@ -32,6 +32,10 @@ pub trait Strategy {
     fn decision(&self) -> Option<&crate::target::Decision> {
         None
     }
+    /// 只在报告时生成指标解释，默认不影响原策略回执或热路径。
+    fn diagnostics(&self) -> Option<serde_json::Value> {
+        None
+    }
     /// 回报由引擎生成，策略只能消费，不能改写账户或订单。
     fn on_event(&mut self, _event: Event) {}
     fn checkpoint(&self) -> Option<crate::config::BuiltinStrategy> {
@@ -89,6 +93,13 @@ pub struct RollingMean {
 }
 
 impl RollingMean {
+    pub fn observations(&self) -> usize {
+        self.count
+    }
+    pub fn value(&self) -> Option<u64> {
+        (self.count != 0 && self.count == self.values.len())
+            .then(|| (self.sum / self.count as u128) as u64)
+    }
     pub fn new(window: usize) -> Result<Self, &'static str> {
         if window == 0 || window > 1_000_000 {
             return Err("window must be in 1..=1_000_000");

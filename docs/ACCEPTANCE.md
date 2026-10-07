@@ -1,5 +1,7 @@
 # 0.4 验收与可复现实验
 
+最新策略功能（v13）：因果观测bid K线、收盘趋势和整数ATR距离仓位已接入标准注册表/纸面TWAP。13专项测试、本机debug/release各247 Rust、15 Python通过；百万报价741单/734成交，费用后净损益−1.83412116USDT且有未平仓。操作与首次性能基线见[BAR_ATR_STRATEGY](BAR_ATR_STRATEGY.md)、[FEATURE_SCORECARD](FEATURE_SCORECARD.md)。这不新增外部自动路由、实际止损或alpha准入；本轮未发布/未跑远程CI。
+
 最新增量（2026-10-07）：本机debug/release各234 Rust、15 Python通过；本轮毛量与不可变净目标各三片真实测试网验收通过（各3 POST/3成交，首片丢ACK后新进程恢复，全资产核对），六笔手续费全零。真实非零费用反馈、部分成交、新版24h和alpha仍未通过；本轮未运行远程CI。最新[逐功能数据](FEATURE_SCORECARD.md)、[净目标设计](NET_EXECUTION.md)与[evidence/v12](evidence/v12/validation.json)。下面保留历史阶段的结果与失败，不能把后续增量之外的缺口当已完成。
 
 2026-10-06，Mac 上的本地验证。该版本增加可恢复策略接入、真实实时纸面链路、Binance Spot Testnet 执行网关与成本研究。**三个生产准入门槛尚未全部通过，当前不能据此投入真实资金。** 没有主网订单端点。

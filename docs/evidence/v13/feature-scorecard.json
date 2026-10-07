@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "version": "v13",
+  "features": [
+    {
+      "feature": "causal observed bid OHLC",
+      "before": "no shared candle signal pipeline",
+      "after": "close only on next observed bucket, no EOF flush or empty bars",
+      "million_closed_bars": 6337,
+      "million_missing_buckets": 1,
+      "demo_closed_bars": 15,
+      "tests": "5 standalone bar/ATR tests plus strategy gap/prefix cases",
+      "performance": "shared configured full strategy first baseline, component cost not isolated"
+    },
+    {
+      "feature": "integer Wilder ATR distance sizing",
+      "before": "fixed lots or cash budget",
+      "after": "closed-bar trend + inverse ATR distance target with caps/grid",
+      "hand_atr": [
+        3,
+        9
+      ],
+      "hand_distance": [
+        6,
+        18
+      ],
+      "hand_target_lots": [
+        20,
+        6
+      ],
+      "durable_distinct_targets": 17,
+      "performance": "same full strategy first baseline, not previous-version or upstream speed comparison"
+    },
+    {
+      "feature": "registered strategy paper execution",
+      "before": "caller writes/registers their own strategy factory",
+      "after": "standard CLI factory bar-atr v1, reuse TWAP and hard risk",
+      "demo_orders": 2,
+      "demo_fills": 2,
+      "demo_fee_minor": "8",
+      "demo_final_position": 0,
+      "million_orders": 741,
+      "million_fills": 734,
+      "million_pnl_minor": "-183412116",
+      "million_fee_minor": "232692916",
+      "million_final_position": 200,
+      "durable_orders": 51,
+      "durable_fills": 51,
+      "durable_pnl_minor": "11800049",
+      "scope": "public futures L1 in spot-style paper model, fixed engineering prefix; fee2bps, marked equity with open holdings, no funding/exit guarantee/alpha"
+    },
+    {
+      "feature": "durable signal and execution recovery",
+      "before": "generic registered strategy framework",
+      "after": "pending bar, ATR/mean, gap warmup and target parent/child state restored together",
+      "tests": "every-quote restore, every3-command SQLite reopen, failed-batch rollback, future state rejection, market grid/position/history risk",
+      "commands_verified_each_durable_run": 100000,
+      "repeats": 3,
+      "original_receipts_match_memory": true
+    },
+    {
+      "feature": "report diagnostics",
+      "before": "only target execution decision",
+      "after": "closed/pending bars, ATR/mean/distance and requested target visible; original strategies omit optional field",
+      "performance": "only report generation, not per-quote JSON diagnostics"
+    }
+  ],
+  "performance": {
+    "memory_median_ns": 947837958,
+    "memory_quotes_per_second": 1055032.65780795,
+    "durable_median_ns": 2208821041,
+    "durable_quotes_per_second": 45273.020377751825,
+    "memory_repeats": 7,
+    "durable_repeats": 3,
+    "first_baseline_scope": "million CSV+shared-core+serialized decision receipt hash; 100k SQLite WAL/FULL+bounded 256 batch+checkpoint; sampled RSS, same-kernel reference not independent economic oracle; futures quotes in spot-style paper model; no alpha/upstream/full-platform superiority/24h claim",
+    "legacy_median_ns": {
+      "old": 2209848833,
+      "new": 2204995167
+    },
+    "legacy_time_change_pct": -0.21963791945944777,
+    "legacy_scope": "same frozen old composition config and 100k quotes, seven alternating v12/v13 pairs; original receipts/state/full audits match, not causal optimization claim"
+  },
+  "limitations": [
+    "million fixed-prefix strategy is negative afterfees, still200lot open holding",
+    "raw serde component state requires validate_state; factory enforces it",
+    "distance budget does not install a stop loss",
+    "signal uses observed bid bars, no trade volume/calendar/exchange revision",
+    "no new live orders; external continuous strategy routing, nonzerofee gate, actualpartialfill/new24h/alpha still pending",
+    "source unpushed, remote CI not run"
+  ]
+}

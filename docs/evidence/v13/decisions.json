@@ -1,0 +1,33 @@
+{
+  "commands": 100000,
+  "decisions": 100000,
+  "target_lots": [
+    0,
+    152,
+    158,
+    162,
+    163,
+    164,
+    169,
+    171,
+    175,
+    181,
+    182,
+    184,
+    186,
+    194,
+    195,
+    197,
+    200
+  ],
+  "unique_targets": 17,
+  "parents": 28,
+  "reasons": {
+    "aligned": 84836,
+    "accepted": 51,
+    "cooldown": 894,
+    "slice_not_due": 14192,
+    "working": 27
+  },
+  "scope": "fixed first100k actual paper receipts, not hypothetical signals"
+}

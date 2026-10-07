@@ -85,7 +85,7 @@ impl SqliteSession {
             path,
             config,
             options,
-            std::sync::Arc::new(crate::registry::StrategyRegistry::default()),
+            std::sync::Arc::new(crate::registry::StrategyRegistry::standard()),
         )
     }
     pub fn open_with_registry(

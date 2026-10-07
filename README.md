@@ -14,6 +14,8 @@
 
 ## 五分钟运行
 
+新增[因果K线与ATR仓位策略](docs/BAR_ATR_STRATEGY.md)：已收盘信号、波动自适应目标、缺桶重新预热、复用TWAP和可恢复纸面订单。运行`kaze-run --config configs/bar-atr-demo.json --input data/bar-atr-demo.jsonl`并指定新的db/report，可看到实际买卖和指标解释；公开行情配置为`configs/btc-bar-atr-v1.json`。
+
 安装 Rust，克隆仓库；`rust-toolchain.toml` 固定工具链。其他机器直接使用 `cargo`；本机的 `scripts/cargo.sh` 兼容已有的独立 Rust 安装。
 
 ```sh

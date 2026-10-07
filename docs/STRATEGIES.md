@@ -32,3 +32,8 @@ cargo run --locked --release --bin kaze-research -- reports/research-plan.json r
 每个可用日期按时间前后半日分训练/测试。训练只用于排序候选与预热指标；测试从平仓、独立现金账户开始，第一费用情景选参，另外情景只评估冻结的选择。每次真正读取的整个CSV与计划SHA-256核对，源校验和及配置写入报告。数据跨度不足、交易不足、风控拒单和负收益必须保留。
 
 `screen_passed` 要求每折、每成本情景净盈亏为正、至少20次成交、无风控拒单。它只是探索性必要条件，不是统计显著性、样本外盈利保证或真钱许可。短前缀与已看过的样本也不构成独立保留集；当前研究仍缺更多日期、资产、组合约束和实际成交误差校准。
+
+
+## v13 因果K线与ATR纸面策略
+
+标准注册表新增bar-atr v1：只用已确认观测bid OHLC，Wilder ATR整数向上舍入、收盘趋势与距离预算生成持续目标，复用同一TWAP/资源/硬风控状态机。缺桶不补造bar，重置预热并目标归零；EOF不强行收盘。pending bar/指标/父子状态同事务，报告可查看指标解释。操作、边界和手算买卖见[BAR_ATR_STRATEGY](BAR_ATR_STRATEGY.md)，性能/回归见[FEATURE_SCORECARD](FEATURE_SCORECARD.md)。该能力已驱动纸面策略订单，尚无持续策略到测试网、实际止损或独立alpha证明。

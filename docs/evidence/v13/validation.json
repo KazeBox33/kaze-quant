@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-10-07T14:42:29.544614+00:00",
+  "rust_tests": {
+    "debug": 247,
+    "release": 247
+  },
+  "new_tests": 13,
+  "python_tests": 15,
+  "fmt": true,
+  "clippy_all_features_all_targets": true,
+  "rustdoc": true,
+  "hardware": "Apple M5/macOS26.5.2 arm64/Rust1.99.0 LLVM23.1.1",
+  "profile": "release thin LTO/codegenunits1/all-features; unbound CPU, no thermal control; benchmarks after checks completed",
+  "binaries": {
+    "paper-v13-before-empty-state-guard": "922cc1c886375a9c390aa68f13c5ed256c95dedaa8989ab650f2cefbdf480e3a",
+    "paper-v13": "25e4f7a39be5c225413de008d5835afe590bf684b2acfa667a268359a52e8661",
+    "paper-v12": "db0592fb2e9e037f949cd184394cf8c197775e7e70c1212903a1f34257f82545",
+    "target-v13-before-empty-state-guard": "b144601faf39456ac7ab721851ee6a8262aa13386720f8778bf3a218ce690758",
+    "target-v13": "0f0d1dd8bc0f87e582466c0d8b5fbf4af25634f9f15f24dd5ff90b861283fd30"
+  },
+  "sources": {
+    "src/bar_strategy.rs": "f35c45c05feddddd37294dd981d516f515e7ed24a272908f83b4e6de3730e99a",
+    "src/bars.rs": "b25d7d1a56cd24e319aa6244a70f91221c62315dfff8bc5970a99150442cec97",
+    "src/target.rs": "9640ee137e868640488c14077b6a3fbf4e4ad813b554bdfb66fa3ed2131d29d8",
+    "src/strategy.rs": "5388e6d0018633b8835e739a63661e56c880fccf0bdc1d953d96b87b5960e40b",
+    "src/registry.rs": "5f69f4a6dbd619f22ad526847098d186b46436bd9125cf68463726d13757a89f",
+    "src/paper.rs": "6c3f33318fcdf606906bd47b5d7bc7a460d77e2e58934da48abae58f46647125",
+    "src/store.rs": "798a001d5f357810ea856a05d5cb665e2b1de110ad55b8f30996458e2874b08a",
+    "tests/bar_strategy.rs": "ae571fea9c89f9f080b225762f9e2505fd33967d6a87366f2a96b5c91e0be6e2",
+    "tests/bars.rs": "ee8832479a7a1d8d3dd31cff678a40d1e11bf6d9354ffb66519d320a3475e192",
+    "configs/btc-bar-atr-v1.json": "d6621fe113f80b7aa7f8a2c41de4cc11ae2ea2232318a50a4b35628b83a2b820",
+    "configs/bar-atr-demo.json": "74c89e268d3f7aa8d6edafac298d9fa9001113eeeed94e128ed9c1d0f678c540",
+    "data/bar-atr-demo.jsonl": "3ce9c1832e0a0691b1ba044a61026867bab42d283004d88f3f6c0f5bfc789fb4"
+  },
+  "publication": "local only; GitHub connection/auth missing, no v13 remote CI",
+  "scope": "registered paper strategy only; no external auto-route/stop-loss/independent alpha/upstream full-platform comparison"
+}

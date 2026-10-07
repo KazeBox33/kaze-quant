@@ -3,6 +3,8 @@
 #![forbid(unsafe_code)]
 
 pub mod account;
+pub mod bar_strategy;
+pub mod bars;
 pub mod book;
 pub mod engine;
 pub mod replay;
