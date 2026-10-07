@@ -6,6 +6,8 @@
 
 这是可运行、有故障验证的回放/纸面平台，测试网接口只能使用虚拟资产。新增单账户 Testnet 原币资产账本、私有执行回报与 REST 核对，见 [外部账本](docs/EXTERNAL_LEDGER.md)。新账本支持持久 REST 历史游标、原子漏收成交恢复和只读私有流重连，见 [历史恢复](docs/HISTORY_RECOVERY.md)。当前没有真实资金端点、自动实盘策略路由、完整组合估值或通过盈利准入的策略。三个门槛的逐项状态见 [验收记录](docs/ACCEPTANCE.md)，不能把代码完成或组件跑分快误读为真钱上线许可。
 
+新增 [目标仓位与可组合纸面TWAP](docs/TARGET_EXECUTION.md)：信号/仓位/过滤/执行分层、整数累计分片、父子计划与账本同事务、逐决策回执及真实进程强杀恢复。外部测试网策略路由仍在后续阶段。
+
 ## 五分钟运行
 
 安装 Rust，克隆仓库；`rust-toolchain.toml` 固定工具链。其他机器直接使用 `cargo`；本机的 `scripts/cargo.sh` 兼容已有的独立 Rust 安装。
@@ -46,7 +48,7 @@ target/release/kaze-run --db reports/demo/session.db \
 |---|---|
 | 执行与账务 | GTC/IOC、部分成交、延迟/限价内滑点、资金/持仓冻结、提交顺序、共享流动性/保守增量预算、逐成交手续费 |
 | 多资产运行 | 直接整数索引路由，最多 64 个资产，各自明确预算、tick/数量网格和持仓上限 |
-| 策略 | passive、threshold、momentum、mean_reversion、sma_cross；带版本的Rust策略注册与持久状态；`Strategy` 回调和每报价最多 64 个动作的有界批量接口 |
+| 策略 | passive、threshold、momentum、mean_reversion、sma_cross、composition（目标仓位/纸面TWAP）；带版本的Rust策略注册与持久状态；`Strategy` 回调和每报价最多 64 个动作的有界批量接口 |
 | 风控 | 单笔金额、价格偏离、持仓/资金/订单容量、行情超时、绝对回撤、人工停止；暂停后撤单 |
 | 持久化 | SQLite WAL/FULL、事务保存命令/回执/检查点、提交后发布候选状态、SHA-256 链、磁盘去重、排他锁 |
 | 恢复 | 校验热检查点后恢复账户/委托/风控/窗口；可逐事件全量审计；在线备份与容量反压 |

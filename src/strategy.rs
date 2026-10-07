@@ -16,6 +16,22 @@ pub trait Strategy {
     fn on_quote_batch(&mut self, view: StrategyView<'_>, actions: &mut ActionBuffer) {
         let _ = actions.push(self.on_quote(view));
     }
+    /// 新执行组合读取已经验证的市场约束；原有策略保留原批量回调。
+    fn on_quote_with_constraints(
+        &mut self,
+        view: StrategyView<'_>,
+        _constraints: crate::target::Constraints,
+        actions: &mut ActionBuffer,
+    ) {
+        self.on_quote_batch(view, actions);
+    }
+    fn on_risk_rejected(&mut self, _request: OrderRequest, _reason: crate::paper::RiskReject) {}
+    fn validate_execution(&self, _engine: &crate::engine::Engine) -> Result<(), &'static str> {
+        Ok(())
+    }
+    fn decision(&self) -> Option<&crate::target::Decision> {
+        None
+    }
     /// 回报由引擎生成，策略只能消费，不能改写账户或订单。
     fn on_event(&mut self, _event: Event) {}
     fn checkpoint(&self) -> Option<crate::config::BuiltinStrategy> {

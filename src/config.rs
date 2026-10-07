@@ -95,6 +95,9 @@ pub struct RiskConfig {
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum StrategyConfig {
     Passive {},
+    Composition {
+        plan: Box<crate::target::CompositionConfig>,
+    },
     Registered {
         name: String,
         version: u32,
@@ -188,8 +191,14 @@ impl PaperConfig {
                     return Err("strategy parameters exceed 8 KiB");
                 }
             }
+            if let StrategyConfig::Composition { plan } = &m.strategy {
+                plan.validate_market(m)?;
+                total_windows += plan.window_slots();
+            }
             let quantity = match m.strategy {
-                StrategyConfig::Passive {} | StrategyConfig::Registered { .. } => None,
+                StrategyConfig::Passive {}
+                | StrategyConfig::Composition { .. }
+                | StrategyConfig::Registered { .. } => None,
                 StrategyConfig::Threshold {
                     buy_below,
                     sell_above,
@@ -255,6 +264,7 @@ impl PaperConfig {
 #[serde(deny_unknown_fields)]
 pub enum BuiltinStrategy {
     Passive,
+    Composition(Box<crate::target::CompositionStrategy>),
     SmaCross {
         fast: RollingMean,
         slow: RollingMean,
@@ -277,6 +287,9 @@ impl StrategyConfig {
                 return Err("registered strategy requires an explicit StrategyRegistry");
             }
             Self::Passive {} => BuiltinStrategy::Passive,
+            Self::Composition { ref plan } => BuiltinStrategy::Composition(Box::new(
+                crate::target::CompositionStrategy::new((**plan).clone())?,
+            )),
             Self::SmaCross {
                 fast,
                 slow,
@@ -328,9 +341,51 @@ impl Strategy for BuiltinStrategy {
     fn checkpoint(&self) -> Option<BuiltinStrategy> {
         Some(self.clone())
     }
+    fn on_quote_with_constraints(
+        &mut self,
+        v: StrategyView<'_>,
+        c: crate::target::Constraints,
+        a: &mut crate::strategy::ActionBuffer,
+    ) {
+        match self {
+            Self::Composition(s) => s.on_quote_with_constraints(v, c, a),
+            _ => self.on_quote_batch(v, a),
+        }
+    }
+    fn on_submit_result(&mut self, r: OrderRequest, o: Result<OrderId, RejectReason>) {
+        if let Self::Composition(s) = self {
+            s.on_submit_result(r, o);
+        }
+    }
+    fn on_event(&mut self, e: Event) {
+        if let Self::Composition(s) = self {
+            s.on_event(e);
+        }
+    }
+    fn on_risk_rejected(&mut self, r: OrderRequest, reason: crate::paper::RiskReject) {
+        if let Self::Composition(s) = self {
+            s.on_risk_rejected(r, reason);
+        }
+    }
+    fn validate_execution(&self, e: &crate::engine::Engine) -> Result<(), &'static str> {
+        match self {
+            Self::Composition(s) => s.validate_execution(e),
+            _ => Ok(()),
+        }
+    }
+    fn decision(&self) -> Option<&crate::target::Decision> {
+        match self {
+            Self::Composition(s) => s.decision(),
+            _ => None,
+        }
+    }
     fn on_quote(&mut self, view: StrategyView<'_>) -> Action {
         match self {
             Self::Passive => Action::None,
+            Self::Composition(s) => {
+                s.warmup(view.quote);
+                Action::None
+            }
             Self::SmaCross {
                 fast,
                 slow,
@@ -415,6 +470,7 @@ impl BuiltinStrategy {
     pub fn validate_state(&self, config: &StrategyConfig) -> Result<(), &'static str> {
         match (self, config) {
             (Self::Passive, StrategyConfig::Passive {}) => Ok(()),
+            (Self::Composition(s), StrategyConfig::Composition { plan }) => s.validate_state(plan),
             (
                 Self::SmaCross {
                     fast,

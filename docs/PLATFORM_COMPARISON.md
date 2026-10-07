@@ -1,6 +1,6 @@
 # KazeQuant与成熟量化平台：借鉴与超越的验收路线
 
-调研日期2026-10-06。核心结论：KazeQuant目前是有可复现证据的Rust回放/纸面平台和独立测试网订单网关，尚未在完整交易生态、市场覆盖、研究工具或实盘能力上超过vn.py、ABU或NautilusTrader。Rust并不自动保证更低延迟、无泄漏、正确账务或盈利。本路线选择可以量化验收的优势，同时补齐真正影响交易闭环的缺口。
+调研日期2026-10-06；2026-10-07补充目标仓位/组合执行阶段。核心结论：KazeQuant目前是有可复现证据的Rust回放/纸面平台和独立测试网订单网关，尚未在完整交易生态、市场覆盖、研究工具或实盘能力上超过vn.py、ABU或NautilusTrader。Rust并不自动保证更低延迟、无泄漏、正确账务或盈利。本路线选择可以量化验收的优势，同时补齐真正影响交易闭环的缺口。
 
 本次直接阅读vn.py事件/网关、独立CTA模板/回测、TWAP，以及ABU因子、仓位、监督、并行研究与指标代码。所读七个仓库来源均固定上游提交与文件内容哈希；初次匿名API限流后通过只读连接器补齐，失败请求也保留。在线文档仅记录访问日期，latest链接仍可能变化。[来源清单](evidence/v06/platform-sources.json)保存SHA/文件哈希/失败请求。没有根据Star数、README自述或语言推导性能排名；也没有本轮安装运行这些平台做同条件计时。
 
@@ -25,7 +25,7 @@ KazeQuant已有Strategy回调/有界动作、PaperRuntime、SQLite候选状态�
 
 策略生命周期的启动边界应是：配置与版本验证→检查点恢复→交易所核对→预热完成→Ready。断线/未知订单/余额不符进入暂停，不能通过重启自动交易。回测、纸面、测试网复用策略状态与决策核心，外部成交/撤单时机由各环境适配器产生；不能声称三个环境必然相同成交。
 
-[TWAP源码](https://github.com/vnpy/vnpy_algotrading/blob/bee959dc464749f7cce66e766249ccdbb2d4869a/vnpy_algotrading/algos/twap_algo.py)按定时器间隔分批、检查限价与剩余成交量，是值得实现的第一种执行算法。我们的版本应将parent/child ID、计划时间、已成交/待确认/待撤单量一起持久化，整数lot分配余数，订单未终结/取消结果未知时不重复补量，策略停止后仍可核对遗留订单。**TWAP是如何执行目标仓位，不是盈利策略**。目前尚未实现；不能简单把定时回调接到Testnet POST。
+[TWAP源码](https://github.com/vnpy/vnpy_algotrading/blob/bee959dc464749f7cce66e766249ccdbb2d4869a/vnpy_algotrading/algos/twap_algo.py)按定时器间隔分批、检查限价与剩余成交量，是值得实现的第一种执行算法。我们的版本应将parent/child ID、计划时间、已成交/待确认/待撤单量一起持久化，整数lot分配余数，订单未终结/取消结果未知时不重复补量，策略停止后仍可核对遗留订单。**TWAP是如何执行目标仓位，不是盈利策略**。现已完成目标仓位与持久纸面TWAP，见[TARGET_EXECUTION](TARGET_EXECUTION.md)；外部异步执行与测试网路由仍未接入，不能把定时回调直接接到POST。
 
 vn.py这个核心EventEngine快照使用未设置maxsize的Queue；我们的实时入口已有4096帧/8KiB上限。可验证差异是指定入口的容量约束，不是整个vn.py都无风控或全系统内存无上限。我们保留有界类型化单写入者，不照搬字符串广播队列进入执行热路径。UI/研究放控制平面，不能阻塞账本写入。
 
@@ -37,7 +37,7 @@ vn.py这个核心EventEngine快照使用未设置maxsize的Queue；我们的实�
 数据/因果特征 → 信号 → 目标仓位 → 风控 → 执行计划 → 订单/成交 → 账务/解释
 ```
 
-每个模块带name/version/parameters/state，快照只保存有界状态；信号不能直接改账户，仓位计算不能绕过现金冻结，模型过滤不能放行硬风控拒单。先做确定性规则组合、目标仓位与可用现金/波动约束，再加入模型。模型与特征产物固定训练截止时间/哈希，交易时仅取已可用信息。现有Rust注册工厂是接入基础，不代表模块组合已实现。
+每个模块带name/version/parameters/state，快照只保存有界状态；信号不能直接改账户，仓位计算不能绕过现金冻结，模型过滤不能放行硬风控拒单。先做确定性规则组合、目标仓位与可用现金/波动约束，再加入模型。模型与特征产物固定训练截止时间/哈希，交易时仅取已可用信息。现有Rust注册工厂是接入基础；现已增加严格类型化composition v1规则组合，信号/仓位/过滤/执行分别配置。任意注册因子组合、波动约束、机器学习过滤仍未实现。
 
 [ABU多标的并行择时](https://github.com/bbfamily/abu/blob/d602d847677e4c2b77b0a122df30816ea68b5710/abupy/AlphaBu/ABuPickTimeMaster.py)先拆分标的任务、汇总行动后应用资金。[LEAN Algorithm Framework](https://www.quantconnect.com/docs/v2/writing-algorithms/algorithm-framework/overview)将Universe Selection、Alpha、Portfolio Construction、Risk Management与Execution分开。借鉴这些边界时，我们只并行独立实验/数据准备，共享现金组合的成交与资金预留仍按全局确定性顺序执行；不能并行“算完收益”后才发现资金重复使用。
 

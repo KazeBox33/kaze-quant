@@ -84,10 +84,26 @@ pub enum RiskReject {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Notice {
-    Engine { market: usize, event: Event },
-    RiskRejected { market: usize, reason: RiskReject },
-    Halted { market: usize, reason: HaltReason },
-    CancelMissing { market: usize, order_id: OrderId },
+    Engine {
+        market: usize,
+        event: Event,
+    },
+    RiskRejected {
+        market: usize,
+        reason: RiskReject,
+    },
+    Halted {
+        market: usize,
+        reason: HaltReason,
+    },
+    CancelMissing {
+        market: usize,
+        order_id: OrderId,
+    },
+    StrategyDecision {
+        market: usize,
+        decision: crate::target::Decision,
+    },
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Receipt {
@@ -267,12 +283,13 @@ impl PaperRuntime {
                 if self.markets[market].halted.is_none() {
                     let m = &mut self.markets[market];
                     self.actions.clear();
-                    m.strategy.on_quote_batch(
+                    m.strategy.on_quote_with_constraints(
                         StrategyView {
                             quote,
                             account: m.engine.account(),
                             active_orders: m.engine.active_count(),
                         },
+                        crate::target::Constraints::from_market(&self.config.markets[market]),
                         &mut self.actions,
                     );
                     if self.actions.actions().is_err() {
@@ -282,6 +299,12 @@ impl PaperRuntime {
                             let action = self.actions.actions().expect("validated batch")[slot];
                             self.action(market, action, &mut notices);
                         }
+                    }
+                    if let Some(d) = self.markets[market].strategy.decision() {
+                        notices.push(Notice::StrategyDecision {
+                            market,
+                            decision: d.clone(),
+                        });
                     }
                 }
             }
@@ -391,6 +414,7 @@ impl PaperRuntime {
                     self.markets[i].engine.compact_terminal_orders(budget);
                 }
                 if let Some(reason) = self.risk(i, request) {
+                    self.markets[i].strategy.on_risk_rejected(request, reason);
                     self.markets[i].risk_rejections += 1;
                     notices.push(Notice::RiskRejected { market: i, reason });
                 } else {
@@ -430,6 +454,7 @@ impl PaperRuntime {
             .iter()
             .enumerate()
             .map(|(i, m)| {
+                m.strategy.validate_execution(&m.engine)?;
                 let strategy = match &self.config.markets[i].strategy {
                     StrategyConfig::Registered {
                         name,
@@ -523,6 +548,7 @@ impl PaperRuntime {
                 }
             };
             let engine = Engine::restore(c.engine.clone(), m.engine)?;
+            strategy.validate_execution(&engine)?;
             if engine
                 .last_quote()
                 .is_some_and(|q| q.timestamp_ns > state.clock_ns)
@@ -559,6 +585,7 @@ impl PaperRuntime {
     pub fn check_invariants(&self) -> Result<(), PaperError> {
         for m in &self.markets {
             m.engine.check_invariants()?;
+            m.strategy.validate_execution(&m.engine)?;
             if m.halted.is_some() && m.engine.active_count() != 0 {
                 return Err("halted market has active orders".into());
             }
@@ -589,6 +616,7 @@ impl PaperRuntime {
                     risk_rejections: m.risk_rejections,
                     active_orders: m.engine.active_count(),
                     metrics: m.engine.metrics().into(),
+                    strategy_decision: m.strategy.decision().cloned(),
                 })
                 .collect(),
         }
@@ -622,6 +650,8 @@ pub struct MarketReport {
     pub risk_rejections: u64,
     pub active_orders: usize,
     pub metrics: MetricReport,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub strategy_decision: Option<crate::target::Decision>,
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct MetricReport {

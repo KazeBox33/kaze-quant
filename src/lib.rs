@@ -33,3 +33,5 @@ pub mod user_stream;
 pub mod recovery;
 
 pub mod continuous;
+
+pub mod target;

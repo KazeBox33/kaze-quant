@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "date": "2026-10-07",
+  "rust_debug": 195,
+  "rust_release": 195,
+  "python_tests": 15,
+  "target_tests": 16,
+  "checks": [
+    "cargo fmt --check",
+    "cargo clippy --locked --all-features --all-targets -- -D warnings",
+    "cargo test --locked --all-features --all-targets",
+    "cargo test --locked --all-features --release",
+    "RUSTDOCFLAGS=-D warnings cargo doc --locked --all-features --no-deps",
+    "python3 -m unittest discover -s scripts -p test_*.py"
+  ],
+  "paper_crash_cases": 5,
+  "network_posts": 0,
+  "scope": "new paper execution capability; current upstream same-workload TWAP benchmark, automatic external strategy route, new 24h and alpha gates not passed",
+  "public_text_format": "logs/CSV published with LF and one final newline; measured values unchanged; original local reports retained"
+}

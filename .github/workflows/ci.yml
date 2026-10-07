@@ -47,6 +47,10 @@ jobs:
           cargo run --locked --release --example history_recovery_bench > reports/ci-history.json
           rustc -vV > reports/rustc.txt
           uname -a > reports/host.txt
+      - name: Durable target position and paper TWAP crash recovery
+        run: |
+          cargo build --locked --release --bin kaze-run --example target_reference
+          python3 scripts/target_acceptance.py --output reports/ci-target-crash
       - uses: actions/upload-artifact@v4
         with:
           name: storage-evidence-${{ matrix.os }}
@@ -57,3 +61,4 @@ jobs:
             reports/host.txt
             reports/sql-first.json
             reports/sql-backup.json
+            reports/ci-target-crash/summary.json
