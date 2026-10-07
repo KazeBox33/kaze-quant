@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "max_commands": 1000000,
+  "markets": [
+    {
+      "symbol": "BTCUSDT-QUOTE",
+      "price_tick": 10,
+      "quantity_step": 1,
+      "engine": {
+        "initial_cash": "1000000000000",
+        "max_position": 100000,
+        "max_active_orders": 128,
+        "max_orders": 4096,
+        "fee_bps": 2,
+        "latency_ns": 1000000
+      },
+      "risk": {
+        "max_order_notional": "50000000000",
+        "max_drawdown": "100000000000",
+        "max_quote_age_ns": 60000000000,
+        "price_collar_bps": 100
+      },
+      "strategy": {
+        "type": "registered",
+        "name": "breakout-bracket",
+        "version": 1,
+        "parameters": {
+          "entry_trigger": 42318240,
+          "entry_limit": 42360560,
+          "quantity": 200,
+          "stop_trigger": 42275920,
+          "stop_limit": 42233640,
+          "profit_trigger": 42360560,
+          "profit_limit": 42360560,
+          "entry_lifetime_ns": 3600000000000
+        }
+      },
+      "units": {
+        "currency": "USDT",
+        "money_scale": 100000000,
+        "quantity_scale": 100000
+      }
+    }
+  ]
+}

@@ -55,7 +55,7 @@ def run(old, new, quotes, config, output, repeats):
                    ordering='old/new on even rounds, new/old on odd rounds; fresh database every run',
                    median_ns=med, new_over_old_time=med['new'] / med['old'], final_state=expected[0],
                    receipt_sha256=expected[1], runs=results,
-                   scope='own v09/v10 full durable paper workload, identical raw receipts; separate binary-bound recovery; no upstream/network/individual quote latency/production SLA comparison')
+                   scope='own supplied old/new full durable paper workload, identical raw receipts; separate binary-bound recovery; no upstream/network/individual quote latency/production SLA comparison')
     (output / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
 
 

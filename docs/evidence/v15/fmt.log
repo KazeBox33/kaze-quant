@@ -1,0 +1,12 @@
+Diff in /Users/xiedongjin/Workspace/learning/kaze-quant/tests/bracket_strategy.rs:117:
+         restored = PaperRuntime::restore(cfg(), serde_json::from_slice(&state).unwrap()).unwrap();
+         assert_eq!(restored.process(&e).unwrap(), expected);
+         let mut session = SqliteSession::open(&t.db(), cfg(), StoreOptions::default()).unwrap();
+-        assert_eq!(session.execute_batch(std::slice::from_ref(&e)).unwrap()[0], expected);
++        assert_eq!(
++            session.execute_batch(std::slice::from_ref(&e)).unwrap()[0],
++            expected
++        );
+         let before = session.runtime().report();
+         assert!(session.execute_batch(&[e]).unwrap()[0].duplicate);
+         assert_eq!(session.runtime().report(), before);

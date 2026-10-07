@@ -1,4 +1,8 @@
 //! 可重放的命令边界：直接整数索引路由，多资产采用独立预算；没有隐藏跨账户融资。
+use crate::conditional::{
+    ActivationReject, CancelReason, ConditionalBook, ConditionalEvent, ConditionalId,
+    ConditionalReject, ConditionalRequest, ConditionalSnapshot, TriggerPolicy,
+};
 use crate::config::StrategyConfig;
 use crate::config::{BuiltinStrategy, PaperConfig};
 use crate::engine::{Engine, EngineSnapshot, MAX_LIFETIME_ORDERS, Metrics};
@@ -54,6 +58,14 @@ pub enum Command {
         market: usize,
         order_id: OrderId,
     },
+    SubmitConditional {
+        market: usize,
+        request: ConditionalRequest,
+    },
+    CancelConditional {
+        market: usize,
+        conditional_id: ConditionalId,
+    },
     /// 适配器的 watchdog 用同一时间轴推进时钟，触发行情超时保护。
     Advance {
         timestamp_ns: u64,
@@ -100,6 +112,10 @@ pub enum Notice {
         market: usize,
         order_id: OrderId,
     },
+    Conditional {
+        market: usize,
+        event: ConditionalEvent,
+    },
     StrategyDecision {
         market: usize,
         decision: crate::target::Decision,
@@ -113,6 +129,7 @@ pub struct Receipt {
 }
 struct Market {
     engine: Engine,
+    conditionals: ConditionalBook,
     strategy: Box<dyn Strategy>,
     halted: Option<HaltReason>,
     risk_rejections: u64,
@@ -172,6 +189,7 @@ impl PaperRuntime {
         for (m, strategy) in config.markets.iter().zip(strategies) {
             markets.push(Market {
                 engine: Engine::new(m.engine.clone())?,
+                conditionals: ConditionalBook::new(m.engine.max_active_orders.min(4096))?,
                 strategy,
                 halted: None,
                 risk_rejections: 0,
@@ -194,6 +212,9 @@ impl PaperRuntime {
     pub fn engine(&self, market: usize) -> Option<&Engine> {
         self.markets.get(market).map(|m| &m.engine)
     }
+    pub fn conditionals(&self, market: usize) -> Option<&ConditionalBook> {
+        self.markets.get(market).map(|m| &m.conditionals)
+    }
     pub fn halted(&self, market: usize) -> Option<HaltReason> {
         self.markets.get(market).and_then(|m| m.halted)
     }
@@ -215,7 +236,9 @@ impl PaperRuntime {
         let market = match command {
             Command::Quote { market, .. }
             | Command::Submit { market, .. }
-            | Command::Cancel { market, .. } => Some(*market),
+            | Command::Cancel { market, .. }
+            | Command::SubmitConditional { market, .. }
+            | Command::CancelConditional { market, .. } => Some(*market),
             _ => None,
         };
         if market.is_some_and(|i| i >= self.markets.len()) {
@@ -268,6 +291,7 @@ impl PaperRuntime {
                 self.clock_ns = quote.timestamp_ns;
                 // 所有资产都执行 watchdog；先撤销超时订单，禁止新鲜快照填掉过期委托。
                 self.expire_feeds(&mut notices);
+                self.expire_conditionals(&mut notices);
                 let mut events = Vec::new();
                 self.markets[market]
                     .engine
@@ -281,6 +305,7 @@ impl PaperRuntime {
                 }
                 // 已暂停仍接收报价用于估值；不再生成订单，直到另开经过审查的新会话。
                 if self.markets[market].halted.is_none() {
+                    self.trigger_conditionals(market, quote, &mut notices);
                     let m = &mut self.markets[market];
                     self.actions.clear();
                     m.strategy.on_quote_with_constraints(
@@ -314,9 +339,21 @@ impl PaperRuntime {
             Command::Cancel { market, order_id } => {
                 self.action(market, Action::Cancel(order_id), &mut notices)
             }
+            Command::SubmitConditional { market, request } => {
+                self.action(market, Action::SubmitConditional(request), &mut notices)
+            }
+            Command::CancelConditional {
+                market,
+                conditional_id,
+            } => self.action(
+                market,
+                Action::CancelConditional(conditional_id),
+                &mut notices,
+            ),
             Command::Advance { timestamp_ns } => {
                 self.clock_ns = timestamp_ns;
                 self.expire_feeds(&mut notices);
+                self.expire_conditionals(&mut notices);
             }
             Command::Halt {} => {
                 for i in 0..self.markets.len() {
@@ -354,6 +391,10 @@ impl PaperRuntime {
         let mut events = Vec::new();
         self.markets[i].engine.finish(&mut events);
         self.dispatch_events(i, events, notices);
+        let events = self.markets[i]
+            .conditionals
+            .cancel_all(CancelReason::Halted);
+        self.dispatch_conditionals(i, events, notices);
         notices.push(Notice::Halted { market: i, reason });
     }
     fn dispatch_events(&mut self, i: usize, events: Vec<Event>, notices: &mut Vec<Notice>) {
@@ -397,30 +438,130 @@ impl PaperRuntime {
         }
         None
     }
+    fn submit_order(
+        &mut self,
+        i: usize,
+        request: OrderRequest,
+        notices: &mut Vec<Notice>,
+    ) -> Result<OrderId, ActivationReject> {
+        let mut events = Vec::new();
+        let result = {
+            if let Some(retain) = self.retention
+                && self.markets[i].engine.orders().len() >= self.config.markets[i].engine.max_orders
+            {
+                let budget = retain.min(
+                    self.config.markets[i]
+                        .engine
+                        .max_orders
+                        .saturating_sub(self.markets[i].engine.active_count() + 1),
+                );
+                self.markets[i].engine.compact_terminal_orders(budget);
+            }
+            if let Some(reason) = self.risk(i, request) {
+                self.markets[i].strategy.on_risk_rejected(request, reason);
+                self.markets[i].risk_rejections += 1;
+                notices.push(Notice::RiskRejected { market: i, reason });
+                Err(ActivationReject::Risk(reason))
+            } else {
+                let outcome = self.markets[i].engine.submit(request, &mut events);
+                self.markets[i].strategy.on_submit_result(request, outcome);
+                outcome.map_err(ActivationReject::Engine)
+            }
+        };
+        self.dispatch_events(i, events, notices);
+        result
+    }
+    fn dispatch_conditionals(
+        &mut self,
+        i: usize,
+        events: Vec<ConditionalEvent>,
+        notices: &mut Vec<Notice>,
+    ) {
+        for event in events {
+            self.markets[i].strategy.on_conditional_event(event);
+            notices.push(Notice::Conditional { market: i, event });
+        }
+    }
+    fn expire_conditionals(&mut self, notices: &mut Vec<Notice>) {
+        for i in 0..self.markets.len() {
+            if !self.markets[i].conditionals.is_empty() {
+                let events = self.markets[i]
+                    .conditionals
+                    .expire(self.clock_ns)
+                    .expect("prevalidated session clock");
+                self.dispatch_conditionals(i, events, notices);
+            }
+        }
+    }
+    fn trigger_conditionals(&mut self, i: usize, q: Quote, notices: &mut Vec<Notice>) {
+        if self.markets[i].conditionals.is_empty() {
+            return;
+        }
+        // 暂时移出拥有的投影，激活闭包才可借用原平台风控/账户路径；无克隆/额外账户。
+        let cap = self.config.markets[i].engine.max_active_orders.min(4096);
+        let mut book = std::mem::replace(
+            &mut self.markets[i].conditionals,
+            ConditionalBook::new(cap).expect("validated capacity"),
+        );
+        let result = book.on_quote(q, TriggerPolicy::Adaptive, |request| {
+            self.submit_order(i, request, notices)
+        });
+        self.markets[i].conditionals = book;
+        self.dispatch_conditionals(i, result.expect("prevalidated conditional quote"), notices);
+    }
+    fn submit_conditional(&mut self, i: usize, r: ConditionalRequest, notices: &mut Vec<Notice>) {
+        let m = &self.markets[i];
+        let c = &self.config.markets[i];
+        // 潜伏意图允许未来价格/尚未持有的退出量；资金、持仓、价格带、订单容量在激活时重查。
+        let risk = if m.halted.is_some() {
+            Some(RiskReject::Halted)
+        } else if m.engine.last_quote().is_none() {
+            Some(RiskReject::NoMarket)
+        } else if self.clock_ns - m.engine.last_quote().expect("checked quote").timestamp_ns
+            > c.risk.max_quote_age_ns
+        {
+            Some(RiskReject::StaleFeed)
+        } else if !r.trigger.units().is_multiple_of(c.price_tick)
+            || !r.order.limit.units().is_multiple_of(c.price_tick)
+            || !r.order.quantity.units().is_multiple_of(c.quantity_step)
+        {
+            Some(RiskReject::Grid)
+        } else if i128::from(r.order.limit.units()) * i128::from(r.order.quantity.units())
+            > c.risk.max_order_notional
+        {
+            Some(RiskReject::Notional)
+        } else {
+            None
+        };
+        let result = if let Some(reason) = risk {
+            self.markets[i].risk_rejections += 1;
+            self.markets[i].conditionals.record_rejection();
+            Err(ConditionalReject::Risk(reason))
+        } else {
+            let q = self.markets[i].engine.last_quote().expect("checked quote");
+            self.markets[i].conditionals.submit(r, q, self.clock_ns)
+        };
+        let event = match result {
+            Ok(id) => ConditionalEvent::Accepted {
+                conditional_id: id,
+                request: r,
+            },
+            Err(reason) => ConditionalEvent::Rejected { request: r, reason },
+        };
+        self.dispatch_conditionals(i, vec![event], notices);
+    }
     fn action(&mut self, i: usize, action: Action, notices: &mut Vec<Notice>) {
         let mut events = Vec::new();
         match action {
             Action::Submit(request) => {
-                if let Some(retain) = self.retention
-                    && self.markets[i].engine.orders().len()
-                        >= self.config.markets[i].engine.max_orders
-                {
-                    let budget = retain.min(
-                        self.config.markets[i]
-                            .engine
-                            .max_orders
-                            .saturating_sub(self.markets[i].engine.active_count() + 1),
-                    );
-                    self.markets[i].engine.compact_terminal_orders(budget);
-                }
-                if let Some(reason) = self.risk(i, request) {
-                    self.markets[i].strategy.on_risk_rejected(request, reason);
-                    self.markets[i].risk_rejections += 1;
-                    notices.push(Notice::RiskRejected { market: i, reason });
-                } else {
-                    let outcome = self.markets[i].engine.submit(request, &mut events);
-                    self.markets[i].strategy.on_submit_result(request, outcome);
-                }
+                let _ = self.submit_order(i, request, notices);
+            }
+            Action::SubmitConditional(request) => self.submit_conditional(i, request, notices),
+            Action::CancelConditional(id) => {
+                let event = self.markets[i]
+                    .conditionals
+                    .cancel(id, CancelReason::Operator);
+                self.dispatch_conditionals(i, vec![event], notices);
             }
             Action::Cancel(order_id) => {
                 if !self.markets[i].engine.cancel(order_id, &mut events) {
@@ -455,6 +596,7 @@ impl PaperRuntime {
             .enumerate()
             .map(|(i, m)| {
                 m.strategy.validate_execution(&m.engine)?;
+                m.strategy.validate_conditionals(&m.conditionals)?;
                 let strategy = match &self.config.markets[i].strategy {
                     StrategyConfig::Registered {
                         name,
@@ -493,6 +635,7 @@ impl PaperRuntime {
                 };
                 Ok(MarketSnapshot {
                     engine: m.engine.snapshot(),
+                    conditionals: m.conditionals.snapshot(),
                     strategy,
                     halted: m.halted,
                     risk_rejections: m.risk_rejections,
@@ -548,6 +691,15 @@ impl PaperRuntime {
                 }
             };
             let engine = Engine::restore(c.engine.clone(), m.engine)?;
+            let conditionals = match m.conditionals {
+                Some(s) => ConditionalBook::restore(
+                    c.engine.max_active_orders.min(4096),
+                    s,
+                    engine.last_quote(),
+                    state.clock_ns,
+                )?,
+                None => ConditionalBook::new(c.engine.max_active_orders.min(4096))?,
+            };
             strategy.validate_execution(&engine)?;
             if engine
                 .last_quote()
@@ -564,6 +716,7 @@ impl PaperRuntime {
             }
             markets.push(Market {
                 engine,
+                conditionals,
                 strategy,
                 halted: m.halted,
                 risk_rejections: m.risk_rejections,
@@ -583,10 +736,29 @@ impl PaperRuntime {
         Ok(runtime)
     }
     pub fn check_invariants(&self) -> Result<(), PaperError> {
-        for m in &self.markets {
+        for (i, m) in self.markets.iter().enumerate() {
             m.engine.check_invariants()?;
+            m.conditionals.check_invariants()?;
+            let c = &self.config.markets[i];
+            for w in m.conditionals.pending() {
+                if !w.request.trigger.units().is_multiple_of(c.price_tick)
+                    || !w.request.order.limit.units().is_multiple_of(c.price_tick)
+                    || !w
+                        .request
+                        .order
+                        .quantity
+                        .units()
+                        .is_multiple_of(c.quantity_step)
+                    || i128::from(w.request.order.limit.units())
+                        * i128::from(w.request.order.quantity.units())
+                        > c.risk.max_order_notional
+                {
+                    return Err("conditional snapshot outside market constraints".into());
+                }
+            }
             m.strategy.validate_execution(&m.engine)?;
-            if m.halted.is_some() && m.engine.active_count() != 0 {
+            m.strategy.validate_conditionals(&m.conditionals)?;
+            if m.halted.is_some() && (m.engine.active_count() != 0 || !m.conditionals.is_empty()) {
                 return Err("halted market has active orders".into());
             }
         }
@@ -618,6 +790,7 @@ impl PaperRuntime {
                     metrics: m.engine.metrics().into(),
                     strategy_decision: m.strategy.decision().cloned(),
                     strategy_diagnostics: m.strategy.diagnostics(),
+                    conditionals: m.conditionals.snapshot(),
                 })
                 .collect(),
         }
@@ -633,6 +806,8 @@ pub struct PaperReport {
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct MarketReport {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub conditionals: Option<ConditionalSnapshot>,
     pub units: crate::config::InstrumentUnits,
     pub market: usize,
     pub symbol: String,
@@ -698,6 +873,8 @@ pub struct PaperSnapshot {
 #[serde(deny_unknown_fields)]
 struct MarketSnapshot {
     engine: EngineSnapshot,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    conditionals: Option<ConditionalSnapshot>,
     strategy: StrategyCheckpoint,
     halted: Option<HaltReason>,
     risk_rejections: u64,

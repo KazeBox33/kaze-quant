@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "environment": "local-paper-no-network",
+  "binary_sha256": "f7886358e81aba3bac579e0561ea7eab1a74f0ba230b49bb13f20954976fd11a",
+  "config_file_sha256": "2d10b3229cfe99e07a665b4cbe198e2d030c004c290218fb9784b749f9cfdb9d",
+  "input_sha256": "2b1c6a4eba4636faff8c4d7e912d9688f50564baefdef3671bb5c554b16a4a2f",
+  "network_posts": 0,
+  "fills": [
+    {
+      "order_id": 1,
+      "side": "Buy",
+      "quantity": 3,
+      "price": 101,
+      "fee": "1",
+      "sequence": 3,
+      "timestamp_ns": 30
+    },
+    {
+      "order_id": 2,
+      "side": "Sell",
+      "quantity": 3,
+      "price": 111,
+      "fee": "1",
+      "sequence": 5,
+      "timestamp_ns": 50
+    }
+  ],
+  "conditional_events": [
+    {
+      "type": "accepted",
+      "conditional_id": 1,
+      "request": {
+        "reference": "ask",
+        "direction": "above_or_equal",
+        "trigger": 101,
+        "order": {
+          "side": "Buy",
+          "limit": 102,
+          "quantity": 3,
+          "time_in_force": "GoodTilCancelled"
+        },
+        "expires_at_ns": 1010,
+        "oco_group": null
+      }
+    },
+    {
+      "type": "triggered",
+      "conditional_id": 1,
+      "order_id": 1,
+      "quote_sequence": 2
+    },
+    {
+      "type": "accepted",
+      "conditional_id": 2,
+      "request": {
+        "reference": "bid",
+        "direction": "below_or_equal",
+        "trigger": 90,
+        "order": {
+          "side": "Sell",
+          "limit": 88,
+          "quantity": 3,
+          "time_in_force": "GoodTilCancelled"
+        },
+        "expires_at_ns": null,
+        "oco_group": 1
+      }
+    },
+    {
+      "type": "accepted",
+      "conditional_id": 3,
+      "request": {
+        "reference": "bid",
+        "direction": "above_or_equal",
+        "trigger": 110,
+        "order": {
+          "side": "Sell",
+          "limit": 110,
+          "quantity": 3,
+          "time_in_force": "GoodTilCancelled"
+        },
+        "expires_at_ns": null,
+        "oco_group": 1
+      }
+    },
+    {
+      "type": "triggered",
+      "conditional_id": 3,
+      "order_id": 2,
+      "quote_sequence": 4
+    },
+    {
+      "type": "cancelled",
+      "conditional_id": 2,
+      "reason": "oco_peer_accepted"
+    }
+  ],
+  "cases": [
+    {
+      "confirmed_prefix": 1,
+      "signal": "SIGKILL",
+      "restarted_recovered": 1,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 6
+    },
+    {
+      "confirmed_prefix": 2,
+      "signal": "SIGKILL",
+      "restarted_recovered": 2,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 6
+    },
+    {
+      "confirmed_prefix": 3,
+      "signal": "SIGKILL",
+      "restarted_recovered": 3,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 6
+    },
+    {
+      "confirmed_prefix": 4,
+      "signal": "SIGKILL",
+      "restarted_recovered": 4,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 6
+    },
+    {
+      "confirmed_prefix": 5,
+      "signal": "SIGKILL",
+      "restarted_recovered": 5,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 6
+    }
+  ],
+  "expected_state": {
+    "clock_ns": 50,
+    "closed": true,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "10028",
+        "conditionals": {
+          "last_sequence": 4,
+          "last_time_ns": 40,
+          "metrics": {
+            "accepted": 3,
+            "activation_rejected": 0,
+            "cancelled": 1,
+            "expired": 0,
+            "rejected": 0,
+            "triggered": 2
+          },
+          "next_id": 4,
+          "pending": []
+        },
+        "equity_minor": "10028",
+        "fees_minor": "2",
+        "halted": "finished",
+        "market": 0,
+        "metrics": {
+          "accepted": 2,
+          "cancelled": 0,
+          "fills": 2,
+          "max_drawdown_minor": "4",
+          "orders_examined": 2,
+          "peak_equity_minor": "10029",
+          "quotes": 5,
+          "rejected": 0
+        },
+        "pnl_minor": "28",
+        "position_units": 0,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "strategy_diagnostics": {
+          "oco_group": 1,
+          "phase": {
+            "type": "complete"
+          },
+          "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+          "strategy": "breakout-bracket"
+        },
+        "symbol": "BRACKET-DEMO",
+        "units": {
+          "currency": "SIM",
+          "money_scale": 100,
+          "quantity_scale": 1
+        }
+      }
+    ],
+    "processed": 6,
+    "schema_version": 1
+  },
+  "audit_chain_sha256": "c1afe3bea5468523c4797e44dc8e179860c53d0617e7f4b516ab3653a0c610cb",
+  "scope": "owned child process SIGKILL after committed receipt; pending/activated/filled/bracket/OCO/completed stages; no mid-transaction timing, real venue partial-fill, external conditional execution or 24h proof"
+}

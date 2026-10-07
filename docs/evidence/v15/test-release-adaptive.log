@@ -1,0 +1,24 @@
+   Compiling kaze-quant v0.6.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+error[E0369]: binary operation `==` cannot be applied to type `TriggerPolicy`
+   --> src/conditional.rs:298:19
+    |
+298 |         if policy == TriggerPolicy::Adaptive {
+    |            ------ ^^ ----------------------- TriggerPolicy
+    |            |
+    |            TriggerPolicy
+    |
+note: an implementation of `PartialEq` might be missing for `TriggerPolicy`
+   --> src/conditional.rs:134:1
+    |
+134 | pub enum TriggerPolicy {
+    | ^^^^^^^^^^^^^^^^^^^^^^ must implement `PartialEq`
+help: consider annotating `TriggerPolicy` with `#[derive(PartialEq)]`
+    |
+134 + #[derive(PartialEq)]
+135 | pub enum TriggerPolicy {
+    |
+
+For more information about this error, try `rustc --explain E0369`.
+error: could not compile `kaze-quant` (lib) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `kaze-quant` (lib test) due to 1 previous error

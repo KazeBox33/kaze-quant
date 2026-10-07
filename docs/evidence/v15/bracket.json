@@ -1,0 +1,969 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "binary_sha256": "f7886358e81aba3bac579e0561ea7eab1a74f0ba230b49bb13f20954976fd11a",
+  "reference_binary_sha256": "65cb6359b4e59c8a09b2b63c046fd958a231dc31275f5ceda412f6fb664a9c04",
+  "config_file_sha256": "618140d094dc94b9955fa0f66531ec359e9e325b5278959c39061f04874b88f8",
+  "million_input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+  "durable_prefix_sha256": "c22be361be4144d983bc334735806aae85e16f4273f57516145ba5ac69671379",
+  "selection": "fixed first 100000 contiguous quotes; config frozen before result; no price/PnL filtering",
+  "memory_runs": [
+    {
+      "config_file_sha256": "618140d094dc94b9955fa0f66531ec359e9e325b5278959c39061f04874b88f8",
+      "digest_rule": "u64 LE receipt length + serde JSON bytes in sequence order",
+      "elapsed_ns": 215149959,
+      "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+      "receipt_sha256": "aa0da1bcc423928823d7047552c59ab04e1123b3b194997485791be26176536f",
+      "state": {
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 1000000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 1000000,
+        "schema_version": 1
+      },
+      "timing": "CSV decode + shared paper core + receipt serialization/hash + retention; no SQLite; final audit excluded"
+    },
+    {
+      "config_file_sha256": "618140d094dc94b9955fa0f66531ec359e9e325b5278959c39061f04874b88f8",
+      "digest_rule": "u64 LE receipt length + serde JSON bytes in sequence order",
+      "elapsed_ns": 215521750,
+      "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+      "receipt_sha256": "aa0da1bcc423928823d7047552c59ab04e1123b3b194997485791be26176536f",
+      "state": {
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 1000000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 1000000,
+        "schema_version": 1
+      },
+      "timing": "CSV decode + shared paper core + receipt serialization/hash + retention; no SQLite; final audit excluded"
+    },
+    {
+      "config_file_sha256": "618140d094dc94b9955fa0f66531ec359e9e325b5278959c39061f04874b88f8",
+      "digest_rule": "u64 LE receipt length + serde JSON bytes in sequence order",
+      "elapsed_ns": 216797167,
+      "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+      "receipt_sha256": "aa0da1bcc423928823d7047552c59ab04e1123b3b194997485791be26176536f",
+      "state": {
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 1000000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 1000000,
+        "schema_version": 1
+      },
+      "timing": "CSV decode + shared paper core + receipt serialization/hash + retention; no SQLite; final audit excluded"
+    },
+    {
+      "config_file_sha256": "618140d094dc94b9955fa0f66531ec359e9e325b5278959c39061f04874b88f8",
+      "digest_rule": "u64 LE receipt length + serde JSON bytes in sequence order",
+      "elapsed_ns": 215246333,
+      "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+      "receipt_sha256": "aa0da1bcc423928823d7047552c59ab04e1123b3b194997485791be26176536f",
+      "state": {
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 1000000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 1000000,
+        "schema_version": 1
+      },
+      "timing": "CSV decode + shared paper core + receipt serialization/hash + retention; no SQLite; final audit excluded"
+    },
+    {
+      "config_file_sha256": "618140d094dc94b9955fa0f66531ec359e9e325b5278959c39061f04874b88f8",
+      "digest_rule": "u64 LE receipt length + serde JSON bytes in sequence order",
+      "elapsed_ns": 216743542,
+      "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+      "receipt_sha256": "aa0da1bcc423928823d7047552c59ab04e1123b3b194997485791be26176536f",
+      "state": {
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 1000000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 1000000,
+        "schema_version": 1
+      },
+      "timing": "CSV decode + shared paper core + receipt serialization/hash + retention; no SQLite; final audit excluded"
+    },
+    {
+      "config_file_sha256": "618140d094dc94b9955fa0f66531ec359e9e325b5278959c39061f04874b88f8",
+      "digest_rule": "u64 LE receipt length + serde JSON bytes in sequence order",
+      "elapsed_ns": 215114000,
+      "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+      "receipt_sha256": "aa0da1bcc423928823d7047552c59ab04e1123b3b194997485791be26176536f",
+      "state": {
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 1000000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 1000000,
+        "schema_version": 1
+      },
+      "timing": "CSV decode + shared paper core + receipt serialization/hash + retention; no SQLite; final audit excluded"
+    },
+    {
+      "config_file_sha256": "618140d094dc94b9955fa0f66531ec359e9e325b5278959c39061f04874b88f8",
+      "digest_rule": "u64 LE receipt length + serde JSON bytes in sequence order",
+      "elapsed_ns": 214494166,
+      "input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+      "receipt_sha256": "aa0da1bcc423928823d7047552c59ab04e1123b3b194997485791be26176536f",
+      "state": {
+        "clock_ns": 1704073538913000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 1000000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 1000000,
+        "schema_version": 1
+      },
+      "timing": "CSV decode + shared paper core + receipt serialization/hash + retention; no SQLite; final audit excluded"
+    }
+  ],
+  "durable_runs": [
+    {
+      "run": 0,
+      "process_wall_ns": 2081968834,
+      "sample_peak_rss_bytes": 7438336,
+      "rss_samples": 19,
+      "rss_rule": "ps rss KiB * 1024, 100ms sampling; may miss transient peaks",
+      "run_stats": {
+        "batch_size": 256,
+        "commit_histogram_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          108,
+          269,
+          13,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "commit_max_ns": 16820500,
+        "commit_total_ns": 1961078574,
+        "committed_batches": 391,
+        "elapsed_ns": 1970196750,
+        "flush_ms": 5,
+        "histogram_rule": "bucket i upper bound 2^i ns; batch commit duration, excludes queue wait and stdout",
+        "received_commands": 100000
+      },
+      "audit_measurement": {
+        "process_wall_ns": 218739542,
+        "sample_peak_rss_bytes": 6504448,
+        "rss_samples": 2,
+        "rss_rule": "ps rss KiB * 1024, 100ms sampling; may miss transient peaks"
+      },
+      "recovery_ns": 12609708,
+      "verified_commands": 100000,
+      "storage_stats": {
+        "database_limit_bytes": 1073741824,
+        "hot_state_bytes": 1693,
+        "logical_database_bytes": 29175808,
+        "wal_bytes": 4185952,
+        "wal_soft_limit_bytes": 67108864
+      },
+      "binary_sha256": "f7886358e81aba3bac579e0561ea7eab1a74f0ba230b49bb13f20954976fd11a",
+      "config_sha256": "755aa7c3e1ab5c4c9fb96edf7254c2a7fbb5bd970d80c8278f7372b28d160b2f",
+      "input_sha256": "c22be361be4144d983bc334735806aae85e16f4273f57516145ba5ac69671379",
+      "audit_chain_sha256": "e6fefe761180c443fc4c4e371ed3440514dc81f6b52cb2d4fc3cf0de03571688",
+      "receipt_sha256": "c23168f6a09b9570113a717fef3df1cd6128430c5f7154ac6fb85a88f8ab21de",
+      "original_receipts_match_memory": true,
+      "state": {
+        "clock_ns": 1704067610285000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      }
+    },
+    {
+      "run": 1,
+      "process_wall_ns": 2304503959,
+      "sample_peak_rss_bytes": 7356416,
+      "rss_samples": 21,
+      "rss_rule": "ps rss KiB * 1024, 100ms sampling; may miss transient peaks",
+      "run_stats": {
+        "batch_size": 256,
+        "commit_histogram_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          41,
+          335,
+          13,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "commit_max_ns": 20205417,
+        "commit_total_ns": 2141223868,
+        "committed_batches": 391,
+        "elapsed_ns": 2153049791,
+        "flush_ms": 5,
+        "histogram_rule": "bucket i upper bound 2^i ns; batch commit duration, excludes queue wait and stdout",
+        "received_commands": 100000
+      },
+      "audit_measurement": {
+        "process_wall_ns": 218741917,
+        "sample_peak_rss_bytes": 6471680,
+        "rss_samples": 2,
+        "rss_rule": "ps rss KiB * 1024, 100ms sampling; may miss transient peaks"
+      },
+      "recovery_ns": 15326250,
+      "verified_commands": 100000,
+      "storage_stats": {
+        "database_limit_bytes": 1073741824,
+        "hot_state_bytes": 1693,
+        "logical_database_bytes": 29175808,
+        "wal_bytes": 4185952,
+        "wal_soft_limit_bytes": 67108864
+      },
+      "binary_sha256": "f7886358e81aba3bac579e0561ea7eab1a74f0ba230b49bb13f20954976fd11a",
+      "config_sha256": "755aa7c3e1ab5c4c9fb96edf7254c2a7fbb5bd970d80c8278f7372b28d160b2f",
+      "input_sha256": "c22be361be4144d983bc334735806aae85e16f4273f57516145ba5ac69671379",
+      "audit_chain_sha256": "e6fefe761180c443fc4c4e371ed3440514dc81f6b52cb2d4fc3cf0de03571688",
+      "receipt_sha256": "c23168f6a09b9570113a717fef3df1cd6128430c5f7154ac6fb85a88f8ab21de",
+      "original_receipts_match_memory": true,
+      "state": {
+        "clock_ns": 1704067610285000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      }
+    },
+    {
+      "run": 2,
+      "process_wall_ns": 2082304292,
+      "sample_peak_rss_bytes": 7356416,
+      "rss_samples": 19,
+      "rss_rule": "ps rss KiB * 1024, 100ms sampling; may miss transient peaks",
+      "run_stats": {
+        "batch_size": 256,
+        "commit_histogram_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          117,
+          261,
+          12,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "commit_max_ns": 19836500,
+        "commit_total_ns": 1950781094,
+        "committed_batches": 391,
+        "elapsed_ns": 1959824875,
+        "flush_ms": 5,
+        "histogram_rule": "bucket i upper bound 2^i ns; batch commit duration, excludes queue wait and stdout",
+        "received_commands": 100000
+      },
+      "audit_measurement": {
+        "process_wall_ns": 221561125,
+        "sample_peak_rss_bytes": 6471680,
+        "rss_samples": 2,
+        "rss_rule": "ps rss KiB * 1024, 100ms sampling; may miss transient peaks"
+      },
+      "recovery_ns": 15544625,
+      "verified_commands": 100000,
+      "storage_stats": {
+        "database_limit_bytes": 1073741824,
+        "hot_state_bytes": 1693,
+        "logical_database_bytes": 29175808,
+        "wal_bytes": 4185952,
+        "wal_soft_limit_bytes": 67108864
+      },
+      "binary_sha256": "f7886358e81aba3bac579e0561ea7eab1a74f0ba230b49bb13f20954976fd11a",
+      "config_sha256": "755aa7c3e1ab5c4c9fb96edf7254c2a7fbb5bd970d80c8278f7372b28d160b2f",
+      "input_sha256": "c22be361be4144d983bc334735806aae85e16f4273f57516145ba5ac69671379",
+      "audit_chain_sha256": "e6fefe761180c443fc4c4e371ed3440514dc81f6b52cb2d4fc3cf0de03571688",
+      "receipt_sha256": "c23168f6a09b9570113a717fef3df1cd6128430c5f7154ac6fb85a88f8ab21de",
+      "original_receipts_match_memory": true,
+      "state": {
+        "clock_ns": 1704067610285000000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "1000005932296",
+            "conditionals": {
+              "last_sequence": 29942,
+              "last_time_ns": 1704067332673000000,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "1000005932296",
+            "fees_minor": "3387704",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "2092920",
+              "orders_examined": 3,
+              "peak_equity_minor": "1000007627080",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "5932296",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BTCUSDT-QUOTE",
+            "units": {
+              "currency": "USDT",
+              "money_scale": 100000000,
+              "quantity_scale": 100000
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      }
+    }
+  ],
+  "memory_median_ns": 215246333,
+  "memory_quotes_per_second": 4645839.889871666,
+  "durable_median_ns": 1970196750,
+  "durable_quotes_per_second": 50756.35212574582,
+  "scope": "million CSV+shared-core+serialized decision receipt hash; 100k SQLite WAL/FULL+bounded 256 batch+checkpoint; sampled RSS, same-kernel reference not independent economic oracle; futures quotes in spot-style paper model; no alpha/upstream/full-platform superiority/24h claim"
+}

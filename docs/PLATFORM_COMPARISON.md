@@ -116,3 +116,8 @@ vn.py这个核心EventEngine快照使用未设置maxsize的Queue；我们的实�
 ## v13 因果K线与ATR纸面策略
 
 标准注册表新增bar-atr v1：只用已确认观测bid OHLC，Wilder ATR整数向上舍入、收盘趋势与距离预算生成持续目标，复用同一TWAP/资源/硬风控状态机。缺桶不补造bar，重置预热并目标归零；EOF不强行收盘。pending bar/指标/父子状态同事务，报告可查看指标解释。操作、边界和手算买卖见[BAR_ATR_STRATEGY](BAR_ATR_STRATEGY.md)，性能/回归见[FEATURE_SCORECARD](FEATURE_SCORECARD.md)。该能力已驱动纸面策略订单，尚无持续策略到测试网、实际止损或独立alpha证明。
+
+
+## v15按vn.py能力推进
+
+新增本地条件意图、到期/OCO与可运行breakout-bracket CTA纸面策略。逐项现有/部分/缺失与实施顺序见[VNPY_PARITY](VNPY_PARITY.md)。固定vnpy_ctastrategy方法的无触发组件对照、Rust稀疏/密集代价和完整公开路径实测见[FEATURE_SCORECARD](FEATURE_SCORECARD.md)；不代表全框架或交易所执行排名。

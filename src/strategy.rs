@@ -29,6 +29,12 @@ pub trait Strategy {
     fn validate_execution(&self, _engine: &crate::engine::Engine) -> Result<(), &'static str> {
         Ok(())
     }
+    fn validate_conditionals(
+        &self,
+        _book: &crate::conditional::ConditionalBook,
+    ) -> Result<(), &'static str> {
+        Ok(())
+    }
     fn decision(&self) -> Option<&crate::target::Decision> {
         None
     }
@@ -38,6 +44,8 @@ pub trait Strategy {
     }
     /// 回报由引擎生成，策略只能消费，不能改写账户或订单。
     fn on_event(&mut self, _event: Event) {}
+    /// 条件接受、触发与实际成交是不同生命周期，策略显式消费关联ID。
+    fn on_conditional_event(&mut self, _event: crate::conditional::ConditionalEvent) {}
     fn checkpoint(&self) -> Option<crate::config::BuiltinStrategy> {
         None
     }

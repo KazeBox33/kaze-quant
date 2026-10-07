@@ -1,0 +1,403 @@
+{
+  "schema_version": 1,
+  "features": [
+    {
+      "feature": "indexed local conditional lifecycle",
+      "before": "no local conditional command or strategy callback",
+      "after": "four bid/ask trigger domains, FIFO candidate identity, expiry, halt, risk activation, no pending reservation",
+      "tests": 11,
+      "waiting_capacity": 4096,
+      "scope": "paper only"
+    },
+    {
+      "feature": "adaptive selection",
+      "before": "first pure indexed dense baseline slower than scan",
+      "after": "fully crossed set size lower bound > N/4 selects submission-order scan, otherwise price index",
+      "first_baseline": [
+        {
+          "orders": 128,
+          "mode": "sparse",
+          "loops": 10000,
+          "median_ns": {
+            "scan": 1432458,
+            "indexed": 144708,
+            "adaptive": 159083,
+            "vnpy-source-sparse": 141257167
+          },
+          "indexed_over_scan_time": 0.10102076291242047,
+          "adaptive_over_scan_time": 0.11105596115208963
+        },
+        {
+          "orders": 128,
+          "mode": "dense",
+          "loops": 2000,
+          "median_ns": {
+            "scan": 788250,
+            "indexed": 2543000,
+            "adaptive": 787833
+          },
+          "indexed_over_scan_time": 3.2261338407865523,
+          "adaptive_over_scan_time": 0.9994709800190295
+        },
+        {
+          "orders": 1024,
+          "mode": "sparse",
+          "loops": 10000,
+          "median_ns": {
+            "scan": 15510250,
+            "indexed": 181292,
+            "adaptive": 194875,
+            "vnpy-source-sparse": 1118855083
+          },
+          "indexed_over_scan_time": 0.011688528553698362,
+          "adaptive_over_scan_time": 0.01256427201366838
+        },
+        {
+          "orders": 1024,
+          "mode": "dense",
+          "loops": 2000,
+          "median_ns": {
+            "scan": 4406625,
+            "indexed": 26798917,
+            "adaptive": 4536584
+          },
+          "indexed_over_scan_time": 6.081506141321306,
+          "adaptive_over_scan_time": 1.0294917312001814
+        },
+        {
+          "orders": 4096,
+          "mode": "sparse",
+          "loops": 10000,
+          "median_ns": {
+            "scan": 68244792,
+            "indexed": 203292,
+            "adaptive": 223166,
+            "vnpy-source-sparse": 4487042500
+          },
+          "indexed_over_scan_time": 0.0029788646729262507,
+          "adaptive_over_scan_time": 0.0032700810341688784
+        },
+        {
+          "orders": 4096,
+          "mode": "dense",
+          "loops": 2000,
+          "median_ns": {
+            "scan": 17025334,
+            "indexed": 135125250,
+            "adaptive": 17032042
+          },
+          "indexed_over_scan_time": 7.936716542535964,
+          "adaptive_over_scan_time": 1.0003940010809773
+        }
+      ],
+      "cost": "four first/last tree checks, dynamic indices and selection Vec; threshold heuristic, not all distributions optimized"
+    },
+    {
+      "feature": "breakout-bracket v1",
+      "before": "bar-ATR targets without actual conditional exits",
+      "after": "single-cycle fixed-entry plus waiting OCO stop-limit/profit; actual full entry precedes exits",
+      "tests": 7,
+      "demo_state": {
+        "clock_ns": 50,
+        "closed": true,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "10028",
+            "conditionals": {
+              "last_sequence": 4,
+              "last_time_ns": 40,
+              "metrics": {
+                "accepted": 3,
+                "activation_rejected": 0,
+                "cancelled": 1,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 2
+              },
+              "next_id": 4,
+              "pending": []
+            },
+            "equity_minor": "10028",
+            "fees_minor": "2",
+            "halted": "finished",
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 2,
+              "max_drawdown_minor": "4",
+              "orders_examined": 2,
+              "peak_equity_minor": "10029",
+              "quotes": 5,
+              "rejected": 0
+            },
+            "pnl_minor": "28",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "oco_group": 1,
+              "phase": {
+                "type": "complete"
+              },
+              "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+              "strategy": "breakout-bracket"
+            },
+            "symbol": "BRACKET-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 6,
+        "schema_version": 1
+      },
+      "public_baseline": {
+        "memory_median_ns": 215246333,
+        "memory_qps": 4645839.889871666,
+        "durable_median_ns": 1970196750,
+        "durable_qps": 50756.35212574582,
+        "final_state": {
+          "clock_ns": 1704073538913000000,
+          "closed": false,
+          "markets": [
+            {
+              "active_orders": 0,
+              "cash_minor": "1000005932296",
+              "conditionals": {
+                "last_sequence": 29942,
+                "last_time_ns": 1704067332673000000,
+                "metrics": {
+                  "accepted": 3,
+                  "activation_rejected": 0,
+                  "cancelled": 1,
+                  "expired": 0,
+                  "rejected": 0,
+                  "triggered": 2
+                },
+                "next_id": 4,
+                "pending": []
+              },
+              "equity_minor": "1000005932296",
+              "fees_minor": "3387704",
+              "halted": null,
+              "market": 0,
+              "metrics": {
+                "accepted": 2,
+                "cancelled": 0,
+                "fills": 2,
+                "max_drawdown_minor": "2092920",
+                "orders_examined": 3,
+                "peak_equity_minor": "1000007627080",
+                "quotes": 1000000,
+                "rejected": 0
+              },
+              "pnl_minor": "5932296",
+              "position_units": 0,
+              "reserved_cash_minor": "0",
+              "risk_rejections": 0,
+              "strategy_diagnostics": {
+                "oco_group": 1,
+                "phase": {
+                  "type": "complete"
+                },
+                "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+                "strategy": "breakout-bracket"
+              },
+              "symbol": "BTCUSDT-QUOTE",
+              "units": {
+                "currency": "USDT",
+                "money_scale": 100000000,
+                "quantity_scale": 100000
+              }
+            }
+          ],
+          "processed": 1000000,
+          "schema_version": 1
+        }
+      },
+      "cost": "partial entry lacks protective exits; stop-limit gap may not fill; fixed levels, no rearm/trailing, no alpha"
+    },
+    {
+      "feature": "transactional condition and strategy recovery",
+      "before": "generic strategy recovery without condition IDs/indices",
+      "after": "same transaction checkpoints and raw receipts; replay reconstructs indices, cross-checks strategy child/pending identity",
+      "crash_cases": 5,
+      "all_receipts_payload_chain_equal": true,
+      "cost": "candidate copy and full checkpoint; crash after committed confirmation, not mid-transaction injected timing"
+    },
+    {
+      "feature": "large receipt bounded budget",
+      "before_limit_bytes": 65536,
+      "after_limit_bytes": 8388608,
+      "batch_total_bytes": 16777216,
+      "capacity_baseline": {
+        "success": true,
+        "commands": 4098,
+        "waiting_capacity": 4096,
+        "triggered": 4096,
+        "old_receipt_limit_bytes": 65536,
+        "trigger_receipt_bytes": 820017,
+        "new_receipt_limit_bytes": 8388608,
+        "batch_receipt_budget_bytes": 16777216,
+        "verified_commands": 4098,
+        "duplicate_retry_state_and_chain_equal": true,
+        "run": {
+          "batch_size": 256,
+          "commit_histogram_counts": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            10,
+            7,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "commit_max_ns": 16399167,
+          "commit_total_ns": 157845918,
+          "committed_batches": 17,
+          "elapsed_ns": 173176041,
+          "flush_ms": 5,
+          "histogram_rule": "bucket i upper bound 2^i ns; batch commit duration, excludes queue wait and stdout",
+          "received_commands": 4098
+        },
+        "state": {
+          "clock_ns": 20,
+          "closed": false,
+          "markets": [
+            {
+              "active_orders": 4096,
+              "cash_minor": "1000000000",
+              "conditionals": {
+                "last_sequence": 2,
+                "last_time_ns": 20,
+                "metrics": {
+                  "accepted": 4096,
+                  "activation_rejected": 0,
+                  "cancelled": 0,
+                  "expired": 0,
+                  "rejected": 0,
+                  "triggered": 4096
+                },
+                "next_id": 4097,
+                "pending": []
+              },
+              "equity_minor": "1000000000",
+              "fees_minor": "0",
+              "halted": null,
+              "market": 0,
+              "metrics": {
+                "accepted": 4096,
+                "cancelled": 0,
+                "fills": 0,
+                "max_drawdown_minor": "0",
+                "orders_examined": 0,
+                "peak_equity_minor": "1000000000",
+                "quotes": 2,
+                "rejected": 0
+              },
+              "pnl_minor": "0",
+              "position_units": 0,
+              "reserved_cash_minor": "495616",
+              "risk_rejections": 0,
+              "symbol": "BRACKET-DEMO",
+              "units": {
+                "currency": "SIM",
+                "money_scale": 100,
+                "quantity_scale": 1
+              }
+            }
+          ],
+          "processed": 4098,
+          "schema_version": 1
+        },
+        "binary_sha256": "f7886358e81aba3bac579e0561ea7eab1a74f0ba230b49bb13f20954976fd11a",
+        "input_sha256": "0f6ee713a2fd3351cae8e4feb3726a7dd9ef08225c59ececcc4ae38abe680d4d",
+        "config_sha256": "de8023830b4c8098116798460064019510c67666eac9b4050f21e39a3569d148",
+        "audit_chain_sha256": "299dde006a99f340adcec2536f5eabb41abb2298f870a435ca75ecdb2d24c7e6",
+        "scope": "first capacity baseline, all accepted children still working on trigger quote; no same-quote fills; full audit and duplicate replay; no network"
+      },
+      "cost": "increased per-receipt limit, serialization and candidate memory; over-budget atomic refusal, no truncation"
+    },
+    {
+      "feature": "unchanged legacy strategy regression",
+      "pairs_each": 7,
+      "median_ns": {
+        "old": 2108854583,
+        "new": 2183938042
+      },
+      "new_over_old_time": 1.035603905364204,
+      "cost": "3.56 percent slower in measured durable ATR workload; no attribution as improvement",
+      "raw_receipts_and_state_equal": true
+    },
+    {
+      "feature": "complete validation",
+      "before_rust_each": 253,
+      "after_rust_each": 271,
+      "python_tests": 15,
+      "new_tests": 18,
+      "network_orders": 0,
+      "ci": "not verified; public API attempt HTTP403"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+   Compiling kaze-quant v0.5.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.73s
+     Running tests/conditional.rs (target/debug/deps/conditional-51d2f78cc8a23187)
+
+running 10 tests
+test invalid_quote_and_regressed_expiry_are_atomic ... ok
+test oco_cancels_peers_after_acceptance_and_both_crossing_choose_oldest_id ... ok
+test rejected_activation_consumes_intent_but_keeps_oco_peer_and_never_retries ... ok
+test expiry_wins_equal_price_trigger_and_never_activates ... ok
+test capacity_cancel_and_recovery_never_reuse_id_or_corrupt_indices ... ok
+test trigger_rechecks_resources_and_does_not_retry_after_cash_rejection ... ok
+test activation_is_next_quote_only_and_latent_intent_does_not_freeze_money ... ok
+test malformed_counter_id_future_time_and_expired_checkpoint_fail_restore ... ok
+test watchdog_halt_and_finish_cancel_latent_orders_before_any_activation ... ok
+test indexed_selection_matches_exhaustive_four_trigger_domains_and_submission_order ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

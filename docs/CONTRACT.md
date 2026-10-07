@@ -158,3 +158,8 @@ composition v1需要市场约束和完整生命周期回报，只在PaperRuntime
 ## v14 订单存储增量
 
 Engine 改用可复用槽位、ID 哈希索引、按提交顺序的历史/活跃链与按 ID 排序的终态索引。终结摘链、归档不搬移活跃记录，生命周期 ID 永不复用；撤单包含 O(log T) 终态索引更新。快照仍按 ID 打包完整保留订单，恢复重建索引并独立审计。`orders()` 返回无分配有序借用视图，序号访问 O(n)，需要连续数组时显式 to_vec；Rust API 因此升至0.5.0。原二进制绑定继续生效，不能直接续写旧会话。[设计、迁移与底层路线](ENGINE_V14.md)、[功能/性能数据](FEATURE_SCORECARD.md)。
+
+
+## v15 本地条件与CTA增量
+
+每资产最多min(max_active_orders,4096)等待意图，bid/ask阈值、到期和OCO索引可重建。报价推进先watchdog/到期、既有订单撮合与回撤停止，再激活条件，最后生成策略动作；同报价提交/激活不成交。等待不冻结，激活完整重风控；失败一次终结不自动重试，成功接受子单即取消同组等待同伴。条件ID/普通订单ID不同，OCO不控制已经工作的子单。breakout-bracket仅完整入场后建固定退出组，部分入场未保护，跳空停止限价可能不成交。条件与策略检查点同事务，SQLite单回执8MiB、整批编码总量16MiB，超限整批不确认。执行/SQL版本升级绑定0.6二进制，旧会话保留旧可执行文件。详细接口、边界、手算与测量见[CONDITIONAL_ORDERS](CONDITIONAL_ORDERS.md)、[FEATURE_SCORECARD](FEATURE_SCORECARD.md)。

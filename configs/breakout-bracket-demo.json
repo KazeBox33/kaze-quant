@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "max_commands": 100000,
+  "markets": [
+    {
+      "symbol": "BRACKET-DEMO",
+      "price_tick": 1,
+      "quantity_step": 1,
+      "engine": {
+        "initial_cash": "10000",
+        "max_position": 100,
+        "max_active_orders": 8,
+        "max_orders": 64,
+        "fee_bps": 10,
+        "latency_ns": 0
+      },
+      "risk": {
+        "max_order_notional": "1000",
+        "max_drawdown": "10000",
+        "max_quote_age_ns": 1000,
+        "price_collar_bps": 2000
+      },
+      "strategy": {
+        "type": "registered",
+        "name": "breakout-bracket",
+        "version": 1,
+        "parameters": {
+          "entry_trigger": 101,
+          "entry_limit": 102,
+          "quantity": 3,
+          "stop_trigger": 90,
+          "stop_limit": 88,
+          "profit_trigger": 110,
+          "profit_limit": 110,
+          "entry_lifetime_ns": 1000
+        }
+      }
+    }
+  ]
+}

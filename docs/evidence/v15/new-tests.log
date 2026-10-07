@@ -1,0 +1,31 @@
+   Compiling kaze-quant v0.5.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.29s
+     Running tests/bracket_strategy.rs (target/debug/deps/bracket_strategy-8ca7243bba603bfb)
+
+running 7 tests
+test capacity_one_preserves_known_leg_and_halt_cancels_it_without_hidden_orders ... ok
+test partial_entry_waits_for_actual_fills_then_oco_exit_partial_fills_hand_ledger ... ok
+test stop_exit_and_gap_below_stop_limit_are_distinct_from_guaranteed_execution ... ok
+test expired_entry_and_cash_rejection_pause_without_rearming ... ok
+test malformed_strategy_child_and_conditional_identity_fail_canonical_restore ... ok
+test trigger_then_invalid_command_rolls_back_intent_activation_and_retry_is_single_child ... ok
+test every_snapshot_and_new_sqlite_process_match_all_receipts_and_dedupe ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.52s
+
+     Running tests/conditional.rs (target/debug/deps/conditional-51d2f78cc8a23187)
+
+running 10 tests
+test invalid_quote_and_regressed_expiry_are_atomic ... ok
+test expiry_wins_equal_price_trigger_and_never_activates ... ok
+test rejected_activation_consumes_intent_but_keeps_oco_peer_and_never_retries ... ok
+test oco_cancels_peers_after_acceptance_and_both_crossing_choose_oldest_id ... ok
+test capacity_cancel_and_recovery_never_reuse_id_or_corrupt_indices ... ok
+test activation_is_next_quote_only_and_latent_intent_does_not_freeze_money ... ok
+test trigger_rechecks_resources_and_does_not_retry_after_cash_rejection ... ok
+test malformed_counter_id_future_time_and_expired_checkpoint_fail_restore ... ok
+test watchdog_halt_and_finish_cancel_latent_orders_before_any_activation ... ok
+test indexed_selection_matches_exhaustive_four_trigger_domains_and_submission_order ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

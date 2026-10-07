@@ -13,9 +13,11 @@ use std::time::Duration;
 
 const MAX_STATE: usize = 64 * 1024 * 1024;
 const MAX_COMMAND: usize = 8192;
-const MAX_RECEIPT: usize = 65536;
+// 条件批量触发需要更大单回执；整批仍限制编码预算，不能随max_batch无界放大。
+const MAX_RECEIPT: usize = 8 * 1024 * 1024;
+const MAX_BATCH_RECEIPTS: usize = 16 * 1024 * 1024;
 type AuditRow = (u64, Vec<u8>, Vec<u8>, Vec<u8>);
-const REVISION: &str = "kaze-sql-v1";
+const REVISION: &str = "kaze-sql-v2-conditional";
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct StoreOptions {
@@ -232,6 +234,7 @@ impl SqliteSession {
         )?;
         let mut chain = self.chain.clone();
         let mut rows: Vec<AuditRow> = Vec::new();
+        let mut receipt_budget = 0usize;
         let mut receipts = Vec::with_capacity(inputs.len());
         for input in inputs {
             let payload = serde_json::to_vec(input)?;
@@ -268,6 +271,10 @@ impl SqliteSession {
             let receipt = candidate.apply(input);
             candidate.compact_checkpoint();
             let receipt_bytes = serde_json::to_vec(&receipt)?;
+            receipt_budget += receipt_bytes.len();
+            if receipt_budget > MAX_BATCH_RECEIPTS {
+                return Err("batch receipts exceed durable capacity".into());
+            }
             if receipt_bytes.len() > MAX_RECEIPT {
                 return Err("receipt exceeds durable capacity".into());
             }

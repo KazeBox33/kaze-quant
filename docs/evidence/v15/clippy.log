@@ -1,0 +1,29 @@
+    Checking kaze-quant v0.5.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+error[E0425]: cannot find value `receipt_budget` in this scope
+   --> src/store.rs:273:13
+    |
+273 |             receipt_budget += receipt_bytes.len();
+    |             ^^^^^^^^^^^^^^
+    |
+help: a local variable with a similar name exists
+    |
+273 -             receipt_budget += receipt_bytes.len();
+273 +             receipt_bytes += receipt_bytes.len();
+    |
+
+error[E0425]: cannot find value `receipt_budget` in this scope
+   --> src/store.rs:274:16
+    |
+274 |             if receipt_budget > MAX_BATCH_RECEIPTS {
+    |                ^^^^^^^^^^^^^^
+    |
+help: a local variable with a similar name exists
+    |
+274 -             if receipt_budget > MAX_BATCH_RECEIPTS {
+274 +             if receipt_bytes > MAX_BATCH_RECEIPTS {
+    |
+
+For more information about this error, try `rustc --explain E0425`.
+error: could not compile `kaze-quant` (lib test) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `kaze-quant` (lib) due to 2 previous errors

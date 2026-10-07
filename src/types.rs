@@ -168,6 +168,8 @@ pub enum Event {
 pub enum Action {
     Submit(OrderRequest),
     Cancel(OrderId),
+    SubmitConditional(crate::conditional::ConditionalRequest),
+    CancelConditional(crate::conditional::ConditionalId),
     None,
 }
 

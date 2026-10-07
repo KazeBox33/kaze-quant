@@ -153,6 +153,12 @@ pub fn replay<R: BufRead, S: Strategy>(
                     summary.failed_cancels += 1;
                 }
             }
+            Action::SubmitConditional(_) | Action::CancelConditional(_) => {
+                return Err(ReplayError {
+                    line: index + 2,
+                    message: "conditional actions require PaperRuntime".into(),
+                });
+            }
             Action::None => (),
         }
     }

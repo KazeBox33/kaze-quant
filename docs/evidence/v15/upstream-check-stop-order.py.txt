@@ -1,0 +1,63 @@
+def check_stop_order(self, tick: TickData) -> None:
+        """用最新价触发本地停止单，触发后发送限价单。"""
+        stop_order: StopOrder
+        for stop_order in list(self.stop_orders.values()):
+            if stop_order.vt_symbol != tick.vt_symbol:
+                continue
+
+            long_triggered: bool = (
+                stop_order.direction == Direction.LONG and tick.last_price >= stop_order.price
+            )
+            short_triggered: bool = (
+                stop_order.direction == Direction.SHORT and tick.last_price <= stop_order.price
+            )
+
+            if long_triggered or short_triggered:
+                strategy: CtaTemplate = self.strategies[stop_order.strategy_name]
+
+                # To get excuted immediately after stop order is
+                # triggered, use limit price if available, otherwise
+                # use ask_price_5 or bid_price_5
+                if stop_order.direction == Direction.LONG:
+                    if tick.limit_up:
+                        price: float = tick.limit_up
+                    else:
+                        price = tick.ask_price_5
+                else:
+                    if tick.limit_down:
+                        price = tick.limit_down
+                    else:
+                        price = tick.bid_price_5
+
+                contract: ContractData | None = self.main_engine.get_contract(stop_order.vt_symbol)
+                if not contract:
+                    continue
+
+                vt_orderids: list = self.send_limit_order(
+                    strategy,
+                    contract,
+                    stop_order.direction,
+                    stop_order.offset,
+                    price,
+                    stop_order.volume,
+                    stop_order.lock,
+                    stop_order.net
+                )
+
+                # Update stop order status if placed successfully
+                if vt_orderids:
+                    # Remove from relation map.
+                    self.stop_orders.pop(stop_order.stop_orderid)
+
+                    strategy_vt_orderids: set = self.strategy_orderid_map[strategy.strategy_name]
+                    if stop_order.stop_orderid in strategy_vt_orderids:
+                        strategy_vt_orderids.remove(stop_order.stop_orderid)
+
+                    # Change stop order status to cancelled and update to strategy.
+                    stop_order.status = StopOrderStatus.TRIGGERED
+                    stop_order.vt_orderids = vt_orderids
+
+                    self.call_strategy_func(
+                        strategy, strategy.on_stop_order, stop_order
+                    )
+                    self.put_stop_order_event(stop_order)

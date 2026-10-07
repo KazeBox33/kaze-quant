@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "max_commands": 100000,
+  "markets": [
+    {
+      "symbol": "BRACKET-DEMO",
+      "price_tick": 1,
+      "quantity_step": 1,
+      "engine": {
+        "initial_cash": "1000000000",
+        "max_position": 10000,
+        "max_active_orders": 4096,
+        "max_orders": 8192,
+        "fee_bps": 10,
+        "latency_ns": 0
+      },
+      "risk": {
+        "max_order_notional": "1000",
+        "max_drawdown": "10000",
+        "max_quote_age_ns": 1000,
+        "price_collar_bps": 10000
+      },
+      "strategy": {
+        "type": "passive"
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-10-07T16:18:08.194776+00:00",
+  "base_commit": "3378227eafcdb311f6635d5da1f12352adeced0d",
+  "rust_tests": {
+    "test-debug-adaptive-pass": 271,
+    "test-release-adaptive-pass": 271
+  },
+  "python_tests": 15,
+  "new_tests": 18,
+  "hardware": "Apple M5/macOS26.5.2 arm64/Rust1.99.0 LLVM23.1.1",
+  "profile": "all-features release thin LTO/codegenunits1 frozen binaries; final performance tasks sequential after tests/build, no CPU affinity/thermal control; seven alternating component and legacy rounds; new strategy memory seven/durable three",
+  "sources": {
+    "src/conditional.rs": "69695d6c6a332a9ffba4716fd5394063172dcb2353fb77eb6d72a70bb290d834",
+    "src/bracket_strategy.rs": "bc1384de33980b1ee83825ac509e5029d58e1b1be5d0d537f2991140f2ea8c63",
+    "src/paper.rs": "7565f299dee8f1c98b794020d12e1ede4e10a02bc55f32488807812a143f8e0a",
+    "src/store.rs": "b698f0557e8568d71865320d48c09311f90295e32fad445f97d2b045dab0135c",
+    "src/config.rs": "57d7e3d525d40f9ae323f0b748c319c77a43ed7e206e5756d00f06348632a296",
+    "src/strategy.rs": "e0cdf6557269c256318d5fc43582b921d6720bfe9aff79f3d9a768061c216c32",
+    "src/types.rs": "6aecdba77e3f9f0cd3bb95df846a9fb1f4a7e54bcaeb97f1c9c79b45b78689f0",
+    "src/registry.rs": "bb66940d8e0e6143e5480f85f7ef55c5915550116b1f4bd4a5f3211b96ccc301",
+    "src/replay.rs": "a60dc56bb81f816ff329c145870dfa1ad90a7a6cf2abb85dc8c076c20772f600",
+    "src/lib.rs": "4f09bed5b70e88e3f9df2e7cfe5c0dcb06bc31bbf4fc65ba0153283d07fdc4c5",
+    "tests/conditional.rs": "98829e0290fd45c30667e8d26a3b97fb8330802c00b39be9b2afdea18461298d",
+    "tests/bracket_strategy.rs": "1d85687da61a50fa1b0e9d41691a47676ba53200a97e25d8ac8c8d5c3b21e3df",
+    "examples/conditional_bench.rs": "879d1c93bd5861ab0a540f277b17b5a89f1c0ec72d7da8c77c44fa7daa17c840",
+    "scripts/conditional_bench.py": "cb94cb877e35aa3fb1776b7da3b8eded1642614fcf5845a52b3fa5f1da0a6273",
+    "scripts/conditional_crash.py": "f358e5ea9072e0e1682cb192a0f78a7935b1d3f21069ad28e00b4c847fcd7aee",
+    "scripts/target_bench.py": "9f44611e89661ce4d6a22803d1aa6e99ce586ad5916c5ebcd20b4e61489b3de8",
+    "scripts/target_regression.py": "df8347d1be3b46d1db2bd670e4622c145f53d007942db29af5956925f7856150",
+    "Cargo.toml": "ed38c80f8db7c383f4ca4c7340d23ba490eb25bc5634edede871840f28b49908",
+    "Cargo.lock": "b9cbfaae4fd12d5a36aab40ada4de361d2a9c780420f5c9563a2559428038852",
+    "configs/btc-breakout-bracket-v1.json": "618140d094dc94b9955fa0f66531ec359e9e325b5278959c39061f04874b88f8",
+    "configs/breakout-bracket-demo.json": "2d10b3229cfe99e07a665b4cbe198e2d030c004c290218fb9784b749f9cfdb9d",
+    "data/breakout-bracket-demo.jsonl": "2b1c6a4eba4636faff8c4d7e912d9688f50564baefdef3671bb5c554b16a4a2f"
+  },
+  "binaries": {
+    "paper-v14": "fea1a32daf92e722bc21045e164b312d08bc571a745320005ddeb541377ffbe1",
+    "paper-v15": "4d771d6c5a4c31fbe302a00f160d3baa89dfe6cc793592b8db804d7e77cd05e5",
+    "paper-v15-final": "f7886358e81aba3bac579e0561ea7eab1a74f0ba230b49bb13f20954976fd11a",
+    "target-v15": "6daaf6fd0013e1fecd20658ddb09c7df7269495ad8fec9505cffd4505611a062",
+    "target-v15-final": "65cb6359b4e59c8a09b2b63c046fd958a231dc31275f5ceda412f6fb664a9c04",
+    "conditional-v15": "563fb6a3db0c94b5d1796370248e6bd532e6f93e079f6e26be309f4927f877fe",
+    "conditional-v15-final": "8f865c5d9273c56b4bd5303a6080729a9d568549deaf2fbafbd1c19a12174983"
+  },
+  "upstream": {
+    "core_revision": "c6e231caf32b7fc97e6459817fff66458cf7e7c4",
+    "cta_revision": "7a8768de9784dda35a7b261a7ade1dbfbff50919",
+    "engine_sha256": "f4d70334efd0a8c748e9ebd02c8a0273c57ec38a85c54cd86a1d2132e4835d56",
+    "source_url": "https://github.com/vnpy/vnpy_ctastrategy/blob/7a8768de9784dda35a7b261a7ade1dbfbff50919/vnpy_ctastrategy/engine.py",
+    "license": "MIT, full original LICENSE retained; Rust implementation did not copy upstream source",
+    "comparison": "exact reviewed AST check_stop_order sparse-only with Enum/SimpleNamespace; floating Python prices vs integer Rust exact reference100/thresholds90..119; no framework imports, gateway, account, receipt, expiry or OCO"
+  },
+  "failures_retained": [
+    "initial E0502 borrow build fixed by separate quote capture",
+    "initial missing receipt_budget declaration corrected",
+    "Clippy cloned_ref_to_slice_refs test fixtures corrected",
+    "Adaptive missing PartialEq derive corrected; failed logs preserved",
+    "pure index dense 4096 path about 7.94 times scan; Adaptive replaces dense selection",
+    "initial component Python mocks used integer fields; retained but final primary uses floats and pinned source hash",
+    "legacy durable ATR same workload slows 3.56 percent",
+    "GitHub public Actions API returned HTTP403; remote checks not confirmed"
+  ],
+  "scope": "paper features and component/whole-paper bounded engineering evidence; zero network orders this round; no full-platform superiority, mainnet, new24h, nonzero actual fee, actual partial-fill or alpha claim"
+}

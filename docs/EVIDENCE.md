@@ -116,3 +116,8 @@ CSV摘要修复后的新CLI另复跑百万报价：单次耗时22.334s（约44,7
 代码提交18fe54c的 [GitHub Actions](https://github.com/KazeBox33/kaze-quant/actions/runs/37437055462) 已完成，两项job均success，含102项debug/release测试、严格静态/文档检查、备份恢复及存储比较。
 
 相同2000命令负载，Linux托管机逐条文件WAL中位825.090ms、256批量8.673ms；macOS托管机分别1690.205ms、32.301ms。原始三轮CSV见 [Linux](evidence/store-2000-ci-linux.csv)、[macOS](evidence/store-2000-ci-macos.csv)，身份见 [CI记录](evidence/ci-20261006.json)。不同硬件/虚拟化/文件系统同步差异很大，Linux的一些单次样本存在百毫秒级抖动；256模式每轮仅8个事务，不能推导稳定尾延迟。此处证明跨平台同语义运行和可复现实验，不用托管机结果保证未来Linux生产机SLA。
+
+
+## v15条件/CTA工程证据
+
+18新增专项、五阶段已确认SIGKILL、4096同时激活及大回执、同输入扫描/纯索引/自适应与固定上游空触发方法、公开新策略首次基线和原ATR七对回归已归档。包括+3.56%原策略持久耗时退步和初始索引密集退步；[逐功能表](FEATURE_SCORECARD.md)、[证据清单](evidence/v15/manifest.json)、[硬件/源码/二进制/失败身份](evidence/v15/validation.json)。组件结果不等于全平台排名，新策略2笔成交无alpha结论。

@@ -37,3 +37,8 @@ cargo run --locked --release --bin kaze-research -- reports/research-plan.json r
 ## v13 因果K线与ATR纸面策略
 
 标准注册表新增bar-atr v1：只用已确认观测bid OHLC，Wilder ATR整数向上舍入、收盘趋势与距离预算生成持续目标，复用同一TWAP/资源/硬风控状态机。缺桶不补造bar，重置预热并目标归零；EOF不强行收盘。pending bar/指标/父子状态同事务，报告可查看指标解释。操作、边界和手算买卖见[BAR_ATR_STRATEGY](BAR_ATR_STRATEGY.md)，性能/回归见[FEATURE_SCORECARD](FEATURE_SCORECARD.md)。该能力已驱动纸面策略订单，尚无持续策略到测试网、实际止损或独立alpha证明。
+
+
+## breakout-bracket v1与条件回调
+
+新增`Action::SubmitConditional/CancelConditional`、`on_conditional_event`与恢复时`validate_conditionals`默认钩子；自定义策略需要跟踪自己的条件ID与子单映射。标准策略参数/单次阶段/恢复/未保护部分入场范围见[CONDITIONAL_ORDERS](CONDITIONAL_ORDERS.md)。使用PaperRuntime/kaze-run；轻量CSV replay不支持执行条件动作。

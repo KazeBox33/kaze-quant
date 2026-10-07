@@ -12,6 +12,8 @@ pub mod replay;
 pub mod strategy;
 pub mod types;
 
+pub mod bracket_strategy;
+pub mod conditional;
 pub mod config;
 pub mod journal;
 pub mod paper;

@@ -23,6 +23,8 @@ impl StrategyRegistry {
         let mut r = Self::default();
         r.register("bar-atr", 1, crate::bar_strategy::factory)
             .expect("unique standard strategy");
+        r.register("breakout-bracket", 1, crate::bracket_strategy::factory)
+            .expect("unique standard strategy");
         r
     }
     pub fn register(

@@ -18,7 +18,7 @@ pub mod money {
 
 pub const SCHEMA_VERSION: u32 = 1;
 /// 更新会改变重放语义的代码时必须递增；旧日志不可悄悄采用新规则。
-pub const EXECUTION_REVISION: &str = "kaze-paper-v1";
+pub const EXECUTION_REVISION: &str = "kaze-paper-v2-conditional";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
