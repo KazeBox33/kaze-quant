@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "environment": "local-paper-no-network",
+  "binary_sha256": "1785b645caa14b2bba6e3700ca1257c905e0a05789e4a7176aac0360184338f6",
+  "config_file_sha256": "57a8ff78edfe67850367953c1420fe076a3add7567afd4c45385103f180119c4",
+  "input_sha256": "1bd54329a36bea8d3e441e56b4a3fc8d39f21dccdf673fddcc5e76e810c54fc4",
+  "network_posts": 0,
+  "child_quantities": [
+    3,
+    3,
+    4
+  ],
+  "one_lot_fills": 10,
+  "cases": [
+    {
+      "confirmed_prefix": 1,
+      "signal": "SIGKILL",
+      "restarted_recovered": 1,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 21
+    },
+    {
+      "confirmed_prefix": 2,
+      "signal": "SIGKILL",
+      "restarted_recovered": 2,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 21
+    },
+    {
+      "confirmed_prefix": 4,
+      "signal": "SIGKILL",
+      "restarted_recovered": 4,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 21
+    },
+    {
+      "confirmed_prefix": 7,
+      "signal": "SIGKILL",
+      "restarted_recovered": 7,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 21
+    },
+    {
+      "confirmed_prefix": 10,
+      "signal": "SIGKILL",
+      "restarted_recovered": 10,
+      "all_original_command_receipt_chain_rows_equal": true,
+      "final_state_equal": true,
+      "full_audit_commands": 21
+    }
+  ],
+  "expected_state": {
+    "clock_ns": 10500,
+    "closed": true,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "8980",
+        "equity_minor": "9980",
+        "fees_minor": "10",
+        "halted": "finished",
+        "market": 0,
+        "metrics": {
+          "accepted": 3,
+          "cancelled": 0,
+          "fills": 10,
+          "max_drawdown_minor": "20",
+          "orders_examined": 10,
+          "peak_equity_minor": "10000",
+          "quotes": 20,
+          "rejected": 0
+        },
+        "pnl_minor": "-20",
+        "position_units": 10,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "strategy_decision": {
+          "action": "None",
+          "authorized_lots": 10,
+          "exposure_bps": 10000,
+          "order_id": null,
+          "parent_id": 1,
+          "position_lots": 10,
+          "projected_lots": 10,
+          "quote_sequence": 20,
+          "reason": "aligned",
+          "target_lots": 10,
+          "timestamp_ns": 10500
+        },
+        "symbol": "TARGET-DEMO",
+        "units": {
+          "currency": "SIM",
+          "money_scale": 100,
+          "quantity_scale": 1
+        }
+      }
+    ],
+    "processed": 21,
+    "schema_version": 1
+  },
+  "audit_chain_sha256": "affdb76d6b69db36ece836cd8d75d0d10d83de0e0b62d30bd8e2f1e6b8d73653",
+  "scope": "owned child process SIGKILL after committed receipt; submitted/partial/completed child stages; no mid-transaction timing, real venue partial-fill, external TWAP or 24h proof"
+}

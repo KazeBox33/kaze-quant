@@ -1,0 +1,1 @@
+Darwin iad20-fj920-237006ca-9abb-4866-923f-84be45c33545-BEF216B5E8F7.local 25.6.0 Darwin Kernel Version 25.6.0: Fri Jul 31 19:16:43 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_VMAPPLE arm64

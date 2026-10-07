@@ -67,6 +67,8 @@ cargo build --locked --release --bin kaze-run --example target_reference
 python3 scripts/target_bench.py --output reports/target-benchmark
 ```
 
+Linux/macOS [CI 37579229668](https://github.com/KazeBox33/kaze-quant/actions/runs/37579229668) 在精确代码提交 `be19d172539f6d2d9ebb30367d73bae5570a221e` 上全部成功。两平台各五个强杀恢复点已核对原始附件及ZIP哈希：[任务身份](evidence/v09/ci.json)、[Linux回执恢复](evidence/v09/ci-target-linux.json)、[macOS回执恢复](evidence/v09/ci-target-macos.json)。后续证据提交只补文档，没有替换被验证的源代码；托管runner不代表目标生产机或24h连续运行。
+
 ## 借鉴与下一步
 
 参考固定源码：[vn.py TargetPosTemplate](https://github.com/vnpy/vnpy_ctastrategy/blob/7a8768de9784dda35a7b261a7ade1dbfbff50919/vnpy_ctastrategy/template.py)、[vn.py TWAP](https://github.com/vnpy/vnpy_algotrading/blob/bee959dc464749f7cce66e766249ccdbb2d4869a/vnpy_algotrading/algos/twap_algo.py)、[ABU因子组合](https://github.com/bbfamily/abu/blob/d602d847677e4c2b77b0a122df30816ea68b5710/abupy/FactorBuyBu/ABuFactorBuyBase.py)。实现独立编写，没有复制上游源码。我们本阶段的特点是整数累计释放、冻结账本与计划同事务、逐决策解释及强杀恢复证据；没有运行上游同条件TWAP对照，不能据此宣称胜过它们。

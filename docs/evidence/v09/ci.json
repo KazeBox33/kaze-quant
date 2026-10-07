@@ -1,0 +1,366 @@
+{
+  "schema_version": 1,
+  "run_id": 37579229668,
+  "url": "https://github.com/KazeBox33/kaze-quant/actions/runs/37579229668",
+  "head_sha": "be19d172539f6d2d9ebb30367d73bae5570a221e",
+  "status": "completed",
+  "conclusion": "success",
+  "checked_at": "2026-10-07 06:15:32 UTC",
+  "jobs": [
+    {
+      "id": 112654866302,
+      "name": "check (ubuntu-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-07T06:01:03Z",
+          "completed_at": "2026-10-07T06:01:04Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-07T06:01:04Z",
+          "completed_at": "2026-10-07T06:01:05Z"
+        },
+        {
+          "name": "Run rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-07T06:01:05Z",
+          "completed_at": "2026-10-07T06:01:13Z"
+        },
+        {
+          "name": "Run cargo fmt --check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-07T06:01:13Z",
+          "completed_at": "2026-10-07T06:01:13Z"
+        },
+        {
+          "name": "Run cargo clippy --locked --all-features --all-targets -- -D warnings",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-07T06:01:13Z",
+          "completed_at": "2026-10-07T06:01:36Z"
+        },
+        {
+          "name": "Run cargo test --locked --all-features --all-targets",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-07T06:01:36Z",
+          "completed_at": "2026-10-07T06:03:59Z"
+        },
+        {
+          "name": "Run cargo test --locked --all-features --release",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-07T06:03:59Z",
+          "completed_at": "2026-10-07T06:08:54Z"
+        },
+        {
+          "name": "Run cargo doc --locked --all-features --no-deps",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-07T06:08:54Z",
+          "completed_at": "2026-10-07T06:08:56Z"
+        },
+        {
+          "name": "Run python3 scripts/test_market_data.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-07T06:08:56Z",
+          "completed_at": "2026-10-07T06:08:56Z"
+        },
+        {
+          "name": "Run python3 scripts/test_research_data.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-07T06:08:56Z",
+          "completed_at": "2026-10-07T06:08:57Z"
+        },
+        {
+          "name": "Run python3 scripts/test_research_holdout.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-07T06:08:57Z",
+          "completed_at": "2026-10-07T06:08:57Z"
+        },
+        {
+          "name": "Run python3 scripts/test_event_time_data.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-07T06:08:57Z",
+          "completed_at": "2026-10-07T06:08:57Z"
+        },
+        {
+          "name": "Run python3 scripts/test_testnet_acceptance.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-07T06:08:57Z",
+          "completed_at": "2026-10-07T06:08:57Z"
+        },
+        {
+          "name": "Replay and recover paper session",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-07T06:08:57Z",
+          "completed_at": "2026-10-07T06:09:31Z"
+        },
+        {
+          "name": "Transactional replay and backup",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-07T06:09:31Z",
+          "completed_at": "2026-10-07T06:09:38Z"
+        },
+        {
+          "name": "Reproducible storage comparison",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-07T06:09:38Z",
+          "completed_at": "2026-10-07T06:09:56Z"
+        },
+        {
+          "name": "Durable target position and paper TWAP crash recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-07T06:09:56Z",
+          "completed_at": "2026-10-07T06:10:01Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-10-07T06:10:01Z",
+          "completed_at": "2026-10-07T06:10:02Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 36,
+          "started_at": "2026-10-07T06:10:02Z",
+          "completed_at": "2026-10-07T06:10:02Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-10-07T06:10:02Z",
+          "completed_at": "2026-10-07T06:10:02Z"
+        }
+      ]
+    },
+    {
+      "id": 112654866646,
+      "name": "check (macos-latest)",
+      "status": "completed",
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-07T06:01:10Z",
+          "completed_at": "2026-10-07T06:01:11Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-07T06:01:11Z",
+          "completed_at": "2026-10-07T06:01:14Z"
+        },
+        {
+          "name": "Run rustup toolchain install 1.99.0 --profile minimal --component rustfmt --component clippy",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-07T06:01:14Z",
+          "completed_at": "2026-10-07T06:01:22Z"
+        },
+        {
+          "name": "Run cargo fmt --check",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-07T06:01:22Z",
+          "completed_at": "2026-10-07T06:01:22Z"
+        },
+        {
+          "name": "Run cargo clippy --locked --all-features --all-targets -- -D warnings",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-07T06:01:22Z",
+          "completed_at": "2026-10-07T06:01:55Z"
+        },
+        {
+          "name": "Run cargo test --locked --all-features --all-targets",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-07T06:01:55Z",
+          "completed_at": "2026-10-07T06:03:11Z"
+        },
+        {
+          "name": "Run cargo test --locked --all-features --release",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-07T06:03:11Z",
+          "completed_at": "2026-10-07T06:09:18Z"
+        },
+        {
+          "name": "Run cargo doc --locked --all-features --no-deps",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8,
+          "started_at": "2026-10-07T06:09:18Z",
+          "completed_at": "2026-10-07T06:09:24Z"
+        },
+        {
+          "name": "Run python3 scripts/test_market_data.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9,
+          "started_at": "2026-10-07T06:09:24Z",
+          "completed_at": "2026-10-07T06:09:25Z"
+        },
+        {
+          "name": "Run python3 scripts/test_research_data.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10,
+          "started_at": "2026-10-07T06:09:25Z",
+          "completed_at": "2026-10-07T06:09:27Z"
+        },
+        {
+          "name": "Run python3 scripts/test_research_holdout.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11,
+          "started_at": "2026-10-07T06:09:27Z",
+          "completed_at": "2026-10-07T06:09:27Z"
+        },
+        {
+          "name": "Run python3 scripts/test_event_time_data.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-10-07T06:09:27Z",
+          "completed_at": "2026-10-07T06:09:28Z"
+        },
+        {
+          "name": "Run python3 scripts/test_testnet_acceptance.py",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-10-07T06:09:28Z",
+          "completed_at": "2026-10-07T06:09:28Z"
+        },
+        {
+          "name": "Replay and recover paper session",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-07T06:09:28Z",
+          "completed_at": "2026-10-07T06:10:16Z"
+        },
+        {
+          "name": "Transactional replay and backup",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-07T06:10:16Z",
+          "completed_at": "2026-10-07T06:10:24Z"
+        },
+        {
+          "name": "Reproducible storage comparison",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16,
+          "started_at": "2026-10-07T06:10:24Z",
+          "completed_at": "2026-10-07T06:10:49Z"
+        },
+        {
+          "name": "Durable target position and paper TWAP crash recovery",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17,
+          "started_at": "2026-10-07T06:10:49Z",
+          "completed_at": "2026-10-07T06:10:56Z"
+        },
+        {
+          "name": "Run actions/upload-artifact@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 18,
+          "started_at": "2026-10-07T06:10:56Z",
+          "completed_at": "2026-10-07T06:10:57Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 36,
+          "started_at": "2026-10-07T06:10:57Z",
+          "completed_at": "2026-10-07T06:10:57Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 37,
+          "started_at": "2026-10-07T06:10:57Z",
+          "completed_at": "2026-10-07T06:10:59Z"
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 11464491264,
+      "name": "storage-evidence-ubuntu-latest",
+      "digest": "sha256:9ef57f92025e1821b6e83efa026f222ad591037815a60c4a4ccb04fe0aac4f57",
+      "verified_download_sha256": true,
+      "verified_crash_cases": 5,
+      "head_sha": "be19d172539f6d2d9ebb30367d73bae5570a221e"
+    },
+    {
+      "id": 11464301726,
+      "name": "storage-evidence-macos-latest",
+      "digest": "sha256:8ac8386ba1ef5b6495cc49e0fc2be862affed33488637da5e137ce3256dbdfda",
+      "verified_download_sha256": true,
+      "verified_crash_cases": 5,
+      "head_sha": "be19d172539f6d2d9ebb30367d73bae5570a221e"
+    }
+  ],
+  "scope": "exact v09 source CI; Ubuntu/macOS all steps plus archived five-stage paper SIGKILL results verified; hosted runner proof, not target production hardware, external execution or 24h"
+}

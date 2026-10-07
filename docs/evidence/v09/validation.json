@@ -17,5 +17,13 @@
   "paper_crash_cases": 5,
   "network_posts": 0,
   "scope": "new paper execution capability; current upstream same-workload TWAP benchmark, automatic external strategy route, new 24h and alpha gates not passed",
-  "public_text_format": "logs/CSV published with LF and one final newline; measured values unchanged; original local reports retained"
+  "public_text_format": "logs/CSV published with LF and one final newline; measured values unchanged; original local reports retained",
+  "ci": {
+    "run": 37579229668,
+    "source_sha": "be19d172539f6d2d9ebb30367d73bae5570a221e",
+    "linux": "success",
+    "macos": "success",
+    "archive_sha256_verified": true,
+    "crash_cases_each": 5
+  }
 }
