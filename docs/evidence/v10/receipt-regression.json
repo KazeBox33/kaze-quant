@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "v09_summary_sha256": "9e56405bb6f7fecc6d1329e2081e87ec1972541157435090b5b1a8efb45b34b0",
+  "v10_summary_sha256": "8ef17e9f392ac06d94996c82cb8d9d432d4d78bf465e55957d1ab8f132862f0f",
+  "million_input_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+  "config_file_sha256": "42ecb39a5a578cd8e9f2162ad587c59e24caf78ff0519d27a063b591a5764557",
+  "memory_raw_receipts_and_state_equal_all_rounds": true,
+  "memory_receipt_sha256": "be2db8eac3e7ba4498fb59ec580be476f6ada5c38036c274a102e048e758b574",
+  "scope": "same-input own-version regression; not independent model/alpha or upstream comparison"
+}

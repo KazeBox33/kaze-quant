@@ -10,7 +10,7 @@
 
 同一计划最多一个未终结子单。限时或暂停后先持久化 cancel_unknown，再调用一次 DELETE；未知撤单后仍只查询，活跃订单回报不会抹去 cancel_unknown。终态订单和迟到成交经原币账本核对后，下一 tick 才能计算替代数量。`plan-pause` 只持久化暂停策略；需要后续 `plan-tick` 且核对成功才能请求撤单，网络不可用时不能保证立即撤掉交易所挂单。`plan-resume` 显式重新核对，保留原时钟和身份，未知提交/撤单阻断恢复。
 
-受管理账本在初始化同事务升级为 `binance-testnet-execution-v2-plan`，旧 v1 二进制拒绝打开，手工 prepare 不能插入父计划外的订单。旧手工账本仍使用 v1，不静默升级经济语义。父配置不可变；SHA-256 检查点用于检测损坏，不是对恶意数据库编辑的认证。
+受管理账本在初始化同事务升级为 `binance-testnet-execution-v2-plan`，旧 v1 二进制拒绝打开，手工 prepare 不能插入父计划外的订单。[保存的旧编译二进制实测](evidence/v10/legacy-binary-guard.json)在复制的 mock 账本上因 revision mismatch 拒绝打开，未访问交易所。旧手工账本仍使用 v1，不静默升级经济语义。父配置不可变；SHA-256 检查点用于检测损坏，不是对恶意数据库编辑的认证。
 
 ## 整数数量与费用
 
@@ -57,3 +57,6 @@ python3 scripts/plan_acceptance.py --binary target/release/kaze-testnet \
 本轮参考 [Binance REST 官方未知执行语义](https://github.com/binance/binance-spot-api-docs/blob/master/rest-api.md) 与 [NautilusTrader 启动核对/持久化文档](https://nautilustrader.io/docs/latest/concepts/live/)（访问 2026-10-07，在线文档可能变化），自行实现，没有复制上游源码。我们的可验收特点是固定边界的原币核对、父子同事务及提交前耐久屏障，并保留强杀后查询而不重发的证据。Nautilus 文档描述的原生 cache/event-store 持久化不作为执行发送的耐久屏障；这只是具体配置语义差异，不说明它无法自定义此屏障，也不支持整体质量/速度更优的结论。
 
 下一阶段先恢复测试网连接、通过真实三片闭环，再让持久策略目标适配原币净仓位与挂单资源；之后才扩展多计划/组合估值、仿真校准与同条件上游完整负载对照。生产目标仍按逐项门槛验收。
+
+
+本轮代码 `c4af51e85d55f7129007dedb300ee2fe5db8611c` 的 [CI37587473980](https://github.com/KazeBox33/kaze-quant/actions/runs/37587473980) 已在 Ubuntu/macOS 全部成功：[完整步骤与提交身份](evidence/v10/ci.json)、[两个 ZIP 摘要与原始恢复结果](evidence/v10/ci-artifacts.json)。两端提交前强杀均保持一条 unknown 与父子链接、新进程零 POST；1004 tick mock 均三子单完成、账本无问题，已有纸面五个强杀恢复点也通过。托管 runner 证据不等于目标生产 Linux 机器、真实交易所或全天门槛。该补充提交只更新文档/证据，执行源代码保持上述已验证提交。
