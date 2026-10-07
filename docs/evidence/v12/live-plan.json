@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "environment": "binance-spot-testnet-virtual",
+  "binary_sha256": "15388b83288bfabf403b5099bc6214b7eb4a92ab8fa615b03188d571ed697ffe",
+  "config": {
+    "version": 1,
+    "plan_id": "kaze-twap-a602d237a63b",
+    "symbol": "BTCUSDT",
+    "side": "Buy",
+    "limit_price": "83027.93000000",
+    "total_quantity": "0.00054000",
+    "quantity_step": "0.00001000",
+    "min_child_quantity": "0.00018000",
+    "max_child_quantity": "0.00018000",
+    "slices": 3,
+    "interval_ms": 10000,
+    "max_working_ms": 30000,
+    "max_reconciliation_ms": 60000,
+    "max_children": 3
+  },
+  "steps": [
+    {
+      "action": "ledger-init",
+      "exit_code": 0,
+      "elapsed_ns": 7304568583
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "elapsed_ns": 1605440667
+    },
+    {
+      "action": "plan-init",
+      "exit_code": 0,
+      "elapsed_ns": 25706000
+    },
+    {
+      "action": "plan-tick-drop-ack",
+      "exit_code": 0,
+      "elapsed_ns": 3978195417
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "elapsed_ns": 2885001792
+    },
+    {
+      "action": "plan-tick",
+      "exit_code": 0,
+      "elapsed_ns": 3620068042
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "elapsed_ns": 2816533875
+    },
+    {
+      "action": "plan-tick",
+      "exit_code": 0,
+      "elapsed_ns": 3604534125
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "elapsed_ns": 2764474792
+    },
+    {
+      "action": "plan-tick",
+      "exit_code": 0,
+      "elapsed_ns": 2819049542
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "elapsed_ns": 2771158667
+    },
+    {
+      "action": "audit",
+      "exit_code": 0,
+      "elapsed_ns": 23905667
+    }
+  ],
+  "parent_plans": 1,
+  "submit_calls": 3,
+  "child_orders": 3,
+  "unique_trades": 3,
+  "first_ack_suppressed": true,
+  "first_child_recovered_in_new_process": true,
+  "repeated_completed_plan_posts": 0,
+  "completed_status": {
+    "authorized_quantity": "0.00054000",
+    "children": 3,
+    "config": {
+      "interval_ms": 10000,
+      "limit_price": "83027.93000000",
+      "max_child_quantity": "0.00018000",
+      "max_children": 3,
+      "max_reconciliation_ms": 60000,
+      "max_working_ms": 30000,
+      "min_child_quantity": "0.00018000",
+      "plan_id": "kaze-twap-a602d237a63b",
+      "quantity_step": "0.00001000",
+      "side": "Buy",
+      "slices": 3,
+      "symbol": "BTCUSDT",
+      "total_quantity": "0.00054000",
+      "version": 1
+    },
+    "current_child": null,
+    "executed_gross_quantity": "0.00054000",
+    "last_ms": 1791381022277,
+    "paused": false,
+    "pending_quantity": "0.00000000",
+    "phase": "completed",
+    "reason": "completed",
+    "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+    "start_ms": 1791380995835,
+    "ticks": 4
+  },
+  "fresh_open_requires_reconciliation": true,
+  "original_asset_deltas_match": true,
+  "economic_deltas": {
+    "": "0.00000000",
+    "BTC": "0.00054000",
+    "USDT": "-44.78798700"
+  },
+  "original_currency_fees": [
+    {
+      "asset": "",
+      "amount": "0.00000000"
+    },
+    {
+      "asset": "",
+      "amount": "0.00000000"
+    },
+    {
+      "asset": "",
+      "amount": "0.00000000"
+    }
+  ],
+  "scope": "one bounded fixed-limit three-child gross quantity TWAP; virtual testnet; application ACK suppression, no physical packet fault/actual partial-fill/continuous target signal/mainnet/alpha/24h proof"
+}

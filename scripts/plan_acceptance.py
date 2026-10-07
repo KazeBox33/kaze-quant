@@ -7,10 +7,10 @@ import subprocess
 import time
 import uuid
 from market_data import sha_file
-from testnet_acceptance import rules, make_intent, decimal, units, check_balances
+from testnet_acceptance import rules, make_intent, decimal, units, check_balances, balance_totals, SCALE
 
 
-def run(binary, output, symbol):
+def run(binary, output, symbol, net_target=False):
     output.mkdir(parents=True, exist_ok=False)
     db = output / 'execution.db'
     steps = []
@@ -39,17 +39,32 @@ def run(binary, output, symbol):
                limit_price=i['price'], total_quantity=decimal(child * 3), quantity_step=decimal(r['step']),
                min_child_quantity=decimal(child), max_child_quantity=decimal(child), slices=3,
                interval_ms=10000, max_working_ms=30000, max_reconciliation_ms=60000, max_children=3)
-    path = output / 'plan.json'
+    if net_target:
+        # 在产生任何订单之前固定整计划1%两币费用预留；实际费用超出则失败，绝不放宽重试。
+        reserve = (child * 3 + 99) // 100
+        quote_reserve = (price * child * 3 + 100 * SCALE - 1) // (100 * SCALE)
+        initial_net = balance_totals(before['account']).get(r['base'], 0)
+        cfg = dict(version=1, plan_id=cfg['plan_id'], symbol=symbol, limit_price=cfg['limit_price'],
+                   target_quantity=decimal(initial_net + child * 3), tolerance_quantity=decimal(reserve),
+                   base_fee_reserve=decimal(reserve), quote_fee_reserve=decimal(quote_reserve),
+                   max_gross_quantity=cfg['total_quantity'],
+                   **{k: cfg[k] for k in ('quantity_step', 'min_child_quantity', 'max_child_quantity', 'slices',
+                                         'interval_ms', 'max_working_ms', 'max_reconciliation_ms', 'max_children')})
+    path = output / ('target.json' if net_target else 'plan.json')
     path.write_text(json.dumps(cfg, indent=2) + '\n')
-    call('plan-init', path)
-    first = call('plan-tick-drop-ack')
+    tick = 'target-tick' if net_target else 'plan-tick'
+    initialized = call('target-init' if net_target else 'plan-init', path)
+    if net_target and (initialized['pilot_transport']['submit_calls'] or initialized['orders'] or
+                       initialized['net_target']['phase'] != 'ready'):
+        raise ValueError('net initialization sent orders or lost mandate')
+    first = call(tick + '-drop-ack')
     if first['pilot_transport']['submit_calls'] != 1 or first['execution_plan']['phase'] != 'submit_unknown':
         raise ValueError('first child not left durably unknown')
     # 独立新进程按历史查询恢复原子单，不用 plan-init 或任何新client ID绕开未知状态。
     recovered = call('reconcile')
     if units(recovered['execution_plan']['executed_gross_quantity']) != child:
         call('plan-pause')
-        call('plan-tick')
+        call(tick)
         raise ValueError('first small virtual child did not fully fill; original plan paused')
     tick_posts = 1
     for index in (2, 3):
@@ -57,7 +72,7 @@ def run(binary, output, symbol):
         remaining = target / 1000 - time.time()
         if remaining > 0:
             time.sleep(min(remaining + 0.05, 11))
-        result = call('plan-tick')
+        result = call(tick)
         posts = result['pilot_transport']['submit_calls']
         tick_posts += posts
         if posts != 1:
@@ -66,9 +81,9 @@ def run(binary, output, symbol):
         recovered = call('reconcile')
         if units(recovered['execution_plan']['executed_gross_quantity']) != child * index:
             call('plan-pause')
-            call('plan-tick')
+            call(tick)
             raise ValueError('child did not fully fill; plan paused, no new child')
-    repeated = call('plan-tick')
+    repeated = call(tick)
     after = call('reconcile')
     fresh = call('audit')
     if repeated['pilot_transport']['submit_calls'] or fresh['execution_plan']['phase'] != 'needs_reconciliation':
@@ -78,6 +93,14 @@ def run(binary, output, symbol):
         raise ValueError('parent completion/original asset audit failed')
     if fresh['orders'] != after['orders'] or fresh['trades'] != after['trades']:
         raise ValueError('fresh evidence differs')
+    if net_target:
+        actual_net = balance_totals(after['account']).get(r['base'], 0)
+        residual = abs(units(cfg['target_quantity']) - actual_net)
+        if (after['net_target']['phase'] != 'satisfied' or not after['net_target']['confirmed_satisfied'] or
+                units(after['net_target']['current_net_quantity']) != actual_net or
+                units(after['net_target']['residual_quantity']) != residual or
+                residual > units(cfg['tolerance_quantity']) or fresh['net_target']['confirmed_satisfied']):
+            raise ValueError('net target/economic feedback or fresh-open status differs')
     summary = dict(schema_version=1, success=True, environment='binance-spot-testnet-virtual',
                    binary_sha256=sha_file(binary), config=cfg, steps=steps, parent_plans=1, submit_calls=tick_posts,
                    child_orders=len(fresh['orders']), unique_trades=len(fresh['trades']),
@@ -85,7 +108,8 @@ def run(binary, output, symbol):
                    completed_status=after['execution_plan'], fresh_open_requires_reconciliation=True,
                    original_asset_deltas_match=True, economic_deltas=balance['economic_deltas'],
                    original_currency_fees=[dict(asset=t['commissionAsset'], amount=t['commission']) for t in fresh['trades']],
-                   scope='one bounded fixed-limit three-child gross quantity TWAP; virtual testnet; application ACK suppression, no physical packet fault/actual partial-fill/continuous target signal/mainnet/alpha/24h proof')
+                   net_target=after.get('net_target'),
+                   scope=('one immutable net target and three-child parent' if net_target else 'one bounded fixed-limit three-child gross quantity TWAP') + '; virtual testnet; application ACK suppression, no physical packet fault/actual partial-fill/continuous target signal/mainnet/alpha/24h proof')
     (output / 'public-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
     print(json.dumps(dict(success=True, child_orders=len(fresh['orders']), submit_calls=tick_posts, all_asset_deltas_match=True)))
 
@@ -95,5 +119,6 @@ if __name__ == '__main__':
     p.add_argument('--binary', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--symbol', default='BTCUSDT')
+    p.add_argument('--net-target', action='store_true', help='immutable net mandate with predeclared whole-parent fee reserves')
     a = p.parse_args()
-    run(a.binary.resolve(), a.output, a.symbol)
+    run(a.binary.resolve(), a.output, a.symbol, a.net_target)

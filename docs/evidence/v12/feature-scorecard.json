@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "version": "v12",
+  "functional": [
+    {
+      "feature": "immutable net mandate + atomic parent",
+      "before": "v11 read-only preview; caller managed gross plan",
+      "after": "one transaction, no initialization POST, restart retains immutable goal and fee reserves",
+      "tests": 14,
+      "proof": "debug.log; before-post.json; old-binary-guard.json"
+    },
+    {
+      "feature": "original currency fee guard",
+      "before": "parent gross progress only",
+      "after": "budget breach pauses future children; unsupported positive fee currency blocks; free vs net checked",
+      "mock_budget_posts": 1,
+      "mock_normal_posts": 3,
+      "scope": "cannot undo already incurred fees; actual nonzero-fee test pending"
+    },
+    {
+      "feature": "distinct net residual completion",
+      "before": "no enforced net completion",
+      "after": "normal mock net .0999 satisfied; tolerance zero residual .0001 completed_with_residual; no automatic repair",
+      "proof": "target-demo.json; residual-demo.json"
+    },
+    {
+      "feature": "real exchange closed loop",
+      "before": "v10/v11 three-child acceptance preflight failed502, zero POST",
+      "after": "gross and net pilots each3 POST/3 fills, droppedACK fresh recovery, original-asset deltas match, completed repeat0 POST",
+      "fees": "all six zero, nonzero-fee gate pending",
+      "proof": "live-plan.json; live-net-zero.json"
+    }
+  ],
+  "performance": {
+    "policy": {
+      "comparison": "same v12 binary, guarded target vs gross with identical canonical decimal config and execution evidence",
+      "median_ns": {
+        "gross": 12925947250,
+        "target": 13386522708
+      },
+      "time_change_pct": 3.5631853441147276,
+      "scope": "same binary, 1004 full fixture REST + SQLite WAL/FULL ticks including process reopen, original base fee and three children; net policy cost not prior-version speedup or upstream/network/alpha proof"
+    },
+    "legacy_plan": {
+      "comparison": "alternating own frozen v11/v12, complete evidence equal",
+      "median_ns": {
+        "old": 12705128166,
+        "new": 12809155417
+      },
+      "time_change_pct": 0.8187815946507859,
+      "scope": "1004 full REST fixture+SQLite WAL/FULL plan ticks, three mock children, suppressed ACK then reopen; own versions, no real network/HFT/upstream/24h proof"
+    },
+    "paper_pairs": {
+      "comparison": "alternating own frozen v11/v12, original receipts/state and fresh independent audit equal",
+      "median_ns": {
+        "old": 2219025667,
+        "new": 2202032458
+      },
+      "time_change_pct": -0.7657959640896772,
+      "scope": "paper engine hot path unchanged this increment; measured change not an optimization causal claim"
+    },
+    "paper_current_baseline": {
+      "memory_median_ns": 926274417,
+      "memory_quotes_per_second": 1079593.6729406617,
+      "durable_median_ns": 2235071166,
+      "durable_quotes_per_second": 44741.30467128043,
+      "scope": "million CSV+shared-core+serialized decision receipt hash; 100k SQLite WAL/FULL+bounded 256 batch+checkpoint; sampled RSS, same-kernel reference not independent economic oracle; futures quotes in spot-style paper model; no alpha/upstream/full-platform superiority/24h claim"
+    },
+    "initialization": {
+      "comparison": "same binary, fresh already-bound journal, complete fixture reconcile + policy/parent transaction; excludes open/bind",
+      "median_ns": {
+        "gross": 13019375,
+        "target": 13365917
+      },
+      "time_change_pct": 2.6617406749555927
+    }
+  },
+  "failures": [
+    "strict policy fixture comparison rejected noncanonical decimal strings; preserved failed pair, fixed workload strings and reran",
+    "real pilots currently zero commission; no real nonzero fee guard acceptance",
+    "unpublished source; no v12 remote CI"
+  ],
+  "outstanding": [
+    "real nonzero fee feedback",
+    "real PARTIALLY_FILLED",
+    "new-version 24h",
+    "independent alpha",
+    "continuous target strategy service",
+    "Linux target hardware",
+    "upstream full-platform same-contract comparison"
+  ]
+}

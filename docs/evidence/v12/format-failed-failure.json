@@ -1,0 +1,10 @@
+{
+  "success": false,
+  "failure": "strict evidence comparison rejected decimal representation differences, 0.10 vs 0.10000000 and 0.04 vs 0.04000000",
+  "remediation": "gross fixture now uses compiler canonical decimal strings before comparison; rerun uses final frozen binary",
+  "original_binary_sha256": "f6ee98d95e65e88cf176048ceec37ccb190a192c220b62c404af06aa8cb0aa9c",
+  "rounds_preserved": [
+    "0-gross.json",
+    "0-target.json"
+  ]
+}

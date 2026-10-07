@@ -1,0 +1,11 @@
+{
+  "checked_at_utc": "2026-10-07T13:48:34.739363+00:00",
+  "url": "https://testnet.binance.vision/api/v3/time",
+  "curl_exit": 0,
+  "http_status": "200",
+  "response": "{\"serverTime\":1791380914813}",
+  "stderr": "",
+  "signed_requests": 0,
+  "post_calls": 0,
+  "scope": "public time preflight only; local route result, not a global exchange diagnosis"
+}

@@ -1,0 +1,541 @@
+{
+  "audit": {
+    "account": {
+      "balances": [
+        {
+          "asset": "BTC",
+          "free": "0.02997000",
+          "locked": "0"
+        },
+        {
+          "asset": "USDT",
+          "free": "199997.00000000",
+          "locked": "0"
+        }
+      ],
+      "canTrade": true,
+      "updateTime": 2
+    },
+    "environment": "binance-spot-testnet",
+    "execution_plan": {
+      "authorized_quantity": "0.10000000",
+      "children": 1,
+      "config": {
+        "interval_ms": 100,
+        "limit_price": "100",
+        "max_child_quantity": "0.04000000",
+        "max_children": 32,
+        "max_reconciliation_ms": 60000,
+        "max_working_ms": 10,
+        "min_child_quantity": "0.01",
+        "plan_id": "kaze-plan-test",
+        "quantity_step": "0.01",
+        "side": "Buy",
+        "slices": 3,
+        "symbol": "BTCUSDT",
+        "total_quantity": "0.10000000",
+        "version": 1
+      },
+      "current_child": null,
+      "executed_gross_quantity": "0.03000000",
+      "last_ms": 2200,
+      "paused": true,
+      "pending_quantity": "0.00000000",
+      "phase": "paused",
+      "reason": "paused",
+      "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+      "start_ms": 1000,
+      "ticks": 1004
+    },
+    "external_ledger": {
+      "expected_total_assets": {
+        "BTC": "0.02997000",
+        "USDT": "199997.00000000"
+      },
+      "external_activity_blocked": false,
+      "health": "ready",
+      "history_recovery": {
+        "confirmed_rounds": 1005,
+        "cursors": [
+          {
+            "confirmed": {
+              "order_id": 1,
+              "symbol": "BTCUSDT",
+              "trade_id": 1
+            },
+            "seed": {
+              "order_id": null,
+              "symbol": "BTCUSDT",
+              "trade_id": null
+            }
+          }
+        ],
+        "last_round": {
+          "account_requests": 2,
+          "history_head_requests": 2,
+          "new_trades": 0,
+          "open_order_requests": 1,
+          "order_pages": 1,
+          "order_records": 1,
+          "pending_order_queries": 0,
+          "trade_pages": 1,
+          "trade_records": 1
+        },
+        "schema_version": 1,
+        "scope": "registered symbols only, durable REST cursors; server history retention/coverage and dedicated-account baseline required; no global private-stream sequence"
+      },
+      "identity": {
+        "account_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "venue": "binance-spot-testnet"
+      },
+      "movement_replay_equal": true,
+      "private_execution_events": 0,
+      "private_stream": {
+        "epochs": [],
+        "scope": "local connection generations; no exchange-wide event sequence"
+      },
+      "reason": "REST orders/trades/assets reconciled",
+      "scope": "original asset totals, fixed baseline; no FX valuation, deposit adoption, strategy PnL or proof of absence of external activity"
+    },
+    "net_target": {
+      "base_fee_remaining": "0.00000000",
+      "confirmed_satisfied": false,
+      "current_net_quantity": "0.02997000",
+      "execution_phase": "paused",
+      "fees_by_original_asset": {
+        "BTC": "0.00003000"
+      },
+      "initial_preview": {
+        "account_identity": {
+          "account_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "venue": "binance-spot-testnet"
+        },
+        "account_snapshot_sha256": "cadfd327975fdee354e54e14b445b2353c3764158ccada1e9514a6f9bd85474a",
+        "account_update_time": 1,
+        "base_asset": "BTC",
+        "base_required": "0.00000000",
+        "decision": "planned",
+        "free_base": "0.00000000",
+        "free_quote": "200000.00000000",
+        "gross_quantity": "0.10000000",
+        "history_cursors": [
+          {
+            "confirmed": {
+              "order_id": null,
+              "symbol": "BTCUSDT",
+              "trade_id": null
+            },
+            "seed": {
+              "order_id": null,
+              "symbol": "BTCUSDT",
+              "trade_id": null
+            }
+          }
+        ],
+        "net_quantity": "0.00000000",
+        "plan": {
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04000000",
+          "max_children": 32,
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "side": "Buy",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "total_quantity": "0.10000000",
+          "version": 1
+        },
+        "projected_net_high": "0.10000000",
+        "projected_net_low": "0.09999000",
+        "quote_asset": "USDT",
+        "quote_required": "10.01000000",
+        "request": {
+          "base_fee_reserve": "0.00001",
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04",
+          "max_children": 32,
+          "max_gross_quantity": "0.10",
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "quote_fee_reserve": "0.01",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "target_quantity": "0.10",
+          "tolerance_quantity": "0.0001",
+          "version": 1
+        },
+        "request_sha256": "c4211bcaf98ad8edfdbdae0569f6ad3302acc1da8cb8323c97bc4a0e7fa44fa9",
+        "schema_version": 1,
+        "scope": "read-only net target compiler for one fresh isolated Spot account; fee reserves are caller assumptions, projection assumes full fills within reserves; snapshot is not send authorization; no automatic signal routing/net-target enforcement/mainnet/alpha",
+        "side": "Buy",
+        "submit_calls": 0,
+        "within_tolerance_if_reserves_hold": true,
+        "worst_residual": "0.00001000"
+      },
+      "observed_within_tolerance": false,
+      "phase": "budget_or_bound_violation",
+      "quote_fee_remaining": "0.01000000",
+      "request": {
+        "base_fee_reserve": "0.00001",
+        "interval_ms": 100,
+        "limit_price": "100",
+        "max_child_quantity": "0.04",
+        "max_children": 32,
+        "max_gross_quantity": "0.10",
+        "max_reconciliation_ms": 60000,
+        "max_working_ms": 10,
+        "min_child_quantity": "0.01",
+        "plan_id": "kaze-plan-test",
+        "quantity_step": "0.01",
+        "quote_fee_reserve": "0.01",
+        "slices": 3,
+        "symbol": "BTCUSDT",
+        "target_quantity": "0.10",
+        "tolerance_quantity": "0.0001",
+        "version": 1
+      },
+      "residual_quantity": "0.07003000",
+      "schema_version": 1,
+      "scope": "one immutable bounded net target linked to one fixed-limit parent; new children guarded by reconciled net/free resources and cumulative fee reserves; detected violation pauses future work, not rollback of actual fills; no continuous strategy update/automatic residual repair/shared portfolio/mainnet/alpha",
+      "violation": "net target fee reserve exceeded"
+    },
+    "orders": [
+      {
+        "intent": {
+          "client_order_id": "kaze-plan-test-0001",
+          "price": "100",
+          "quantity": "0.03000000",
+          "side": "Buy",
+          "symbol": "BTCUSDT"
+        },
+        "observation": {
+          "clientOrderId": "kaze-plan-test-0001",
+          "cummulativeQuoteQty": "3.00000000",
+          "executedQty": "0.03000000",
+          "orderId": 1,
+          "origQty": "0.03000000",
+          "price": "100",
+          "side": "BUY",
+          "status": "FILLED",
+          "symbol": "BTCUSDT",
+          "updateTime": 2
+        },
+        "phase": "terminal"
+      }
+    ],
+    "problems": [],
+    "schema_version": 1,
+    "scope": "observed exchange balances and per-order trade reconciliation; no FX portfolio PnL or authenticated journal signatures",
+    "trades": [
+      {
+        "commission": "0.00003000",
+        "commissionAsset": "BTC",
+        "id": 1,
+        "isBuyer": true,
+        "orderId": 1,
+        "price": "100.00000000",
+        "qty": "0.03000000",
+        "quoteQty": "3.00000000",
+        "symbol": "BTCUSDT"
+      }
+    ]
+  },
+  "elapsed_ns": 17091447916,
+  "first_steps": [
+    {
+      "cancel_attempted": false,
+      "operation": "submit_unresolved: venue outcome: Unknown; query/reconcile before any new submission",
+      "post_calls": 1,
+      "status": {
+        "authorized_quantity": "0.03000000",
+        "children": 1,
+        "config": {
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04000000",
+          "max_children": 32,
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "side": "Buy",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "total_quantity": "0.10000000",
+          "version": 1
+        },
+        "current_child": "kaze-plan-test-0001",
+        "executed_gross_quantity": "0.00000000",
+        "last_ms": 1000,
+        "paused": false,
+        "pending_quantity": "0.03000000",
+        "phase": "submit_unknown",
+        "reason": "child intent committed before one POST",
+        "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+        "start_ms": 1000,
+        "ticks": 1
+      }
+    },
+    {
+      "cancel_attempted": false,
+      "operation": "paused",
+      "post_calls": 0,
+      "status": {
+        "authorized_quantity": "0.03000000",
+        "children": 1,
+        "config": {
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04000000",
+          "max_children": 32,
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "side": "Buy",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "total_quantity": "0.10000000",
+          "version": 1
+        },
+        "current_child": null,
+        "executed_gross_quantity": "0.03000000",
+        "last_ms": 1000,
+        "paused": true,
+        "pending_quantity": "0.00000000",
+        "phase": "paused",
+        "reason": "paused",
+        "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+        "start_ms": 1000,
+        "ticks": 2
+      }
+    },
+    {
+      "cancel_attempted": false,
+      "operation": "paused",
+      "post_calls": 0,
+      "status": {
+        "authorized_quantity": "0.06000000",
+        "children": 1,
+        "config": {
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04000000",
+          "max_children": 32,
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "side": "Buy",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "total_quantity": "0.10000000",
+          "version": 1
+        },
+        "current_child": null,
+        "executed_gross_quantity": "0.03000000",
+        "last_ms": 1100,
+        "paused": true,
+        "pending_quantity": "0.00000000",
+        "phase": "paused",
+        "reason": "paused",
+        "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+        "start_ms": 1000,
+        "ticks": 3
+      }
+    },
+    {
+      "cancel_attempted": false,
+      "operation": "paused",
+      "post_calls": 0,
+      "status": {
+        "authorized_quantity": "0.10000000",
+        "children": 1,
+        "config": {
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04000000",
+          "max_children": 32,
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "side": "Buy",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "total_quantity": "0.10000000",
+          "version": 1
+        },
+        "current_child": null,
+        "executed_gross_quantity": "0.03000000",
+        "last_ms": 1200,
+        "paused": true,
+        "pending_quantity": "0.00000000",
+        "phase": "paused",
+        "reason": "paused",
+        "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+        "start_ms": 1000,
+        "ticks": 4
+      }
+    }
+  ],
+  "fixture_source_operations": 6030,
+  "initialization_ns": 14727791,
+  "mode": "budget",
+  "net_target": {
+    "base_fee_remaining": "0.00000000",
+    "confirmed_satisfied": false,
+    "current_net_quantity": "0.02997000",
+    "execution_phase": "paused",
+    "fees_by_original_asset": {
+      "BTC": "0.00003000"
+    },
+    "initial_preview": {
+      "account_identity": {
+        "account_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "venue": "binance-spot-testnet"
+      },
+      "account_snapshot_sha256": "cadfd327975fdee354e54e14b445b2353c3764158ccada1e9514a6f9bd85474a",
+      "account_update_time": 1,
+      "base_asset": "BTC",
+      "base_required": "0.00000000",
+      "decision": "planned",
+      "free_base": "0.00000000",
+      "free_quote": "200000.00000000",
+      "gross_quantity": "0.10000000",
+      "history_cursors": [
+        {
+          "confirmed": {
+            "order_id": null,
+            "symbol": "BTCUSDT",
+            "trade_id": null
+          },
+          "seed": {
+            "order_id": null,
+            "symbol": "BTCUSDT",
+            "trade_id": null
+          }
+        }
+      ],
+      "net_quantity": "0.00000000",
+      "plan": {
+        "interval_ms": 100,
+        "limit_price": "100",
+        "max_child_quantity": "0.04000000",
+        "max_children": 32,
+        "max_reconciliation_ms": 60000,
+        "max_working_ms": 10,
+        "min_child_quantity": "0.01",
+        "plan_id": "kaze-plan-test",
+        "quantity_step": "0.01",
+        "side": "Buy",
+        "slices": 3,
+        "symbol": "BTCUSDT",
+        "total_quantity": "0.10000000",
+        "version": 1
+      },
+      "projected_net_high": "0.10000000",
+      "projected_net_low": "0.09999000",
+      "quote_asset": "USDT",
+      "quote_required": "10.01000000",
+      "request": {
+        "base_fee_reserve": "0.00001",
+        "interval_ms": 100,
+        "limit_price": "100",
+        "max_child_quantity": "0.04",
+        "max_children": 32,
+        "max_gross_quantity": "0.10",
+        "max_reconciliation_ms": 60000,
+        "max_working_ms": 10,
+        "min_child_quantity": "0.01",
+        "plan_id": "kaze-plan-test",
+        "quantity_step": "0.01",
+        "quote_fee_reserve": "0.01",
+        "slices": 3,
+        "symbol": "BTCUSDT",
+        "target_quantity": "0.10",
+        "tolerance_quantity": "0.0001",
+        "version": 1
+      },
+      "request_sha256": "c4211bcaf98ad8edfdbdae0569f6ad3302acc1da8cb8323c97bc4a0e7fa44fa9",
+      "schema_version": 1,
+      "scope": "read-only net target compiler for one fresh isolated Spot account; fee reserves are caller assumptions, projection assumes full fills within reserves; snapshot is not send authorization; no automatic signal routing/net-target enforcement/mainnet/alpha",
+      "side": "Buy",
+      "submit_calls": 0,
+      "within_tolerance_if_reserves_hold": true,
+      "worst_residual": "0.00001000"
+    },
+    "observed_within_tolerance": false,
+    "phase": "budget_or_bound_violation",
+    "quote_fee_remaining": "0.01000000",
+    "request": {
+      "base_fee_reserve": "0.00001",
+      "interval_ms": 100,
+      "limit_price": "100",
+      "max_child_quantity": "0.04",
+      "max_children": 32,
+      "max_gross_quantity": "0.10",
+      "max_reconciliation_ms": 60000,
+      "max_working_ms": 10,
+      "min_child_quantity": "0.01",
+      "plan_id": "kaze-plan-test",
+      "quantity_step": "0.01",
+      "quote_fee_reserve": "0.01",
+      "slices": 3,
+      "symbol": "BTCUSDT",
+      "target_quantity": "0.10",
+      "tolerance_quantity": "0.0001",
+      "version": 1
+    },
+    "residual_quantity": "0.07003000",
+    "schema_version": 1,
+    "scope": "one immutable bounded net target linked to one fixed-limit parent; new children guarded by reconciled net/free resources and cumulative fee reserves; detected violation pauses future work, not rollback of actual fills; no continuous strategy update/automatic residual repair/shared portfolio/mainnet/alpha",
+    "violation": "net target fee reserve exceeded"
+  },
+  "post_calls": 1,
+  "scope": "full bound recovery + SQLite WAL/FULL, original base fee 0.1%, one reopen after suppressed ACK and 1000 finished ticks; fixture not network latency or alpha",
+  "status": {
+    "authorized_quantity": "0.10000000",
+    "children": 1,
+    "config": {
+      "interval_ms": 100,
+      "limit_price": "100",
+      "max_child_quantity": "0.04000000",
+      "max_children": 32,
+      "max_reconciliation_ms": 60000,
+      "max_working_ms": 10,
+      "min_child_quantity": "0.01",
+      "plan_id": "kaze-plan-test",
+      "quantity_step": "0.01",
+      "side": "Buy",
+      "slices": 3,
+      "symbol": "BTCUSDT",
+      "total_quantity": "0.10000000",
+      "version": 1
+    },
+    "current_child": null,
+    "executed_gross_quantity": "0.03000000",
+    "last_ms": 2200,
+    "paused": true,
+    "pending_quantity": "0.00000000",
+    "phase": "paused",
+    "reason": "paused",
+    "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+    "start_ms": 1000,
+    "ticks": 1004
+  },
+  "success": true,
+  "ticks": 1004
+}

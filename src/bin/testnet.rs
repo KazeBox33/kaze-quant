@@ -107,7 +107,7 @@ fn run() -> Result<(), PaperError> {
     let args: Vec<_> = std::env::args().skip(1).collect();
     if args.first().is_some_and(|s| s == "--help") || args.is_empty() {
         println!(
-            "Binance Spot TESTNET only; never real-money endpoint.\nUsage: kaze-testnet JOURNAL submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL submit-drop-ack INTENT.json MAX_USDT\n       kaze-testnet JOURNAL gap-submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL monitor SECONDS\n       kaze-testnet JOURNAL monitor-gap SECONDS\n       kaze-testnet JOURNAL stream-watch SECONDS\n       kaze-testnet JOURNAL stream-submit INTENT.json MAX_USDT SECONDS\n       kaze-testnet JOURNAL ledger-init SYMBOL\n       kaze-testnet JOURNAL target-preview TARGET.json\n       kaze-testnet JOURNAL plan-init PLAN.json\n       kaze-testnet JOURNAL plan-tick | plan-tick-drop-ack\n       kaze-testnet JOURNAL plan-pause | plan-resume\n       kaze-testnet JOURNAL reconcile\n       kaze-testnet JOURNAL cancel CLIENT_ID\n       kaze-testnet JOURNAL audit\n       kaze-testnet market SYMBOL\nCredentials: local env or configs/testnet.credentials.env.\nsubmit-drop-ack intentionally discards an accepted response; it is NOT a wire-level fault.\nUncertain submissions are never resent, even if query returns not-found."
+            "Binance Spot TESTNET only; never real-money endpoint.\nUsage: kaze-testnet JOURNAL submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL submit-drop-ack INTENT.json MAX_USDT\n       kaze-testnet JOURNAL gap-submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL monitor SECONDS\n       kaze-testnet JOURNAL monitor-gap SECONDS\n       kaze-testnet JOURNAL stream-watch SECONDS\n       kaze-testnet JOURNAL stream-submit INTENT.json MAX_USDT SECONDS\n       kaze-testnet JOURNAL ledger-init SYMBOL\n       kaze-testnet JOURNAL target-preview TARGET.json\n       kaze-testnet JOURNAL target-init TARGET.json\n       kaze-testnet JOURNAL target-tick | target-tick-drop-ack\n       kaze-testnet JOURNAL plan-init PLAN.json\n       kaze-testnet JOURNAL plan-tick | plan-tick-drop-ack\n       kaze-testnet JOURNAL plan-pause | plan-resume\n       kaze-testnet JOURNAL reconcile\n       kaze-testnet JOURNAL cancel CLIENT_ID\n       kaze-testnet JOURNAL audit\n       kaze-testnet market SYMBOL\nCredentials: local env or configs/testnet.credentials.env.\nsubmit-drop-ack intentionally discards an accepted response; it is NOT a wire-level fault.\nUncertain submissions are never resent, even if query returns not-found."
         );
         return Ok(());
     }
@@ -139,6 +139,7 @@ fn run() -> Result<(), PaperError> {
     };
     let mut stream_report = serde_json::Value::Null;
     let mut target_preview = serde_json::Value::Null;
+    let mut net_initialization = serde_json::Value::Null;
     let result = match args[1].as_str() {
         "monitor" | "monitor-gap" if args.len() == 3 => {
             let seconds = args[2]
@@ -298,6 +299,19 @@ fn run() -> Result<(), PaperError> {
             }
             journal.submit_once(&mut venue, &intent, cap)
         }
+        "target-init" if args.len() == 3 => {
+            use std::io::Read;
+            let mut bytes = Vec::new();
+            std::fs::File::open(&args[2])?
+                .take(8193)
+                .read_to_end(&mut bytes)?;
+            if bytes.len() > 8192 {
+                return Err("target request exceeds 8 KiB".into());
+            }
+            net_initialization =
+                journal.init_net_target(&mut venue, serde_json::from_slice(&bytes)?)?;
+            Ok(())
+        }
         "target-preview" if args.len() == 3 => {
             use std::io::Read;
             let mut bytes = Vec::new();
@@ -334,8 +348,15 @@ fn run() -> Result<(), PaperError> {
             }
             journal.init_plan(serde_json::from_slice(&bytes)?)
         }
-        "plan-tick" | "plan-tick-drop-ack" if args.len() == 2 => {
-            venue.discard_ack = args[1] == "plan-tick-drop-ack";
+        "plan-tick" | "plan-tick-drop-ack" | "target-tick" | "target-tick-drop-ack"
+            if args.len() == 2 =>
+        {
+            if args[1].starts_with("target-") {
+                // 显式净目标入口不能悄悄退化为没有净目标约束的毛量执行。
+                journal.net_target_status()?;
+            }
+            venue.discard_ack =
+                args[1] == "plan-tick-drop-ack" || args[1] == "target-tick-drop-ack";
             let r = journal.tick_plan(&mut venue, kaze_quant::binance::now_ms())?;
             stream_report = serde_json::to_value(r)?;
             Ok(())
@@ -348,6 +369,9 @@ fn run() -> Result<(), PaperError> {
     };
     let mut audit = journal.audit()?;
     audit["private_stream_pilot"] = stream_report;
+    if !net_initialization.is_null() {
+        audit["net_target_initialization"] = net_initialization;
+    }
     if !target_preview.is_null() {
         audit["target_preview"] = target_preview;
     }

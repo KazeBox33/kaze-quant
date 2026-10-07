@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-10-07T14:02:39.596262+00:00",
+  "rust_tests": {
+    "debug": 234,
+    "release": 234
+  },
+  "python_tests": 15,
+  "fmt": true,
+  "clippy_all_features_all_targets": true,
+  "rustdoc_warnings_denied": true,
+  "hardware": "Apple M5",
+  "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.5.2\nBuildVersion:\t\t25F84",
+  "compiler": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: aarch64-apple-darwin\nrelease: 1.99.0\nLLVM version: 23.1.1",
+  "profile": "release, thin LTO, one codegen unit; v12 frozen artifacts built all-features",
+  "binaries": {
+    "plan-v11-publish": "d8a9b84f6cef379dcbfd176a86013e41d59e7a83be979796e82cac980a3227c9",
+    "plan-v12": "8599b98e8e9711f3d6361ff9602f441d5115bbe889a490e41788a6bfcdfd9119",
+    "testnet-v12-gross": "15388b83288bfabf403b5099bc6214b7eb4a92ab8fa615b03188d571ed697ffe",
+    "testnet-v12": "a917d7e9e4a7157348da9e247bb27fffb3901f0cbdd64850ca1de3a6a53bdcac",
+    "paper-v12": "db0592fb2e9e037f949cd184394cf8c197775e7e70c1212903a1f34257f82545",
+    "testnet-v11-publish": "762c9427819747bede8ec12e5b82f84becb84e6e84f54b3b03867bb40c575061",
+    "target-v12": "a53b94e0cb335ce546779977b562ffad4db7eaed5150251011aece69305663a9",
+    "net-execution-v12-format-failed": "f6ee98d95e65e88cf176048ceec37ccb190a192c220b62c404af06aa8cb0aa9c",
+    "paper-v11-publish": "fa88a5ecd2d0403c9c8efa2636df74cb3d29d05991c754c5ab3b50107956e140",
+    "net-execution-v12": "5105dc8dba5284a5c3917d4f652e93404d6e18b87155c693b55a312e64c3deb8"
+  },
+  "remote_main_last_verified": "2446e7de64327357c5ea0785e1c94388598fbb02",
+  "github_publication": "not published: this session has no GitHub connector and gh is unauthenticated",
+  "remote_ci": "not run for unpublished v11/v12",
+  "live": "two independent Testnet virtual three-child pilots, six POST/six fills, all observed commissions zero; nonzero fee gate still pending",
+  "scope": "local checks and separate virtual exchange pilots, not mainnet/partial-fill/new24h/alpha/full-platform superiority"
+}

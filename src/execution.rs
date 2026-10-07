@@ -162,7 +162,9 @@ impl ExecutionJournal {
             Some(r)
                 if matches!(
                     r.as_str(),
-                    "binance-testnet-execution-v1" | "binance-testnet-execution-v2-plan"
+                    "binance-testnet-execution-v1"
+                        | "binance-testnet-execution-v2-plan"
+                        | "binance-testnet-execution-v3-target"
                 ) => {}
             _ => return Err("execution journal revision mismatch".into()),
         }
@@ -170,14 +172,27 @@ impl ExecutionJournal {
         crate::recovery::create_schema(&conn)?;
         crate::continuous::create_schema(&conn)?;
         crate::external_plan::create_schema(&conn)?;
+        crate::net_execution::create_schema(&conn)?;
         let revision: String =
             conn.query_row("SELECT revision FROM execution_meta", [], |r| r.get(0))?;
         if crate::external_plan::has_plan(&conn)?
-            != (revision == "binance-testnet-execution-v2-plan")
+            != matches!(
+                revision.as_str(),
+                "binance-testnet-execution-v2-plan" | "binance-testnet-execution-v3-target"
+            )
         {
             return Err("plan journal revision/state conflict".into());
         }
-        Ok(Self { conn, _lock: lock })
+        if crate::net_execution::has_target(&conn)?
+            != (revision == "binance-testnet-execution-v3-target")
+        {
+            return Err("net target journal revision/state conflict".into());
+        }
+        let j = Self { conn, _lock: lock };
+        if crate::net_execution::has_target(&j.conn)? {
+            crate::net_execution::validate(&j)?;
+        }
+        Ok(j)
     }
     /// 返回 false 表示身份已存在，调用方不得再次发送。
     pub fn prepare(&mut self, intent: &OrderIntent, cap: i128) -> Result<bool, PaperError> {
@@ -252,6 +267,9 @@ impl ExecutionJournal {
         let mut audit = serde_json::json!({"schema_version":1,"environment":"binance-spot-testnet","problems":problems,"orders":self.orders()?,"trades":trades,"account":latest.map(|s| serde_json::from_str::<AccountObservation>(&s)).transpose()?,"external_ledger":self.external_audit()?,"scope":"observed exchange balances and per-order trade reconciliation; no FX portfolio PnL or authenticated journal signatures"});
         if crate::external_plan::has_plan(&self.conn)? {
             audit["execution_plan"] = serde_json::to_value(self.plan_status()?)?;
+        }
+        if crate::net_execution::has_target(&self.conn)? {
+            audit["net_target"] = self.net_target_status()?;
         }
         Ok(audit)
     }

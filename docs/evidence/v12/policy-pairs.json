@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "binary_sha256": "5105dc8dba5284a5c3917d4f652e93404d6e18b87155c693b55a312e64c3deb8",
+  "repeats_each": 7,
+  "ordering": "gross/target even, target/gross odd; fresh database each run",
+  "median_ns": {
+    "gross": 12925947250,
+    "target": 13386522708
+  },
+  "initialization_median_ns": {
+    "gross": 13019375,
+    "target": 13365917
+  },
+  "target_over_gross_time": 1.0356318534411473,
+  "runs": [
+    {
+      "round": 0,
+      "mode": "gross",
+      "elapsed_ns": 12836245709,
+      "initialization_ns": 12995500
+    },
+    {
+      "round": 0,
+      "mode": "target",
+      "elapsed_ns": 13572885334,
+      "initialization_ns": 13254541
+    },
+    {
+      "round": 1,
+      "mode": "target",
+      "elapsed_ns": 13273460833,
+      "initialization_ns": 14576708
+    },
+    {
+      "round": 1,
+      "mode": "gross",
+      "elapsed_ns": 12967020292,
+      "initialization_ns": 12917792
+    },
+    {
+      "round": 2,
+      "mode": "gross",
+      "elapsed_ns": 12925947250,
+      "initialization_ns": 13966959
+    },
+    {
+      "round": 2,
+      "mode": "target",
+      "elapsed_ns": 13332713542,
+      "initialization_ns": 13082542
+    },
+    {
+      "round": 3,
+      "mode": "target",
+      "elapsed_ns": 13386522708,
+      "initialization_ns": 14521791
+    },
+    {
+      "round": 3,
+      "mode": "gross",
+      "elapsed_ns": 12968115875,
+      "initialization_ns": 13019375
+    },
+    {
+      "round": 4,
+      "mode": "gross",
+      "elapsed_ns": 12955131250,
+      "initialization_ns": 12983166
+    },
+    {
+      "round": 4,
+      "mode": "target",
+      "elapsed_ns": 13407741959,
+      "initialization_ns": 13365917
+    },
+    {
+      "round": 5,
+      "mode": "target",
+      "elapsed_ns": 13363138583,
+      "initialization_ns": 14809625
+    },
+    {
+      "round": 5,
+      "mode": "gross",
+      "elapsed_ns": 12806994417,
+      "initialization_ns": 13247375
+    },
+    {
+      "round": 6,
+      "mode": "gross",
+      "elapsed_ns": 12735024041,
+      "initialization_ns": 13944750
+    },
+    {
+      "round": 6,
+      "mode": "target",
+      "elapsed_ns": 13470763416,
+      "initialization_ns": 12240125
+    }
+  ],
+  "same_underlying_execution_evidence": true,
+  "evidence_sha256": "50c944cad30e962a2cd1061a95e72e2c32fa3a0773819b278d972a4057afa690",
+  "scope": "same binary, 1004 full fixture REST + SQLite WAL/FULL ticks including process reopen, original base fee and three children; net policy cost not prior-version speedup or upstream/network/alpha proof"
+}

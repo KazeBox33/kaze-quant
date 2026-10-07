@@ -10,7 +10,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct TargetRequest {
     pub version: u32,
@@ -182,7 +182,7 @@ pub fn allocate(i: AllocationInput) -> Result<Allocation, PaperError> {
     Ok(a)
 }
 impl TargetRequest {
-    fn plan(&self, side: Side, qty: i128) -> Result<PlanConfig, PaperError> {
+    pub(crate) fn plan(&self, side: Side, qty: i128) -> Result<PlanConfig, PaperError> {
         Ok(PlanConfig {
             version: 1,
             plan_id: self.plan_id.clone(),

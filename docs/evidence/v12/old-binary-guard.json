@@ -1,0 +1,8 @@
+{
+  "success": true,
+  "old_binary_rejected_v3": true,
+  "exit_code": 1,
+  "stderr": "error: execution journal revision mismatch\n",
+  "network_used": false,
+  "post_calls": 0
+}

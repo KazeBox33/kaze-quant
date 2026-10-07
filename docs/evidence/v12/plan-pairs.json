@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "old_binary_sha256": "d8a9b84f6cef379dcbfd176a86013e41d59e7a83be979796e82cac980a3227c9",
+  "new_binary_sha256": "8599b98e8e9711f3d6361ff9602f441d5115bbe889a490e41788a6bfcdfd9119",
+  "repeats_each": 7,
+  "ordering": "old/new even, new/old odd; fresh database every run",
+  "median_ns": {
+    "old": 12705128166,
+    "new": 12809155417
+  },
+  "new_over_old_time": 1.0081878159465079,
+  "runs": [
+    {
+      "round": 0,
+      "version": "old",
+      "elapsed_ns": 12734088541,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 0,
+      "version": "new",
+      "elapsed_ns": 12656148667,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 1,
+      "version": "new",
+      "elapsed_ns": 12833138333,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 1,
+      "version": "old",
+      "elapsed_ns": 12734333000,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 2,
+      "version": "old",
+      "elapsed_ns": 12773986750,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 2,
+      "version": "new",
+      "elapsed_ns": 12430880292,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 3,
+      "version": "new",
+      "elapsed_ns": 12983140750,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 3,
+      "version": "old",
+      "elapsed_ns": 12705128166,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 4,
+      "version": "old",
+      "elapsed_ns": 12426134625,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 4,
+      "version": "new",
+      "elapsed_ns": 12809155417,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 5,
+      "version": "new",
+      "elapsed_ns": 12824020958,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 5,
+      "version": "old",
+      "elapsed_ns": 12704245667,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 6,
+      "version": "old",
+      "elapsed_ns": 12703023666,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    },
+    {
+      "round": 6,
+      "version": "new",
+      "elapsed_ns": 12723192417,
+      "ticks": 1004,
+      "mock_posts": 3,
+      "fixture_source_operations": 6030
+    }
+  ],
+  "evidence_sha256": "81cc5bf928a073dded3c0194adf163e31e922b68e757453932843ef92600ee96",
+  "same_complete_mock_evidence": true,
+  "scope": "1004 full REST fixture+SQLite WAL/FULL plan ticks, three mock children, suppressed ACK then reopen; own versions, no real network/HFT/upstream/24h proof"
+}

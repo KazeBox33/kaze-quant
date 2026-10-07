@@ -1,0 +1,13 @@
+ledger-init exit=0
+market exit=0
+plan-init exit=0
+plan-tick-drop-ack exit=0
+reconcile exit=0
+plan-tick exit=0
+reconcile exit=0
+plan-tick exit=0
+reconcile exit=0
+plan-tick exit=0
+reconcile exit=0
+audit exit=0
+{"success": true, "child_orders": 3, "submit_calls": 3, "all_asset_deltas_match": true}

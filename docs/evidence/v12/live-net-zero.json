@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "environment": "binance-spot-testnet-virtual",
+  "binary_sha256": "a917d7e9e4a7157348da9e247bb27fffb3901f0cbdd64850ca1de3a6a53bdcac",
+  "config": {
+    "version": 1,
+    "plan_id": "kaze-twap-7b65ac91ba32",
+    "symbol": "BTCUSDT",
+    "limit_price": "83430.57000000",
+    "target_quantity": "1.00105000",
+    "tolerance_quantity": "0.00000510",
+    "base_fee_reserve": "0.00000510",
+    "quote_fee_reserve": "0.42549591",
+    "max_gross_quantity": "0.00051000",
+    "quantity_step": "0.00001000",
+    "min_child_quantity": "0.00017000",
+    "max_child_quantity": "0.00017000",
+    "slices": 3,
+    "interval_ms": 10000,
+    "max_working_ms": 30000,
+    "max_reconciliation_ms": 60000,
+    "max_children": 3
+  },
+  "steps": [
+    {
+      "action": "ledger-init",
+      "exit_code": 0,
+      "elapsed_ns": 6030091000
+    },
+    {
+      "action": "market",
+      "exit_code": 0,
+      "elapsed_ns": 1530741708
+    },
+    {
+      "action": "target-init",
+      "exit_code": 0,
+      "elapsed_ns": 2820801458
+    },
+    {
+      "action": "target-tick-drop-ack",
+      "exit_code": 0,
+      "elapsed_ns": 3716547375
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "elapsed_ns": 2845077625
+    },
+    {
+      "action": "target-tick",
+      "exit_code": 0,
+      "elapsed_ns": 3520332500
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "elapsed_ns": 2814451334
+    },
+    {
+      "action": "target-tick",
+      "exit_code": 0,
+      "elapsed_ns": 3661038708
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "elapsed_ns": 2826409250
+    },
+    {
+      "action": "target-tick",
+      "exit_code": 0,
+      "elapsed_ns": 2746645292
+    },
+    {
+      "action": "reconcile",
+      "exit_code": 0,
+      "elapsed_ns": 2821744500
+    },
+    {
+      "action": "audit",
+      "exit_code": 0,
+      "elapsed_ns": 23524417
+    }
+  ],
+  "parent_plans": 1,
+  "submit_calls": 3,
+  "child_orders": 3,
+  "unique_trades": 3,
+  "first_ack_suppressed": true,
+  "first_child_recovered_in_new_process": true,
+  "repeated_completed_plan_posts": 0,
+  "completed_status": {
+    "authorized_quantity": "0.00051000",
+    "children": 3,
+    "config": {
+      "interval_ms": 10000,
+      "limit_price": "83430.57000000",
+      "max_child_quantity": "0.00017000",
+      "max_children": 3,
+      "max_reconciliation_ms": 60000,
+      "max_working_ms": 30000,
+      "min_child_quantity": "0.00017000",
+      "plan_id": "kaze-twap-7b65ac91ba32",
+      "quantity_step": "0.00001000",
+      "side": "Buy",
+      "slices": 3,
+      "symbol": "BTCUSDT",
+      "total_quantity": "0.00051000",
+      "version": 1
+    },
+    "current_child": null,
+    "executed_gross_quantity": "0.00051000",
+    "last_ms": 1791381236319,
+    "paused": false,
+    "pending_quantity": "0.00000000",
+    "phase": "completed",
+    "reason": "completed",
+    "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+    "start_ms": 1791381209758,
+    "ticks": 4
+  },
+  "fresh_open_requires_reconciliation": true,
+  "original_asset_deltas_match": true,
+  "economic_deltas": {
+    "": "0.00000000",
+    "BTC": "0.00051000",
+    "USDT": "-42.48026980"
+  },
+  "original_currency_fees": [
+    {
+      "asset": "",
+      "amount": "0.00000000"
+    },
+    {
+      "asset": "",
+      "amount": "0.00000000"
+    },
+    {
+      "asset": "",
+      "amount": "0.00000000"
+    }
+  ],
+  "net_target": {
+    "base_fee_remaining": "0.00000510",
+    "confirmed_satisfied": true,
+    "current_net_quantity": "1.00105000",
+    "execution_phase": "completed",
+    "fees_by_original_asset": {
+      "": "0.00000000"
+    },
+    "initial_preview": {
+      "account_identity": {
+        "account_hash": "efed46a9ccc3044874c73ddb44c3504c78e24addf0266bfacc274bf75d765eaf",
+        "venue": "binance-spot-testnet"
+      },
+      "account_snapshot_sha256": "4183a03aacc30316f2e739a0b62ece7562466a76612392fb5e87eb9dcaf0221f",
+      "account_update_time": 1791381019555,
+      "base_asset": "BTC",
+      "base_required": "0.00000000",
+      "decision": "planned",
+      "free_base": "1.00054000",
+      "free_quote": "9955.21201300",
+      "gross_quantity": "0.00051000",
+      "history_cursors": [
+        {
+          "confirmed": {
+            "order_id": 64424,
+            "symbol": "BTCUSDT",
+            "trade_id": 21222
+          },
+          "seed": {
+            "order_id": 64424,
+            "symbol": "BTCUSDT",
+            "trade_id": 21222
+          }
+        }
+      ],
+      "net_quantity": "1.00054000",
+      "plan": {
+        "interval_ms": 10000,
+        "limit_price": "83430.57000000",
+        "max_child_quantity": "0.00017000",
+        "max_children": 3,
+        "max_reconciliation_ms": 60000,
+        "max_working_ms": 30000,
+        "min_child_quantity": "0.00017000",
+        "plan_id": "kaze-twap-7b65ac91ba32",
+        "quantity_step": "0.00001000",
+        "side": "Buy",
+        "slices": 3,
+        "symbol": "BTCUSDT",
+        "total_quantity": "0.00051000",
+        "version": 1
+      },
+      "projected_net_high": "1.00105000",
+      "projected_net_low": "1.00104490",
+      "quote_asset": "USDT",
+      "quote_required": "42.97508661",
+      "request": {
+        "base_fee_reserve": "0.00000510",
+        "interval_ms": 10000,
+        "limit_price": "83430.57000000",
+        "max_child_quantity": "0.00017000",
+        "max_children": 3,
+        "max_gross_quantity": "0.00051000",
+        "max_reconciliation_ms": 60000,
+        "max_working_ms": 30000,
+        "min_child_quantity": "0.00017000",
+        "plan_id": "kaze-twap-7b65ac91ba32",
+        "quantity_step": "0.00001000",
+        "quote_fee_reserve": "0.42549591",
+        "slices": 3,
+        "symbol": "BTCUSDT",
+        "target_quantity": "1.00105000",
+        "tolerance_quantity": "0.00000510",
+        "version": 1
+      },
+      "request_sha256": "2bcd7920fda316bc94196756f9a715c78679c4c40297b0372b6bd77803cfe679",
+      "schema_version": 1,
+      "scope": "read-only net target compiler for one fresh isolated Spot account; fee reserves are caller assumptions, projection assumes full fills within reserves; snapshot is not send authorization; no automatic signal routing/net-target enforcement/mainnet/alpha",
+      "side": "Buy",
+      "submit_calls": 0,
+      "within_tolerance_if_reserves_hold": true,
+      "worst_residual": "0.00000510"
+    },
+    "observed_within_tolerance": true,
+    "phase": "satisfied",
+    "quote_fee_remaining": "0.42549591",
+    "request": {
+      "base_fee_reserve": "0.00000510",
+      "interval_ms": 10000,
+      "limit_price": "83430.57000000",
+      "max_child_quantity": "0.00017000",
+      "max_children": 3,
+      "max_gross_quantity": "0.00051000",
+      "max_reconciliation_ms": 60000,
+      "max_working_ms": 30000,
+      "min_child_quantity": "0.00017000",
+      "plan_id": "kaze-twap-7b65ac91ba32",
+      "quantity_step": "0.00001000",
+      "quote_fee_reserve": "0.42549591",
+      "slices": 3,
+      "symbol": "BTCUSDT",
+      "target_quantity": "1.00105000",
+      "tolerance_quantity": "0.00000510",
+      "version": 1
+    },
+    "residual_quantity": "0.00000000",
+    "schema_version": 1,
+    "scope": "one immutable bounded net target linked to one fixed-limit parent; new children guarded by reconciled net/free resources and cumulative fee reserves; detected violation pauses future work, not rollback of actual fills; no continuous strategy update/automatic residual repair/shared portfolio/mainnet/alpha",
+    "violation": null
+  },
+  "scope": "one immutable net target and three-child parent; virtual testnet; application ACK suppression, no physical packet fault/actual partial-fill/continuous target signal/mainnet/alpha/24h proof"
+}

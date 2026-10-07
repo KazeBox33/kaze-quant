@@ -310,22 +310,7 @@ impl ExecutionJournal {
             return Err("plan instrument is not bound".into());
         }
         let tx = self.conn.transaction()?;
-        // 旧二进制只认识v1，必须拒绝打开受计划管理的账本，不能绕开父子身份。
-        tx.execute(
-            "UPDATE execution_meta SET revision='binance-testnet-execution-v2-plan'",
-            [],
-        )?;
-        save(
-            &tx,
-            &State {
-                config,
-                start_ms: None,
-                last_ms: None,
-                ticks: 0,
-                paused: false,
-                reason: "initialized; awaiting fresh reconciliation".into(),
-            },
-        )?;
+        init_plan_tx(&tx, config)?;
         tx.commit()?;
         Ok(())
     }
@@ -390,6 +375,10 @@ impl ExecutionJournal {
     /// 显式恢复只解除人工暂停，仍必须核对；不会重发任何已持久化的子单身份。
     pub fn resume_plan(&mut self, v: &mut impl ExecutionVenue) -> Result<(), PaperError> {
         self.reconcile(v)?;
+        if let Some(reason) = crate::net_execution::budget_violation(self)? {
+            self.pause_plan(&reason)?;
+            return Err("net target violation blocks resume".into());
+        }
         let (mut s, k) = load(&self.conn)?;
         let (_, _, current) = progress(self, &s, &k)?;
         if current
@@ -426,6 +415,10 @@ impl ExecutionJournal {
         if start.elapsed().as_millis() > u128::from(s.config.max_reconciliation_ms) {
             self.mark_execution_gap("plan reconciliation took too long", false)?;
             return Err("stale reconciliation; no plan operation".into());
+        }
+        if let Some(reason) = crate::net_execution::budget_violation(self)? {
+            self.pause_plan(&reason)?;
+            s = load(&self.conn)?.0;
         }
         let (gross, _, current) = progress(self, &s, &kids)?;
         s.start_ms.get_or_insert(now_ms);
@@ -479,6 +472,10 @@ impl ExecutionJournal {
             } else if qty >= decimal::parse(&s.config.min_child_quantity)? {
                 let number = kids.len() as u16 + 1;
                 let intent = s.config.intent(number, qty)?;
+                if let Err(e) = crate::net_execution::verify_child(self, &intent) {
+                    self.pause_plan(&format!("net target child: {e}"))?;
+                    return Err(e);
+                }
                 if let Err(e) = v.validate_intent(&intent) {
                     self.pause_plan(&format!("child preflight: {e}"))?;
                     return Err(PaperError(e.to_string()));
@@ -541,4 +538,25 @@ impl ExecutionJournal {
             status: self.plan_status()?,
         })
     }
+}
+
+/// 调用者先验证新空账本/配置；让净目标和父计划共享初始化事务。
+pub(crate) fn init_plan_tx(c: &Connection, config: PlanConfig) -> Result<(), PaperError> {
+    // 旧二进制只认识v1，必须拒绝打开受计划管理的账本，不能绕开父子身份。
+    c.execute(
+        "UPDATE execution_meta SET revision='binance-testnet-execution-v2-plan'",
+        [],
+    )?;
+    save(
+        c,
+        &State {
+            config,
+            start_ms: None,
+            last_ms: None,
+            ticks: 0,
+            paused: false,
+            reason: "initialized; awaiting fresh reconciliation".into(),
+        },
+    )?;
+    Ok(())
 }
