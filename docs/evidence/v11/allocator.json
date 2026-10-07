@@ -1,0 +1,115 @@
+{
+  "input_samples": 4096,
+  "max_enumerated_lots": 128,
+  "rounds_each": 7,
+  "runs": [
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 38812417,
+      "mode": "formula",
+      "round": 0
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 199692625,
+      "mode": "enumeration",
+      "round": 0
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 190349041,
+      "mode": "enumeration",
+      "round": 1
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 18754666,
+      "mode": "formula",
+      "round": 1
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 18573083,
+      "mode": "formula",
+      "round": 2
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 192414542,
+      "mode": "enumeration",
+      "round": 2
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 191309916,
+      "mode": "enumeration",
+      "round": 3
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 18603584,
+      "mode": "formula",
+      "round": 3
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 18639584,
+      "mode": "formula",
+      "round": 4
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 191161542,
+      "mode": "enumeration",
+      "round": 4
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 192749417,
+      "mode": "enumeration",
+      "round": 5
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 18595458,
+      "mode": "formula",
+      "round": 5
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 18756000,
+      "mode": "formula",
+      "round": 6
+    },
+    {
+      "allocations": 1000000,
+      "checksum": "311984260036113290225585859296149885392",
+      "elapsed_ns": 190123750,
+      "mode": "enumeration",
+      "round": 6
+    }
+  ],
+  "schema_version": 1,
+  "scope": "allocation component only; production formula includes bound checks and diagnostics; naive own quantity oracle scans up to128 lots and only returns gross; no CSV/SQL/JSON/network/strategy economics/upstream platform benchmark",
+  "success": true,
+  "median_ns": {
+    "formula": 18639584,
+    "enumeration": 191309916
+  },
+  "enumeration_over_formula_time": 10.263636570429899,
+  "binary_sha256": "f05beefb98d6581e28ddf74eef671202583bcb6309ae0adfd48746ef6b656f15",
+  "host": "Apple M5/macOS26.5.2 arm64; rustc1.99.0 LLVM23.1.1; thin LTO singlecodegenunit"
+}

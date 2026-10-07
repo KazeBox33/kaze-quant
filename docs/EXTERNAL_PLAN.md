@@ -60,3 +60,6 @@ python3 scripts/plan_acceptance.py --binary target/release/kaze-testnet \
 
 
 本轮代码 `c4af51e85d55f7129007dedb300ee2fe5db8611c` 的 [CI37587473980](https://github.com/KazeBox33/kaze-quant/actions/runs/37587473980) 已在 Ubuntu/macOS 全部成功：[完整步骤与提交身份](evidence/v10/ci.json)、[两个 ZIP 摘要与原始恢复结果](evidence/v10/ci-artifacts.json)。两端提交前强杀均保持一条 unknown 与父子链接、新进程零 POST；1004 tick mock 均三子单完成、账本无问题，已有纸面五个强杀恢复点也通过。托管 runner 证据不等于目标生产 Linux 机器、真实交易所或全天门槛。该补充提交只更新文档/证据，执行源代码保持上述已验证提交。
+
+
+后续v11增加[只读原币净目标编译](NET_TARGET.md)，可以生成本节固定毛量计划；当前执行器仍不自动维护净目标或费用预留，不能将该预览误认为连续策略适配已经完成。

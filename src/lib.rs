@@ -28,6 +28,7 @@ pub mod registry;
 pub mod telemetry;
 
 pub mod external_state;
+pub mod external_target;
 pub mod user_stream;
 
 pub mod recovery;

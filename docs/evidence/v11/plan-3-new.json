@@ -1,0 +1,385 @@
+{
+  "audit": {
+    "account": {
+      "balances": [
+        {
+          "asset": "BTC",
+          "free": "0.10000000",
+          "locked": "0"
+        },
+        {
+          "asset": "USDT",
+          "free": "199989.99000000",
+          "locked": "0"
+        }
+      ],
+      "canTrade": true,
+      "updateTime": 4
+    },
+    "environment": "binance-spot-testnet",
+    "execution_plan": {
+      "authorized_quantity": "0.10000000",
+      "children": 3,
+      "config": {
+        "interval_ms": 100,
+        "limit_price": "100",
+        "max_child_quantity": "0.04",
+        "max_children": 32,
+        "max_reconciliation_ms": 60000,
+        "max_working_ms": 10,
+        "min_child_quantity": "0.01",
+        "plan_id": "kaze-plan-test",
+        "quantity_step": "0.01",
+        "side": "Buy",
+        "slices": 3,
+        "symbol": "BTCUSDT",
+        "total_quantity": "0.10",
+        "version": 1
+      },
+      "current_child": null,
+      "executed_gross_quantity": "0.10000000",
+      "last_ms": 2200,
+      "paused": false,
+      "pending_quantity": "0.00000000",
+      "phase": "completed",
+      "reason": "completed",
+      "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+      "start_ms": 1000,
+      "ticks": 1004
+    },
+    "external_ledger": {
+      "expected_total_assets": {
+        "BTC": "0.10000000",
+        "USDT": "199989.99000000"
+      },
+      "external_activity_blocked": false,
+      "health": "ready",
+      "history_recovery": {
+        "confirmed_rounds": 1005,
+        "cursors": [
+          {
+            "confirmed": {
+              "order_id": 3,
+              "symbol": "BTCUSDT",
+              "trade_id": 3
+            },
+            "seed": {
+              "order_id": null,
+              "symbol": "BTCUSDT",
+              "trade_id": null
+            }
+          }
+        ],
+        "last_round": {
+          "account_requests": 2,
+          "history_head_requests": 2,
+          "new_trades": 0,
+          "open_order_requests": 1,
+          "order_pages": 1,
+          "order_records": 1,
+          "pending_order_queries": 0,
+          "trade_pages": 1,
+          "trade_records": 1
+        },
+        "schema_version": 1,
+        "scope": "registered symbols only, durable REST cursors; server history retention/coverage and dedicated-account baseline required; no global private-stream sequence"
+      },
+      "identity": {
+        "account_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "venue": "binance-spot-testnet"
+      },
+      "movement_replay_equal": true,
+      "private_execution_events": 0,
+      "private_stream": {
+        "epochs": [],
+        "scope": "local connection generations; no exchange-wide event sequence"
+      },
+      "reason": "REST orders/trades/assets reconciled",
+      "scope": "original asset totals, fixed baseline; no FX valuation, deposit adoption, strategy PnL or proof of absence of external activity"
+    },
+    "orders": [
+      {
+        "intent": {
+          "client_order_id": "kaze-plan-test-0001",
+          "price": "100",
+          "quantity": "0.03000000",
+          "side": "Buy",
+          "symbol": "BTCUSDT"
+        },
+        "observation": {
+          "clientOrderId": "kaze-plan-test-0001",
+          "cummulativeQuoteQty": "3.00000000",
+          "executedQty": "0.03000000",
+          "orderId": 1,
+          "origQty": "0.03000000",
+          "price": "100",
+          "side": "BUY",
+          "status": "FILLED",
+          "symbol": "BTCUSDT",
+          "updateTime": 2
+        },
+        "phase": "terminal"
+      },
+      {
+        "intent": {
+          "client_order_id": "kaze-plan-test-0002",
+          "price": "100",
+          "quantity": "0.03000000",
+          "side": "Buy",
+          "symbol": "BTCUSDT"
+        },
+        "observation": {
+          "clientOrderId": "kaze-plan-test-0002",
+          "cummulativeQuoteQty": "3.00000000",
+          "executedQty": "0.03000000",
+          "orderId": 2,
+          "origQty": "0.03000000",
+          "price": "100",
+          "side": "BUY",
+          "status": "FILLED",
+          "symbol": "BTCUSDT",
+          "updateTime": 2
+        },
+        "phase": "terminal"
+      },
+      {
+        "intent": {
+          "client_order_id": "kaze-plan-test-0003",
+          "price": "100",
+          "quantity": "0.04000000",
+          "side": "Buy",
+          "symbol": "BTCUSDT"
+        },
+        "observation": {
+          "clientOrderId": "kaze-plan-test-0003",
+          "cummulativeQuoteQty": "4.00000000",
+          "executedQty": "0.04000000",
+          "orderId": 3,
+          "origQty": "0.04000000",
+          "price": "100",
+          "side": "BUY",
+          "status": "FILLED",
+          "symbol": "BTCUSDT",
+          "updateTime": 2
+        },
+        "phase": "terminal"
+      }
+    ],
+    "problems": [],
+    "schema_version": 1,
+    "scope": "observed exchange balances and per-order trade reconciliation; no FX portfolio PnL or authenticated journal signatures",
+    "trades": [
+      {
+        "commission": "0.00300000",
+        "commissionAsset": "USDT",
+        "id": 1,
+        "isBuyer": true,
+        "orderId": 1,
+        "price": "100.00000000",
+        "qty": "0.03000000",
+        "quoteQty": "3.00000000",
+        "symbol": "BTCUSDT"
+      },
+      {
+        "commission": "0.00300000",
+        "commissionAsset": "USDT",
+        "id": 2,
+        "isBuyer": true,
+        "orderId": 2,
+        "price": "100.00000000",
+        "qty": "0.03000000",
+        "quoteQty": "3.00000000",
+        "symbol": "BTCUSDT"
+      },
+      {
+        "commission": "0.00400000",
+        "commissionAsset": "USDT",
+        "id": 3,
+        "isBuyer": true,
+        "orderId": 3,
+        "price": "100.00000000",
+        "qty": "0.04000000",
+        "quoteQty": "4.00000000",
+        "symbol": "BTCUSDT"
+      }
+    ]
+  },
+  "elapsed_ns": 12879958583,
+  "first_steps": [
+    {
+      "cancel_attempted": false,
+      "operation": "submit_unresolved: venue outcome: Unknown; query/reconcile before any new submission",
+      "post_calls": 1,
+      "status": {
+        "authorized_quantity": "0.03000000",
+        "children": 1,
+        "config": {
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04",
+          "max_children": 32,
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "side": "Buy",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "total_quantity": "0.10",
+          "version": 1
+        },
+        "current_child": "kaze-plan-test-0001",
+        "executed_gross_quantity": "0.00000000",
+        "last_ms": 1000,
+        "paused": false,
+        "pending_quantity": "0.03000000",
+        "phase": "submit_unknown",
+        "reason": "child intent committed before one POST",
+        "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+        "start_ms": 1000,
+        "ticks": 1
+      }
+    },
+    {
+      "cancel_attempted": false,
+      "operation": "wait",
+      "post_calls": 0,
+      "status": {
+        "authorized_quantity": "0.03000000",
+        "children": 1,
+        "config": {
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04",
+          "max_children": 32,
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "side": "Buy",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "total_quantity": "0.10",
+          "version": 1
+        },
+        "current_child": null,
+        "executed_gross_quantity": "0.03000000",
+        "last_ms": 1000,
+        "paused": false,
+        "pending_quantity": "0.00000000",
+        "phase": "ready",
+        "reason": "wait",
+        "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+        "start_ms": 1000,
+        "ticks": 2
+      }
+    },
+    {
+      "cancel_attempted": false,
+      "operation": "submitted",
+      "post_calls": 1,
+      "status": {
+        "authorized_quantity": "0.06000000",
+        "children": 2,
+        "config": {
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04",
+          "max_children": 32,
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "side": "Buy",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "total_quantity": "0.10",
+          "version": 1
+        },
+        "current_child": null,
+        "executed_gross_quantity": "0.06000000",
+        "last_ms": 1100,
+        "paused": false,
+        "pending_quantity": "0.00000000",
+        "phase": "needs_reconciliation",
+        "reason": "child intent committed before one POST",
+        "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+        "start_ms": 1000,
+        "ticks": 3
+      }
+    },
+    {
+      "cancel_attempted": false,
+      "operation": "submitted",
+      "post_calls": 1,
+      "status": {
+        "authorized_quantity": "0.10000000",
+        "children": 3,
+        "config": {
+          "interval_ms": 100,
+          "limit_price": "100",
+          "max_child_quantity": "0.04",
+          "max_children": 32,
+          "max_reconciliation_ms": 60000,
+          "max_working_ms": 10,
+          "min_child_quantity": "0.01",
+          "plan_id": "kaze-plan-test",
+          "quantity_step": "0.01",
+          "side": "Buy",
+          "slices": 3,
+          "symbol": "BTCUSDT",
+          "total_quantity": "0.10",
+          "version": 1
+        },
+        "current_child": null,
+        "executed_gross_quantity": "0.10000000",
+        "last_ms": 1200,
+        "paused": false,
+        "pending_quantity": "0.00000000",
+        "phase": "needs_reconciliation",
+        "reason": "child intent committed before one POST",
+        "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+        "start_ms": 1000,
+        "ticks": 4
+      }
+    }
+  ],
+  "fixture_source_operations": 6030,
+  "post_calls": 3,
+  "scope": "full bound recovery + plan ticks + SQLite WAL/FULL, 3 mock filled children and 1000 completed ticks; process reopen after suppressed ACK; no real network/upstream comparison",
+  "status": {
+    "authorized_quantity": "0.10000000",
+    "children": 3,
+    "config": {
+      "interval_ms": 100,
+      "limit_price": "100",
+      "max_child_quantity": "0.04",
+      "max_children": 32,
+      "max_reconciliation_ms": 60000,
+      "max_working_ms": 10,
+      "min_child_quantity": "0.01",
+      "plan_id": "kaze-plan-test",
+      "quantity_step": "0.01",
+      "side": "Buy",
+      "slices": 3,
+      "symbol": "BTCUSDT",
+      "total_quantity": "0.10",
+      "version": 1
+    },
+    "current_child": null,
+    "executed_gross_quantity": "0.10000000",
+    "last_ms": 2200,
+    "paused": false,
+    "pending_quantity": "0.00000000",
+    "phase": "completed",
+    "reason": "completed",
+    "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+    "start_ms": 1000,
+    "ticks": 1004
+  },
+  "success": true,
+  "ticks": 1004
+}

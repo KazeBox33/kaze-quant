@@ -107,7 +107,7 @@ fn run() -> Result<(), PaperError> {
     let args: Vec<_> = std::env::args().skip(1).collect();
     if args.first().is_some_and(|s| s == "--help") || args.is_empty() {
         println!(
-            "Binance Spot TESTNET only; never real-money endpoint.\nUsage: kaze-testnet JOURNAL submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL submit-drop-ack INTENT.json MAX_USDT\n       kaze-testnet JOURNAL gap-submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL monitor SECONDS\n       kaze-testnet JOURNAL monitor-gap SECONDS\n       kaze-testnet JOURNAL stream-watch SECONDS\n       kaze-testnet JOURNAL stream-submit INTENT.json MAX_USDT SECONDS\n       kaze-testnet JOURNAL ledger-init SYMBOL\n       kaze-testnet JOURNAL plan-init PLAN.json\n       kaze-testnet JOURNAL plan-tick | plan-tick-drop-ack\n       kaze-testnet JOURNAL plan-pause | plan-resume\n       kaze-testnet JOURNAL reconcile\n       kaze-testnet JOURNAL cancel CLIENT_ID\n       kaze-testnet JOURNAL audit\n       kaze-testnet market SYMBOL\nCredentials: local env or configs/testnet.credentials.env.\nsubmit-drop-ack intentionally discards an accepted response; it is NOT a wire-level fault.\nUncertain submissions are never resent, even if query returns not-found."
+            "Binance Spot TESTNET only; never real-money endpoint.\nUsage: kaze-testnet JOURNAL submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL submit-drop-ack INTENT.json MAX_USDT\n       kaze-testnet JOURNAL gap-submit INTENT.json MAX_USDT\n       kaze-testnet JOURNAL monitor SECONDS\n       kaze-testnet JOURNAL monitor-gap SECONDS\n       kaze-testnet JOURNAL stream-watch SECONDS\n       kaze-testnet JOURNAL stream-submit INTENT.json MAX_USDT SECONDS\n       kaze-testnet JOURNAL ledger-init SYMBOL\n       kaze-testnet JOURNAL target-preview TARGET.json\n       kaze-testnet JOURNAL plan-init PLAN.json\n       kaze-testnet JOURNAL plan-tick | plan-tick-drop-ack\n       kaze-testnet JOURNAL plan-pause | plan-resume\n       kaze-testnet JOURNAL reconcile\n       kaze-testnet JOURNAL cancel CLIENT_ID\n       kaze-testnet JOURNAL audit\n       kaze-testnet market SYMBOL\nCredentials: local env or configs/testnet.credentials.env.\nsubmit-drop-ack intentionally discards an accepted response; it is NOT a wire-level fault.\nUncertain submissions are never resent, even if query returns not-found."
         );
         return Ok(());
     }
@@ -138,6 +138,7 @@ fn run() -> Result<(), PaperError> {
         discarded: false,
     };
     let mut stream_report = serde_json::Value::Null;
+    let mut target_preview = serde_json::Value::Null;
     let result = match args[1].as_str() {
         "monitor" | "monitor-gap" if args.len() == 3 => {
             let seconds = args[2]
@@ -297,6 +298,31 @@ fn run() -> Result<(), PaperError> {
             }
             journal.submit_once(&mut venue, &intent, cap)
         }
+        "target-preview" if args.len() == 3 => {
+            use std::io::Read;
+            let mut bytes = Vec::new();
+            std::fs::File::open(&args[2])?
+                .take(8193)
+                .read_to_end(&mut bytes)?;
+            if bytes.len() > 8192 {
+                return Err("target request exceeds 8 KiB".into());
+            }
+            let request: kaze_quant::external_target::TargetRequest =
+                serde_json::from_slice(&bytes)?;
+            request.validate()?;
+            let start = std::time::Instant::now();
+            journal.reconcile(&mut venue)?;
+            if start.elapsed().as_millis() > u128::from(request.max_reconciliation_ms) {
+                journal.mark_execution_gap("target preview reconciliation stale", false)?;
+                return Err("stale target preview reconciliation".into());
+            }
+            target_preview = journal.preview_target(&request)?;
+            if start.elapsed().as_millis() > u128::from(request.max_reconciliation_ms) {
+                journal.mark_execution_gap("target preview compilation stale", false)?;
+                return Err("stale target preview compilation".into());
+            }
+            Ok(())
+        }
         "plan-init" if args.len() == 3 => {
             use std::io::Read;
             let mut bytes = Vec::new();
@@ -322,6 +348,9 @@ fn run() -> Result<(), PaperError> {
     };
     let mut audit = journal.audit()?;
     audit["private_stream_pilot"] = stream_report;
+    if !target_preview.is_null() {
+        audit["target_preview"] = target_preview;
+    }
     audit["pilot_transport"] = serde_json::json!({
         "submit_calls":venue.submit_calls,
         "accepted_ack_discarded":venue.discarded,

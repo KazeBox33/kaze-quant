@@ -56,6 +56,10 @@ jobs:
           cargo build --locked --release --example external_plan_demo
           python3 scripts/plan_crash.py --output reports/ci-plan-before-post
           target/release/examples/external_plan_demo demo reports/ci-plan-demo > reports/ci-plan-demo.json
+      - name: Net target compiler original asset examples
+        run: |
+          cargo build --locked --release --example net_target_demo
+          target/release/examples/net_target_demo reports/ci-net-target > reports/ci-net-target.json
       - uses: actions/upload-artifact@v4
         with:
           name: storage-evidence-${{ matrix.os }}
@@ -69,3 +73,4 @@ jobs:
             reports/ci-target-crash/summary.json
             reports/ci-plan-before-post/summary.json
             reports/ci-plan-demo.json
+            reports/ci-net-target.json

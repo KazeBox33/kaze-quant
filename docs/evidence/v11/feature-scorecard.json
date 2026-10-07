@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "features": [
+    {
+      "feature": "原币净目标编译",
+      "previous": "毛量父计划需手工输入；无对应净目标编译",
+      "current": "净量/free资源/毛量分离，输出费用预留区间与父计划",
+      "data": {
+        "demo_cases": 5,
+        "preview_posts_each": 0,
+        "buy_gross": "0.10",
+        "buy_actual_net": "0.0999",
+        "sell_gross": "0.09",
+        "sell_actual_residual": "0.00991",
+        "nonplan_cases": 3
+      },
+      "gain": "减少手工数量转换错误，并公开目标缺口；不是盈利改善",
+      "cost": "费用预留由调用方声明；不自动强制净目标/费用假设，不提供连续策略协调",
+      "evidence": "net-demo.json"
+    },
+    {
+      "feature": "网格与资源核验",
+      "previous": "外部计划验证毛量网格，没有净目标诊断",
+      "current": "容差hold、资金不足、网格最低量与locked/free区别",
+      "data": {
+        "new_rust_tests": 10,
+        "enumerated_candidate_cases": 4320,
+        "all_quantity_oracle_equal": true
+      },
+      "gain": "计算前可解释为什么不生成计划",
+      "cost": "仅一个隔离Spot账户、新空账本；无第三币种费用/共享组合估值",
+      "evidence": "debug.log"
+    },
+    {
+      "feature": "整数分配组件",
+      "previous": "首次组件，无旧功能基线",
+      "current": "闭式整数资源限制与网格量化",
+      "data": {
+        "input_entries": 4096,
+        "allocations_each_run": 1000000,
+        "runs_each": 7,
+        "formula_median_ns": 18639584,
+        "naive_quantity_enumeration_median_ns": 191309916,
+        "naive_over_formula_time": 10.263636570429899
+      },
+      "gain": "相对本项目朴素最多128lot数量枚举基线快约10.26倍",
+      "cost": "不含解析/JSON/CSV/SQL/网络；公式含诊断、oracle仅输出数量，基线是算法对照不是旧平台",
+      "evidence": "allocator.json"
+    },
+    {
+      "feature": "完整外部计划回归",
+      "previous": "v10固定毛量生命周期",
+      "current": "生命周期源未修改；v11编译模块加入后复测",
+      "data": {
+        "ticks_per_run": 1004,
+        "pairs": 7,
+        "old_median_ns": 12812258958,
+        "new_median_ns": 12835971166,
+        "new_time_change_percent": 0.18507437351782396,
+        "full_evidence_equal": true
+      },
+      "gain": "无性能提升结论；本轮增加约0.19%耗时",
+      "cost": "FULL同步与全核对；mock网络，不是HFT",
+      "evidence": "plan-pairs.json"
+    },
+    {
+      "feature": "完整纸面持久回归",
+      "previous": "v10固定10万报价负载",
+      "current": "同配置/前缀交替14次，每次新数据库及新进程全量审计",
+      "data": {
+        "quotes_per_run": 100000,
+        "pairs": 7,
+        "old_median_ns": 2205069125,
+        "new_median_ns": 2148886292,
+        "new_time_change_percent": -2.5478944112466317,
+        "raw_receipts_state_equal": true,
+        "each_full_recovery_equal": true
+      },
+      "gain": "本次测得耗时减少约2.55%，不是已证明的优化因果",
+      "cost": "计时含256批次WAL/FULL；全审计在计时外；无上游排名",
+      "evidence": "paper-pairs.json"
+    },
+    {
+      "feature": "百万公开报价基线",
+      "previous": "v10七轮中位929120500ns",
+      "current": "v11同负载七轮中位947784750ns",
+      "data": {
+        "quotes": 1000000,
+        "runs": 7,
+        "previous_median_ns": 929120500,
+        "current_median_ns": 947784750,
+        "time_change_percent": 2.0088083300282333,
+        "quotes_per_second": 1055091.8866335421,
+        "raw_receipts_state_equal_all_runs": true,
+        "durable_100k_three_run_quotes_per_second": 44965.02536692014
+      },
+      "gain": "无提升；本次跨时段测得内存耗时增加约2.01%",
+      "cost": "跨时段对照非交替，不能证明代码导致该差异；同核心经济模型，不是独立实盘oracle",
+      "evidence": "paper.json"
+    }
+  ],
+  "outstanding_gates": [
+    "真实测试网三片",
+    "真实部分成交",
+    "新版本24h",
+    "独立盈利留出",
+    "连续持久净目标策略协调",
+    "同条件上游整平台对比"
+  ],
+  "publication": {
+    "status": "local_prepared",
+    "reason": "GitHub plugin currently disconnected; gh not logged in; git push dry run cannot read username; no credentials requested"
+  },
+  "scope": "每功能数据与前后变化；所有预测基于完整成交/声明费用预留；不外推收益/生产SLA/整平台超越"
+}

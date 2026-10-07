@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "source_parent_commit": "2446e7de64327357c5ea0785e1c94388598fbb02",
+  "host": "Apple M5/macOS26.5.2 arm64",
+  "compiler": "rustc1.99.0 LLVM23.1.1",
+  "profile": "release thin LTO single codegen unit; paper default features, network demos/allocator/testnet network feature build",
+  "checks": {
+    "fmt": {
+      "success": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "public_log_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "clippy": {
+      "success": true,
+      "log_sha256": "f2066ca264b9a8598ecd436c70919e1efe1acea4098ad2a13b5d82d67bc049ec",
+      "public_log_sha256": "f2066ca264b9a8598ecd436c70919e1efe1acea4098ad2a13b5d82d67bc049ec"
+    },
+    "debug": {
+      "success": true,
+      "log_sha256": "4bb7e9d5ec268ee0a6967fa4e6440c9324c6ff8433b1bb8f6bddd9bb82c353c8",
+      "passed_tests": 220,
+      "public_log_sha256": "dca8e79b1d9910927b6d1e04e260b4db0bfe0add319c9da83634303feb96335e"
+    },
+    "release": {
+      "success": true,
+      "log_sha256": "304dbd9c0d053d74b8943e602df46a2df4a2ee535fdddc8eb26fe6ac4ef2cbca",
+      "passed_tests": 220,
+      "public_log_sha256": "189a90c01f6f0752fcb38eefe13815010be30b9f050edc51668c1169cb16ca0e"
+    },
+    "doc": {
+      "success": true,
+      "log_sha256": "bc75c34739db6e7fb23fa4a27b73740c64ca12ab5de5c853b0b2d56edd3b541e",
+      "public_log_sha256": "bc75c34739db6e7fb23fa4a27b73740c64ca12ab5de5c853b0b2d56edd3b541e"
+    },
+    "python": {
+      "success": true,
+      "log_sha256": "ee9ab2de31c7e1e373f46d02dc07db017d8e20c7c95c898bb020834186986fa7",
+      "passed_tests": 15,
+      "public_log_sha256": "ee9ab2de31c7e1e373f46d02dc07db017d8e20c7c95c898bb020834186986fa7"
+    }
+  },
+  "binaries": {
+    "allocator-v11-publish": "f05beefb98d6581e28ddf74eef671202583bcb6309ae0adfd48746ef6b656f15",
+    "net-target-v11-publish": "d6788ca9e29985f5b6c95b015df2c792502ad91ad7d5cd9756a82dcd35f5092f",
+    "plan-v11-publish": "d8a9b84f6cef379dcbfd176a86013e41d59e7a83be979796e82cac980a3227c9",
+    "plan-v10-publish": "48d80ac4c04a1a702a840c9f84bfc7925996070acbfba867411032ecdea4f5eb",
+    "testnet-v11-publish": "762c9427819747bede8ec12e5b82f84becb84e6e84f54b3b03867bb40c575061",
+    "paper-v11-publish": "fa88a5ecd2d0403c9c8efa2636df74cb3d29d05991c754c5ab3b50107956e140",
+    "paper-v10-publish": "deb561bfb991bd256fb1ffb12a6ce76590ed613a7cdd9da2250eeca1b9db374e"
+  },
+  "scope": "local final source checks; current GitHub plugin disconnected and gh not logged in; remote publication/current CI unverified; real testnet under maintenance",
+  "public_log_encoding": "UTF-8 trailing empty lines removed; log_sha256 refers original local report, public_log_sha256 refers published copy"
+}
