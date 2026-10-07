@@ -74,3 +74,6 @@ Linux/macOS [CI 37579229668](https://github.com/KazeBox33/kaze-quant/actions/run
 参考固定源码：[vn.py TargetPosTemplate](https://github.com/vnpy/vnpy_ctastrategy/blob/7a8768de9784dda35a7b261a7ade1dbfbff50919/vnpy_ctastrategy/template.py)、[vn.py TWAP](https://github.com/vnpy/vnpy_algotrading/blob/bee959dc464749f7cce66e766249ccdbb2d4869a/vnpy_algotrading/algos/twap_algo.py)、[ABU因子组合](https://github.com/bbfamily/abu/blob/d602d847677e4c2b77b0a122df30816ea68b5710/abupy/FactorBuyBu/ABuFactorBuyBase.py)。实现独立编写，没有复制上游源码。我们本阶段的特点是整数累计释放、冻结账本与计划同事务、逐决策解释及强杀恢复证据；没有运行上游同条件TWAP对照，不能据此宣称胜过它们。
 
 后续先把策略Ready/暂停/未知提交/待撤/重启核对与外部执行连接，再验证测试网父子路由。独立数据留出、Spot L2/逐笔与延迟/队列仿真、同条件上游比较仍未完成；旧24h观察失败状态保持，真实部分成交和真钱准入没有通过。
+
+
+后续 v10 已完成有界固定毛量外部父子执行生命周期，见[EXTERNAL_PLAN](EXTERNAL_PLAN.md)。原币手续费/净仓位与本节纸面目标语义不同，尚未把composition直接自动路由到外部账户。

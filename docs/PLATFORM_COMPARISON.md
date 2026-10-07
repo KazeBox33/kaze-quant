@@ -25,7 +25,7 @@ KazeQuant已有Strategy回调/有界动作、PaperRuntime、SQLite候选状态�
 
 策略生命周期的启动边界应是：配置与版本验证→检查点恢复→交易所核对→预热完成→Ready。断线/未知订单/余额不符进入暂停，不能通过重启自动交易。回测、纸面、测试网复用策略状态与决策核心，外部成交/撤单时机由各环境适配器产生；不能声称三个环境必然相同成交。
 
-[TWAP源码](https://github.com/vnpy/vnpy_algotrading/blob/bee959dc464749f7cce66e766249ccdbb2d4869a/vnpy_algotrading/algos/twap_algo.py)按定时器间隔分批、检查限价与剩余成交量，是值得实现的第一种执行算法。我们的版本应将parent/child ID、计划时间、已成交/待确认/待撤单量一起持久化，整数lot分配余数，订单未终结/取消结果未知时不重复补量，策略停止后仍可核对遗留订单。**TWAP是如何执行目标仓位，不是盈利策略**。现已完成目标仓位与持久纸面TWAP，见[TARGET_EXECUTION](TARGET_EXECUTION.md)；外部异步执行与测试网路由仍未接入，不能把定时回调直接接到POST。
+[TWAP源码](https://github.com/vnpy/vnpy_algotrading/blob/bee959dc464749f7cce66e766249ccdbb2d4869a/vnpy_algotrading/algos/twap_algo.py)按定时器间隔分批、检查限价与剩余成交量，是值得实现的第一种执行算法。我们的版本应将parent/child ID、计划时间、已成交/待确认/待撤单量一起持久化，整数lot分配余数，订单未终结/取消结果未知时不重复补量，策略停止后仍可核对遗留订单。**TWAP是如何执行目标仓位，不是盈利策略**。现已完成目标仓位与持久纸面TWAP，见[TARGET_EXECUTION](TARGET_EXECUTION.md)；后续已新增有界固定毛量外部父子计划，见[EXTERNAL_PLAN](EXTERNAL_PLAN.md)；连续策略净目标适配仍未完成，不能把定时回调直接接到POST。
 
 vn.py这个核心EventEngine快照使用未设置maxsize的Queue；我们的实时入口已有4096帧/8KiB上限。可验证差异是指定入口的容量约束，不是整个vn.py都无风控或全系统内存无上限。我们保留有界类型化单写入者，不照搬字符串广播队列进入执行热路径。UI/研究放控制平面，不能阻塞账本写入。
 
@@ -96,3 +96,8 @@ vn.py这个核心EventEngine快照使用未设置maxsize的Queue；我们的实�
 ## 历史补洞与连续观察后续增量
 
 新期初 REST 历史游标、整轮原子补查、持久连接代次与有界只读重连观察已经实现。验收、完整本地恢复计时、SQL索引修复和旧版24h失败见[HISTORY_RECOVERY](HISTORY_RECOVERY.md)。本增量替代本文之前“历史游标/连续重连尚未实现”的状态；不表示自动策略路由、全天运行、主网、真实部分成交或完整上游平台性能排名通过。下一顺序仍是目标仓位与可组合策略，再进入持久TWAP和更严谨的研究/仿真。
+
+
+## 2026-10-07 有界外部计划增量
+
+固定限价毛量父计划现在能够通过已有测试网网关分片执行：每次完整原币核对、父子意图同事务、一次发送许可、未知提交/撤单查询与暂停/恢复。管理账本版本阻止旧二进制和手工prepare绕过父计划；细节、限制、操作和原始证据见[EXTERNAL_PLAN](EXTERNAL_PLAN.md)。这是一个排他账户/账本/父计划的有界能力；连续composition信号到净目标、组合估值/回撤、真实部分成交、新版本24h、alpha与主网仍未通过。真实三片验收在ledger-init前置请求因502失败，0意图/0 POST；官方测试网页面显示维护，不沿用旧人工测试网实测作为此计划的验收。

@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "success": false,
+  "environment": "binance-spot-testnet-virtual",
+  "date": "2026-10-07",
+  "steps": [
+    {
+      "action": "ledger-init",
+      "exit_code": 1,
+      "elapsed_ns": 1067250500
+    }
+  ],
+  "binary_sha256": "3f120e16213dd5268fc3f41f4bf4fc6010368ac6cf43d115c1ef432fe9beff12",
+  "durable_intents": 0,
+  "submit_calls": 0,
+  "public_time_probe_http_status": 502,
+  "official_page": "https://testnet.binance.vision/",
+  "official_page_observed": "Testnet currently under maintenance; Please retry after a few minutes.",
+  "scope": "first ledger-init failed before plan/order creation; final binary live three-child acceptance unverified; no new virtual trades this increment"
+}

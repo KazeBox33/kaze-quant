@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "csv_encoding": "UTF-8; LF normalization only, numeric samples unchanged",
+  "files": {
+    "0-new.rss.csv": "e1de0faf8e0bbd77c0dafa67cb35fbd4bbab007de00fb2a4a6c62716b77abccd",
+    "0-old.rss.csv": "5537495c63470692a901cd5c77e171da269fb32ce4fdd38549d3c78469de6f79",
+    "1-new.rss.csv": "f7ac3e77720d71b1c0f3ee29b1ca52f794c209c9e203d7ebfbd7d8e78fb00f95",
+    "1-old.rss.csv": "bb0adf4df8d95a446f437958e20cc9e6a0bdba2a8524bef344652c6f2573aa12",
+    "2-new.rss.csv": "bb261335b1b7bfe8a07fdb31d6a12ec6fbaabef45a5a5f51058a4bf0d3915ea9",
+    "2-old.rss.csv": "75e309f94a8400c9fca807715a6b265fab62bfdc03d2548c2b102a03c41b9fc5",
+    "3-new.rss.csv": "73d4ac14eb385d835915b17122dae316deb0fe004248245c711386f019c52d24",
+    "3-old.rss.csv": "dc7be12d1fe0b96c5fe839d29c24fca25fd58708a8c898e9e72dfd6cad0a5734",
+    "4-new.rss.csv": "c4d3f01dc2292ed3a47ca6f5da13819ae8538682f163508cf7342c7dee7e3e3a",
+    "4-old.rss.csv": "f841d015bc13eab599cbb11af5473a7221e4adeeee4dea93ecae8d2f8892a89f",
+    "5-new.rss.csv": "6eb39ce3ae26ded4d13b7f7a8c9b4c7b51aed7c03d283db69997ab7260b2b085",
+    "5-old.rss.csv": "b482439b064be2268a83b889ba40dd2919cfc988fc5d3fee195180e3cb2a0cc8",
+    "6-new.rss.csv": "0d744121c3c3d03a9141883e0d7e4da81c56d791b1fbf899726a4718e8c8faab",
+    "6-old.rss.csv": "09d395cf802dca12a5f6f03ed8d9b9c4308a208bcbfe2f1603c95b396faa06cf",
+    "before-post-crash.json": "293b10be3b8254b511d535a4fceefca0b50329cc64f2b18c33cce93301420db5",
+    "mock-0.json": "fac75a4d864964895fef7cffce830e07dd13ad2512fef6658e814245c45941ea",
+    "mock-1.json": "63f89d9dd0669bc0639aac6da15e955c466863cb3b08df524a4cba9e70d79c89",
+    "mock-2.json": "015d46cabc386b9e6c6fca4e0c8a440118a59848ce0e2e77152f3674d9123e45",
+    "mock-3.json": "fdff5bd5d1c8f682e685680604f9eeeb099f8c63d2edd70f883fd7afc021c2f5",
+    "mock-4.json": "11a8b04946fc69428c4b45adff5c04ccd9816a5b940abfe40124eebafb3228fc",
+    "mock-5.json": "97d6d2d8aa2ad95f8f6fe6d7b68a96bb7988ffa587cfb525146a529629a9ee41",
+    "mock-6.json": "114260ca75b41ab244734f62f66ea1880f0de947feef4e21b867df6a14c5fc31",
+    "mock-summary.json": "5e5a8232310d281b7322d320c6dfab31f4bd8ae2f5cef7d80c02915a63f07ef9",
+    "paired-regression.json": "eef8c75af47b0e9d170dd158f1c54fd9ca220eaf695c6ba64e30d056438804c1",
+    "paper-summary.json": "8ef17e9f392ac06d94996c82cb8d9d432d4d78bf465e55957d1ab8f132862f0f",
+    "testnet-connection-failure.json": "731c48f3b0f3399a14f69537d21441fc93030e0f8fb1086a9fdcdf41b5f85ad9",
+    "validation-mac.json": "ca53f91c7ad4ca1b6d12a129429aae951cf2c3b611b84a77a5b12f48fb141d51"
+  }
+}

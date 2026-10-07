@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "success": true,
+  "binary_sha256": "48d80ac4c04a1a702a840c9f84bfc7925996070acbfba867411032ecdea4f5eb",
+  "signal": "SIGKILL",
+  "boundary": "intent and child linkage committed; mock submit not invoked",
+  "durable_unknown_intents": 1,
+  "durable_child_links": 1,
+  "fresh_process_posts": 0,
+  "recovered": {
+    "post_calls": 0,
+    "scope": "mock unsent durable child; query not-found is not resend permission",
+    "status": {
+      "authorized_quantity": "0.03000000",
+      "children": 1,
+      "config": {
+        "interval_ms": 100,
+        "limit_price": "100",
+        "max_child_quantity": "0.04",
+        "max_children": 32,
+        "max_reconciliation_ms": 60000,
+        "max_working_ms": 10,
+        "min_child_quantity": "0.01",
+        "plan_id": "kaze-plan-test",
+        "quantity_step": "0.01",
+        "side": "Buy",
+        "slices": 3,
+        "symbol": "BTCUSDT",
+        "total_quantity": "0.10",
+        "version": 1
+      },
+      "current_child": "kaze-plan-test-0001",
+      "executed_gross_quantity": "0.00000000",
+      "last_ms": 1000,
+      "paused": false,
+      "pending_quantity": "0.03000000",
+      "phase": "submit_unknown",
+      "reason": "child intent committed before one POST",
+      "scope": "bounded fixed-limit gross-quantity testnet execution; original-asset ledger authoritative, no net target/alpha/mainnet or continuous signal routing",
+      "start_ms": 1000,
+      "ticks": 1
+    },
+    "success": true
+  },
+  "scope": "owned process, deterministic no-network fixture; not actual unsent venue proof or physical network fault"
+}

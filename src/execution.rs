@@ -159,67 +159,35 @@ impl ExecutionJournal {
                     [],
                 )?;
             }
-            Some(r) if r == "binance-testnet-execution-v1" => (),
+            Some(r)
+                if matches!(
+                    r.as_str(),
+                    "binance-testnet-execution-v1" | "binance-testnet-execution-v2-plan"
+                ) => {}
             _ => return Err("execution journal revision mismatch".into()),
         }
         crate::external_state::create_schema(&conn)?;
         crate::recovery::create_schema(&conn)?;
         crate::continuous::create_schema(&conn)?;
+        crate::external_plan::create_schema(&conn)?;
+        let revision: String =
+            conn.query_row("SELECT revision FROM execution_meta", [], |r| r.get(0))?;
+        if crate::external_plan::has_plan(&conn)?
+            != (revision == "binance-testnet-execution-v2-plan")
+        {
+            return Err("plan journal revision/state conflict".into());
+        }
         Ok(Self { conn, _lock: lock })
     }
     /// 返回 false 表示身份已存在，调用方不得再次发送。
     pub fn prepare(&mut self, intent: &OrderIntent, cap: i128) -> Result<bool, PaperError> {
-        intent.validate(cap)?;
-        let json = serde_json::to_string(intent)?;
+        if crate::external_plan::has_plan(&self.conn)? {
+            return Err("managed plan journal: submit through plan tick".into());
+        }
         let tx = self.conn.transaction()?;
-        let old: Option<String> = tx
-            .query_row(
-                "SELECT intent FROM intents WHERE id=?1",
-                [&intent.client_order_id],
-                |r| r.get(0),
-            )
-            .optional()?;
-        if let Some(old) = old {
-            if old != json {
-                return Err("client ID reused with a different intent".into());
-            }
-            return Ok(false);
-        }
-        let health: Option<(String, i64)> = tx
-            .query_row("SELECT health,blocked FROM external_control", [], |r| {
-                Ok((r.get(0)?, r.get(1)?))
-            })
-            .optional()?;
-        if health.is_some_and(|(h, b)| h != "ready" || b != 0) {
-            return Err("external account requires reconciliation before new intent".into());
-        }
-        if identity_bound(&tx)? {
-            let known: i64 = tx.query_row(
-                "SELECT count(*) FROM instruments WHERE symbol=?1",
-                [&intent.symbol],
-                |r| r.get(0),
-            )?;
-            if known != 1 {
-                return Err("instrument is not bound to account ledger".into());
-            }
-        }
-        let count: i64 = tx.query_row("SELECT count(*) FROM intents", [], |r| r.get(0))?;
-        let unresolved: i64 = tx.query_row(
-            "SELECT count(*) FROM intents WHERE phase != 'terminal'",
-            [],
-            |r| r.get(0),
-        )?;
-        if count >= 10_000 || unresolved != 0 {
-            return Err(
-                "execution capacity or unresolved order: reconcile before new submission".into(),
-            );
-        }
-        tx.execute(
-            "INSERT INTO intents VALUES (?1,?2,'unknown',NULL)",
-            params![intent.client_order_id, json],
-        )?;
+        let inserted = prepare_tx(&tx, intent, cap)?;
         tx.commit()?;
-        Ok(true)
+        Ok(inserted)
     }
     pub fn orders(&self) -> Result<Vec<TrackedOrder>, PaperError> {
         let mut stmt = self
@@ -281,10 +249,69 @@ impl ExecutionJournal {
         if latest.is_none() {
             problems.push("account snapshot absent".into());
         }
-        Ok(
-            serde_json::json!({"schema_version":1,"environment":"binance-spot-testnet","problems":problems,"orders":self.orders()?,"trades":trades,"account":latest.map(|s| serde_json::from_str::<AccountObservation>(&s)).transpose()?,"external_ledger":self.external_audit()?,"scope":"observed exchange balances and per-order trade reconciliation; no FX portfolio PnL or authenticated journal signatures"}),
-        )
+        let mut audit = serde_json::json!({"schema_version":1,"environment":"binance-spot-testnet","problems":problems,"orders":self.orders()?,"trades":trades,"account":latest.map(|s| serde_json::from_str::<AccountObservation>(&s)).transpose()?,"external_ledger":self.external_audit()?,"scope":"observed exchange balances and per-order trade reconciliation; no FX portfolio PnL or authenticated journal signatures"});
+        if crate::external_plan::has_plan(&self.conn)? {
+            audit["execution_plan"] = serde_json::to_value(self.plan_status()?)?;
+        }
+        Ok(audit)
     }
+}
+
+/// 计划和子单身份必须与意图在同一事务写入；网络调用始终在提交之后。
+pub(crate) fn prepare_tx(
+    tx: &Connection,
+    intent: &OrderIntent,
+    cap: i128,
+) -> Result<bool, PaperError> {
+    intent.validate(cap)?;
+    let json = serde_json::to_string(intent)?;
+    let old: Option<String> = tx
+        .query_row(
+            "SELECT intent FROM intents WHERE id=?1",
+            [&intent.client_order_id],
+            |r| r.get(0),
+        )
+        .optional()?;
+    if let Some(old) = old {
+        if old != json {
+            return Err("client ID reused with a different intent".into());
+        }
+        return Ok(false);
+    }
+    let health: Option<(String, i64)> = tx
+        .query_row("SELECT health,blocked FROM external_control", [], |r| {
+            Ok((r.get(0)?, r.get(1)?))
+        })
+        .optional()?;
+    if health.is_some_and(|(h, b)| h != "ready" || b != 0) {
+        return Err("external account requires reconciliation before new intent".into());
+    }
+    if identity_bound(tx)? {
+        let known: i64 = tx.query_row(
+            "SELECT count(*) FROM instruments WHERE symbol=?1",
+            [&intent.symbol],
+            |r| r.get(0),
+        )?;
+        if known != 1 {
+            return Err("instrument is not bound to account ledger".into());
+        }
+    }
+    let count: i64 = tx.query_row("SELECT count(*) FROM intents", [], |r| r.get(0))?;
+    let unresolved: i64 = tx.query_row(
+        "SELECT count(*) FROM intents WHERE phase != 'terminal'",
+        [],
+        |r| r.get(0),
+    )?;
+    if count >= 10_000 || unresolved != 0 {
+        return Err(
+            "execution capacity or unresolved order: reconcile before new submission".into(),
+        );
+    }
+    tx.execute(
+        "INSERT INTO intents VALUES (?1,?2,'unknown',NULL)",
+        params![intent.client_order_id, json],
+    )?;
+    Ok(true)
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -411,6 +438,9 @@ impl ExecutionJournal {
         if before.status.terminal() {
             return Ok(());
         }
+        if order.phase == "cancel_unknown" {
+            return Err("cancel already attempted; query only until terminal evidence".into());
+        }
         self.conn.execute(
             "UPDATE intents SET phase='cancel_unknown' WHERE id=?1",
             [id],
@@ -505,10 +535,10 @@ impl ExecutionJournal {
 
 /// 单个SQL事务可同时写订单证据、成交去重和资产变动。
 pub(crate) fn observe_tx(tx: &Connection, obs: &OrderObservation) -> Result<bool, PaperError> {
-    let (intent, old): (String, Option<String>) = tx.query_row(
-        "SELECT intent,observation FROM intents WHERE id=?1",
+    let (intent, old, old_phase): (String, Option<String>, String) = tx.query_row(
+        "SELECT intent,observation,phase FROM intents WHERE id=?1",
         [&obs.client_order_id],
-        |r| Ok((r.get(0)?, r.get(1)?)),
+        |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)),
     )?;
     let intent: OrderIntent = serde_json::from_str(&intent)?;
     let filled = decimal::parse(&obs.executed_qty)?;
@@ -576,6 +606,8 @@ pub(crate) fn observe_tx(tx: &Connection, obs: &OrderObservation) -> Result<bool
             obs.client_order_id,
             if obs.status.terminal() {
                 "terminal"
+            } else if old_phase == "cancel_unknown" {
+                "cancel_unknown"
             } else {
                 "open"
             },

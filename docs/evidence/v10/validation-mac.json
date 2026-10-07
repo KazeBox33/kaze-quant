@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-07",
+  "host": "Apple M5/macOS 26.5.2 arm64",
+  "rustc": "cargo 1.99.0 (5f94df478 2026-08-27)",
+  "checks": {
+    "debug": {
+      "success": true,
+      "log_sha256": "703b505f24d7afbddf6ed4f2516641e52f970af8b0ab9cc7f7554631daaa9e8a",
+      "passed_tests": 210
+    },
+    "release": {
+      "success": true,
+      "log_sha256": "2ee6233f38cfc58853f7832ab9937b883b693ab37dce7557c5a51f3cfecb5053",
+      "passed_tests": 210
+    },
+    "python": {
+      "success": true,
+      "log_sha256": "c3fd6821410307a01188f1ce02581d6fefa730c38ebe807b0d8f479f7cf83cf0",
+      "passed_tests": 15
+    },
+    "doc": {
+      "success": true,
+      "log_sha256": "880400c717f52c85bb57c4760cae1af80b55b4e7ef0c1671c2897f25b5a6ce58"
+    },
+    "clippy": {
+      "success": true,
+      "log_sha256": "c92508a29848820f033cd2ea015c85dde0953c88b07cc967ce34b7c08f610549"
+    },
+    "fmt": {
+      "success": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "scope": "local checks; CI attached after publication; no live plan acceptance",
+  "binaries": {
+    "testnet-v10-publish": "64896285bdf60084e5f78d914faf070e9c430e9bff7ae52d8a52d178d38e97ec",
+    "testnet-v10-connection-failure": "3f120e16213dd5268fc3f41f4bf4fc6010368ac6cf43d115c1ef432fe9beff12",
+    "paper-v10-publish": "deb561bfb991bd256fb1ffb12a6ce76590ed613a7cdd9da2250eeca1b9db374e"
+  },
+  "mock_binary_sha256": "48d80ac4c04a1a702a840c9f84bfc7925996070acbfba867411032ecdea4f5eb",
+  "profile": "release thin LTO, codegen-units=1; mock/testnet network-feature builds, paper default-feature build",
+  "compiler": "rustc 1.99.0, LLVM 23.1.1"
+}

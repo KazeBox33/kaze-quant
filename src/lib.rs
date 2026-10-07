@@ -35,3 +35,5 @@ pub mod recovery;
 pub mod continuous;
 
 pub mod target;
+
+pub mod external_plan;

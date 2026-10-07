@@ -51,6 +51,11 @@ jobs:
         run: |
           cargo build --locked --release --bin kaze-run --example target_reference
           python3 scripts/target_acceptance.py --output reports/ci-target-crash
+      - name: External plan sends only after durable intent and never replays send permission
+        run: |
+          cargo build --locked --release --example external_plan_demo
+          python3 scripts/plan_crash.py --output reports/ci-plan-before-post
+          target/release/examples/external_plan_demo demo reports/ci-plan-demo > reports/ci-plan-demo.json
       - uses: actions/upload-artifact@v4
         with:
           name: storage-evidence-${{ matrix.os }}
@@ -62,3 +67,5 @@ jobs:
             reports/sql-first.json
             reports/sql-backup.json
             reports/ci-target-crash/summary.json
+            reports/ci-plan-before-post/summary.json
+            reports/ci-plan-demo.json
