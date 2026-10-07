@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-08 Asia/Shanghai",
+  "version": "0.7.0",
+  "base_commit": "9360dbd7d29960d655a2ed81fc1a5beaa6e3dd9f",
+  "source_sha256": {
+    "Cargo.toml": "a7fec781721858e0710d8288baa65fd7501f67e9c1b8888d0a36c999a80ba557",
+    "Cargo.lock": "fb6de879f518f6159cc964e9465e252d48dff8c64d52f4779d7482b2379fb005",
+    "src/target.rs": "4d9d20e39cff50c7b348a4ac61de850d9c6c2a3dcc71b6c0816bdbeb013dd38e",
+    "src/bar_strategy.rs": "5196b011b3411e9cea1fe7e7d04118ae2f3674460f7ff4edd71f3797c8f8c142",
+    "src/config.rs": "cf3b62d442f02cefc8a120890abd8bf033cbed13f25ca8d0b163805d8984bbaa",
+    "src/store.rs": "c8f0768cabc5c437bef070bfb9a18aafaf924e7e166cdb1426cd28ec0dbc3427",
+    "tests/algorithms.rs": "e8714cda0b86854818013401ed517b2db97178e8dced9dffbbeb8705c267e7f3",
+    "tests/target.rs": "4bae969fbb42738218b26f4ac4dee673246ddfb8b85d7a5245c9ff5f383687f5",
+    "examples/algo_reference.rs": "8d441d0e0dea73e31691a53d5c431cf0c603031fcc3ddc0bcebf40a07954756f",
+    "scripts/algo_crash.py": "19fe97d28c762d3392e0ca2c4c057ef0a981ddc7d1ca707d4bd7becfac0b292f",
+    "scripts/algo_compare.py": "f3fe7fad3bc2381e18949fda203de1525e6b71ecdb7cbd4fe574572168d7c84b"
+  },
+  "binary_sha256": {
+    "paper-v15-final": "f7886358e81aba3bac579e0561ea7eab1a74f0ba230b49bb13f20954976fd11a",
+    "paper-v16": "c597355929843ba203558d8dfc4ab498a810c7984dac2652a288e05a928650f7",
+    "target-v16": "fa52350001cb02a7d7255e7e2be909840f094b68c9b38557d888f31599ef88f3",
+    "algo-v16": "3e023ff48adc0c0046670c97ab6b1becc2b1c79ffc4745707c51f018b3ff0740",
+    "paper-v16-final": "5ad24c23ce9ec5eaca71d81eadce18c5a6edb304bcf90ebece4748a625548dfa",
+    "target-v16-final": "efa44b485a7b272a7102c1c6fb21fdda33d39d6e675b7e05821dda2a674eded6",
+    "algo-v16-final": "83c2fc28256049a903f3860d2619f15e4f9a8e2d46eb645e4ca02caef5999a65"
+  },
+  "build": "scripts/cargo.sh build --locked --all-features --release --bin kaze-run --example target_reference --example algo_reference; release thin LTO/codegen-units=1; rustc and host files included",
+  "checks": {
+    "fmt": true,
+    "clippy_all_features_all_targets_deny_warnings": true,
+    "rustdoc_deny_warnings": true,
+    "debug_rust": 285,
+    "release_rust": 285,
+    "python": 15,
+    "new_algorithm_tests": 14,
+    "new_sigkill_cases": 10,
+    "network_orders_this_iteration": 0,
+    "fresh_clone_default_binary_path": true
+  },
+  "failures_preserved": [
+    "Initial test closure returned a view with an invalid borrow lifetime; replaced by lifetime-correct helper function (first-tests.log).",
+    "Malformed-progress fixture initially edited an unused JSON path; corrected to strategy.Composition.parent.progress and asserted object shape (new-tests.log).",
+    "Initial million-quote Iceberg run had 3544 platform PriceCollar rejections. Added tracked-policy price-grid/band preflight; retained initial binary identity/data and reran final baseline.",
+    "First and final baselines ran sequentially across build revisions, not alternating controlled attribution; timings can drift."
+  ],
+  "scope": "paper single-market algorithms; no mainnet, external algo route, venue queue/hidden liquidity, real partial fill, new 24h or alpha acceptance",
+  "remote_ci": "unverified; adding CI steps is not remote pass evidence",
+  "source_reference_revision": "bee959dc464749f7cce66e766249ccdbb2d4869a",
+  "measurement": "Apple M5/macOS26.5.2 arm64; no CPU affinity/thermal control; final performance sequential after compilation/tests; raw rounds all retained; RSS sampled by ps every100ms can miss peaks",
+  "credentials": "No credential or database content included; frozen executables retained locally, manifest SHA identifies them"
+}

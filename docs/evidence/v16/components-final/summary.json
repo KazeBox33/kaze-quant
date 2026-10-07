@@ -1,0 +1,660 @@
+{
+  "success": true,
+  "quotes": 100000,
+  "repeats_each": 7,
+  "median_ns": {
+    "kaze": 21656833,
+    "vnpy-method": 46080625
+  },
+  "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+  "actions": 100000,
+  "all_original_intent_traces_equal": true,
+  "binary_sha256": "83c2fc28256049a903f3860d2619f15e4f9a8e2d46eb645e4ca02caef5999a65",
+  "source_sha256": "b1ee536daed9c662aaa35337ea50d1c28e91102953783939e8bd30789f0b70c3",
+  "revision": "bee959dc464749f7cce66e766249ccdbb2d4869a",
+  "config_sha256": "3cedcb5f3a31074ad304d73b22eb91452bc71fbf5117013bfea8923c40783f3a",
+  "input_sha256": "29d95baead0ccfad2580d2fa015aa8570fa80d635e29d56eca0c527b49e9ca9a",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.6 (main, Jun 10 2026, 10:03:53) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "source_url": "https://github.com/vnpy/vnpy_algotrading/blob/bee959dc464749f7cce66e766249ccdbb2d4869a/vnpy_algotrading/algos/best_limit_algo.py",
+  "runs": [
+    {
+      "actions": 100000,
+      "elapsed_ns": 44577708,
+      "scope": "CSV+full paper planning/risk/core/retention and accepted-submit/confirmed-cancel digest; no SQLite or event receipt serialization; zero-liquidity no-fill comparison trace",
+      "state": {
+        "clock_ns": 100000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "10000",
+            "equity_minor": "10000",
+            "fees_minor": "0",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 50000,
+              "cancelled": 50000,
+              "fills": 0,
+              "max_drawdown_minor": "0",
+              "orders_examined": 50000,
+              "peak_equity_minor": "10000",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "0",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_decision": {
+              "action": {
+                "Cancel": 50000
+              },
+              "authorized_lots": 10,
+              "exposure_bps": 10000,
+              "order_id": 50000,
+              "parent_id": 1,
+              "position_lots": 0,
+              "projected_lots": 5,
+              "quote_sequence": 100000,
+              "reason": "price_moved",
+              "target_lots": 10,
+              "timestamp_ns": 100000
+            },
+            "strategy_diagnostics": {
+              "algorithm": {
+                "limit_guard": 120,
+                "min_reprice_ns": 0,
+                "type": "best_limit"
+              },
+              "child": null,
+              "parent": {
+                "id": 1,
+                "progress": {
+                  "cancelled_children": 50000,
+                  "filled_lots": 0,
+                  "reprice_requests": 50000,
+                  "submitted_children": 50000
+                },
+                "side": "Buy",
+                "start_ns": 1,
+                "start_position": 0,
+                "target": 10,
+                "total": 10
+              },
+              "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+            },
+            "symbol": "BEST-LIMIT-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      },
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "round": 0,
+      "version": "kaze"
+    },
+    {
+      "elapsed_ns": 52497667,
+      "actions": 100000,
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "next_id": 50001,
+      "active_id": null,
+      "round": 0,
+      "version": "vnpy-method"
+    },
+    {
+      "elapsed_ns": 45985792,
+      "actions": 100000,
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "next_id": 50001,
+      "active_id": null,
+      "round": 1,
+      "version": "vnpy-method"
+    },
+    {
+      "actions": 100000,
+      "elapsed_ns": 21480250,
+      "scope": "CSV+full paper planning/risk/core/retention and accepted-submit/confirmed-cancel digest; no SQLite or event receipt serialization; zero-liquidity no-fill comparison trace",
+      "state": {
+        "clock_ns": 100000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "10000",
+            "equity_minor": "10000",
+            "fees_minor": "0",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 50000,
+              "cancelled": 50000,
+              "fills": 0,
+              "max_drawdown_minor": "0",
+              "orders_examined": 50000,
+              "peak_equity_minor": "10000",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "0",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_decision": {
+              "action": {
+                "Cancel": 50000
+              },
+              "authorized_lots": 10,
+              "exposure_bps": 10000,
+              "order_id": 50000,
+              "parent_id": 1,
+              "position_lots": 0,
+              "projected_lots": 5,
+              "quote_sequence": 100000,
+              "reason": "price_moved",
+              "target_lots": 10,
+              "timestamp_ns": 100000
+            },
+            "strategy_diagnostics": {
+              "algorithm": {
+                "limit_guard": 120,
+                "min_reprice_ns": 0,
+                "type": "best_limit"
+              },
+              "child": null,
+              "parent": {
+                "id": 1,
+                "progress": {
+                  "cancelled_children": 50000,
+                  "filled_lots": 0,
+                  "reprice_requests": 50000,
+                  "submitted_children": 50000
+                },
+                "side": "Buy",
+                "start_ns": 1,
+                "start_position": 0,
+                "target": 10,
+                "total": 10
+              },
+              "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+            },
+            "symbol": "BEST-LIMIT-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      },
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "round": 1,
+      "version": "kaze"
+    },
+    {
+      "actions": 100000,
+      "elapsed_ns": 21464291,
+      "scope": "CSV+full paper planning/risk/core/retention and accepted-submit/confirmed-cancel digest; no SQLite or event receipt serialization; zero-liquidity no-fill comparison trace",
+      "state": {
+        "clock_ns": 100000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "10000",
+            "equity_minor": "10000",
+            "fees_minor": "0",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 50000,
+              "cancelled": 50000,
+              "fills": 0,
+              "max_drawdown_minor": "0",
+              "orders_examined": 50000,
+              "peak_equity_minor": "10000",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "0",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_decision": {
+              "action": {
+                "Cancel": 50000
+              },
+              "authorized_lots": 10,
+              "exposure_bps": 10000,
+              "order_id": 50000,
+              "parent_id": 1,
+              "position_lots": 0,
+              "projected_lots": 5,
+              "quote_sequence": 100000,
+              "reason": "price_moved",
+              "target_lots": 10,
+              "timestamp_ns": 100000
+            },
+            "strategy_diagnostics": {
+              "algorithm": {
+                "limit_guard": 120,
+                "min_reprice_ns": 0,
+                "type": "best_limit"
+              },
+              "child": null,
+              "parent": {
+                "id": 1,
+                "progress": {
+                  "cancelled_children": 50000,
+                  "filled_lots": 0,
+                  "reprice_requests": 50000,
+                  "submitted_children": 50000
+                },
+                "side": "Buy",
+                "start_ns": 1,
+                "start_position": 0,
+                "target": 10,
+                "total": 10
+              },
+              "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+            },
+            "symbol": "BEST-LIMIT-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      },
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "round": 2,
+      "version": "kaze"
+    },
+    {
+      "elapsed_ns": 45586833,
+      "actions": 100000,
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "next_id": 50001,
+      "active_id": null,
+      "round": 2,
+      "version": "vnpy-method"
+    },
+    {
+      "elapsed_ns": 46080625,
+      "actions": 100000,
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "next_id": 50001,
+      "active_id": null,
+      "round": 3,
+      "version": "vnpy-method"
+    },
+    {
+      "actions": 100000,
+      "elapsed_ns": 21702125,
+      "scope": "CSV+full paper planning/risk/core/retention and accepted-submit/confirmed-cancel digest; no SQLite or event receipt serialization; zero-liquidity no-fill comparison trace",
+      "state": {
+        "clock_ns": 100000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "10000",
+            "equity_minor": "10000",
+            "fees_minor": "0",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 50000,
+              "cancelled": 50000,
+              "fills": 0,
+              "max_drawdown_minor": "0",
+              "orders_examined": 50000,
+              "peak_equity_minor": "10000",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "0",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_decision": {
+              "action": {
+                "Cancel": 50000
+              },
+              "authorized_lots": 10,
+              "exposure_bps": 10000,
+              "order_id": 50000,
+              "parent_id": 1,
+              "position_lots": 0,
+              "projected_lots": 5,
+              "quote_sequence": 100000,
+              "reason": "price_moved",
+              "target_lots": 10,
+              "timestamp_ns": 100000
+            },
+            "strategy_diagnostics": {
+              "algorithm": {
+                "limit_guard": 120,
+                "min_reprice_ns": 0,
+                "type": "best_limit"
+              },
+              "child": null,
+              "parent": {
+                "id": 1,
+                "progress": {
+                  "cancelled_children": 50000,
+                  "filled_lots": 0,
+                  "reprice_requests": 50000,
+                  "submitted_children": 50000
+                },
+                "side": "Buy",
+                "start_ns": 1,
+                "start_position": 0,
+                "target": 10,
+                "total": 10
+              },
+              "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+            },
+            "symbol": "BEST-LIMIT-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      },
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "round": 3,
+      "version": "kaze"
+    },
+    {
+      "actions": 100000,
+      "elapsed_ns": 21787250,
+      "scope": "CSV+full paper planning/risk/core/retention and accepted-submit/confirmed-cancel digest; no SQLite or event receipt serialization; zero-liquidity no-fill comparison trace",
+      "state": {
+        "clock_ns": 100000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "10000",
+            "equity_minor": "10000",
+            "fees_minor": "0",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 50000,
+              "cancelled": 50000,
+              "fills": 0,
+              "max_drawdown_minor": "0",
+              "orders_examined": 50000,
+              "peak_equity_minor": "10000",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "0",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_decision": {
+              "action": {
+                "Cancel": 50000
+              },
+              "authorized_lots": 10,
+              "exposure_bps": 10000,
+              "order_id": 50000,
+              "parent_id": 1,
+              "position_lots": 0,
+              "projected_lots": 5,
+              "quote_sequence": 100000,
+              "reason": "price_moved",
+              "target_lots": 10,
+              "timestamp_ns": 100000
+            },
+            "strategy_diagnostics": {
+              "algorithm": {
+                "limit_guard": 120,
+                "min_reprice_ns": 0,
+                "type": "best_limit"
+              },
+              "child": null,
+              "parent": {
+                "id": 1,
+                "progress": {
+                  "cancelled_children": 50000,
+                  "filled_lots": 0,
+                  "reprice_requests": 50000,
+                  "submitted_children": 50000
+                },
+                "side": "Buy",
+                "start_ns": 1,
+                "start_position": 0,
+                "target": 10,
+                "total": 10
+              },
+              "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+            },
+            "symbol": "BEST-LIMIT-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      },
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "round": 4,
+      "version": "kaze"
+    },
+    {
+      "elapsed_ns": 45882042,
+      "actions": 100000,
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "next_id": 50001,
+      "active_id": null,
+      "round": 4,
+      "version": "vnpy-method"
+    },
+    {
+      "elapsed_ns": 46278750,
+      "actions": 100000,
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "next_id": 50001,
+      "active_id": null,
+      "round": 5,
+      "version": "vnpy-method"
+    },
+    {
+      "actions": 100000,
+      "elapsed_ns": 21656833,
+      "scope": "CSV+full paper planning/risk/core/retention and accepted-submit/confirmed-cancel digest; no SQLite or event receipt serialization; zero-liquidity no-fill comparison trace",
+      "state": {
+        "clock_ns": 100000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "10000",
+            "equity_minor": "10000",
+            "fees_minor": "0",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 50000,
+              "cancelled": 50000,
+              "fills": 0,
+              "max_drawdown_minor": "0",
+              "orders_examined": 50000,
+              "peak_equity_minor": "10000",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "0",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_decision": {
+              "action": {
+                "Cancel": 50000
+              },
+              "authorized_lots": 10,
+              "exposure_bps": 10000,
+              "order_id": 50000,
+              "parent_id": 1,
+              "position_lots": 0,
+              "projected_lots": 5,
+              "quote_sequence": 100000,
+              "reason": "price_moved",
+              "target_lots": 10,
+              "timestamp_ns": 100000
+            },
+            "strategy_diagnostics": {
+              "algorithm": {
+                "limit_guard": 120,
+                "min_reprice_ns": 0,
+                "type": "best_limit"
+              },
+              "child": null,
+              "parent": {
+                "id": 1,
+                "progress": {
+                  "cancelled_children": 50000,
+                  "filled_lots": 0,
+                  "reprice_requests": 50000,
+                  "submitted_children": 50000
+                },
+                "side": "Buy",
+                "start_ns": 1,
+                "start_position": 0,
+                "target": 10,
+                "total": 10
+              },
+              "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+            },
+            "symbol": "BEST-LIMIT-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      },
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "round": 5,
+      "version": "kaze"
+    },
+    {
+      "actions": 100000,
+      "elapsed_ns": 21637792,
+      "scope": "CSV+full paper planning/risk/core/retention and accepted-submit/confirmed-cancel digest; no SQLite or event receipt serialization; zero-liquidity no-fill comparison trace",
+      "state": {
+        "clock_ns": 100000,
+        "closed": false,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "10000",
+            "equity_minor": "10000",
+            "fees_minor": "0",
+            "halted": null,
+            "market": 0,
+            "metrics": {
+              "accepted": 50000,
+              "cancelled": 50000,
+              "fills": 0,
+              "max_drawdown_minor": "0",
+              "orders_examined": 50000,
+              "peak_equity_minor": "10000",
+              "quotes": 100000,
+              "rejected": 0
+            },
+            "pnl_minor": "0",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_decision": {
+              "action": {
+                "Cancel": 50000
+              },
+              "authorized_lots": 10,
+              "exposure_bps": 10000,
+              "order_id": 50000,
+              "parent_id": 1,
+              "position_lots": 0,
+              "projected_lots": 5,
+              "quote_sequence": 100000,
+              "reason": "price_moved",
+              "target_lots": 10,
+              "timestamp_ns": 100000
+            },
+            "strategy_diagnostics": {
+              "algorithm": {
+                "limit_guard": 120,
+                "min_reprice_ns": 0,
+                "type": "best_limit"
+              },
+              "child": null,
+              "parent": {
+                "id": 1,
+                "progress": {
+                  "cancelled_children": 50000,
+                  "filled_lots": 0,
+                  "reprice_requests": 50000,
+                  "submitted_children": 50000
+                },
+                "side": "Buy",
+                "start_ns": 1,
+                "start_position": 0,
+                "target": 10,
+                "total": 10
+              },
+              "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+            },
+            "symbol": "BEST-LIMIT-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 100000,
+        "schema_version": 1
+      },
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "round": 6,
+      "version": "kaze"
+    },
+    {
+      "elapsed_ns": 46382500,
+      "actions": 100000,
+      "trace_sha256": "1c4b9fe8ba5755b73272a88f69c0e90ce4deccf0b5f8df648df8823ccf944690",
+      "next_id": 50001,
+      "active_id": null,
+      "round": 6,
+      "version": "vnpy-method"
+    }
+  ],
+  "scope": "source exact AST BestLimit class, stub event publication/no gateway or account, deterministic min=max5, immediate terminal cancel feedback, zero liquidity/no fills; Kaze CSV+full paper risk/account/core/retention+same intent digest; timing costs differ; no full framework, realistic maker queue, Iceberg speed, external route or platform superiority comparison"
+}

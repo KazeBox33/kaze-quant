@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "max_commands": 100000,
+  "markets": [
+    {
+      "symbol": "ICEBERG-DEMO",
+      "price_tick": 1,
+      "quantity_step": 1,
+      "engine": {
+        "initial_cash": "10000",
+        "max_position": 100,
+        "max_active_orders": 128,
+        "max_orders": 128,
+        "fee_bps": 10,
+        "latency_ns": 0
+      },
+      "risk": {
+        "max_order_notional": "200000",
+        "max_drawdown": "100000",
+        "max_quote_age_ns": 1000000000,
+        "price_collar_bps": 1000
+      },
+      "strategy": {
+        "type": "composition",
+        "plan": {
+          "version": 2,
+          "signal": {
+            "type": "constant",
+            "exposure_bps": 10000
+          },
+          "sizing": {
+            "type": "fixed_lots",
+            "lots": 10
+          },
+          "max_spread_bps": 10000,
+          "cooldown_ns": 0,
+          "min_rebalance_lots": 1,
+          "max_child_lots": 10,
+          "max_working_ns": 1000,
+          "schedule": {
+            "type": "iceberg",
+            "limit": 102,
+            "display_lots": 3,
+            "replenish_interval_ns": 5
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,3 +1,11 @@
+# 0.7纸面算法增量（v16）
+
+统一Immediate/TWAP/Iceberg/BestLimit执行完成；10个已确认阶段强杀恢复，285项debug/release Rust及15项Python通过。公开数据与固定vn.py源方法对照的范围及成本见[逐功能数据](FEATURE_SCORECARD.md)、[运行/接口](ALGORITHMIC_EXECUTION.md)。本轮没有测试网/主网下单，也没有补齐真实部分成交、非零真实费用反馈、新版24h或独立alpha门槛。远程CI待确认。
+
+以下保留历史验收记录；较新的逐功能记录优先，不能将历史测试网费用结论合并成新算法已验收。
+
+---
+
 # 0.4 验收与可复现实验
 
 最新策略功能（v13）：因果观测bid K线、收盘趋势和整数ATR距离仓位已接入标准注册表/纸面TWAP。13专项测试、本机debug/release各247 Rust、15 Python通过；百万报价741单/734成交，费用后净损益−1.83412116USDT且有未平仓。操作与首次性能基线见[BAR_ATR_STRATEGY](BAR_ATR_STRATEGY.md)、[FEATURE_SCORECARD](FEATURE_SCORECARD.md)。这不新增外部自动路由、实际止损或alpha准入；本轮未发布/未跑远程CI。

@@ -1,0 +1,16 @@
+   Compiling kaze-quant v0.6.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.65s
+     Running tests/algorithms.rs (target/debug/deps/algorithms-1db727c6a03acb4f)
+
+running 8 tests
+test fixed_limit_resources_use_limit_including_fee_instead_of_current_ask ... ok
+test pending_reprice_without_cancel_ack_survives_restore_and_never_replaces ... ok
+test best_limit_partial_fill_before_reprice_ack_and_never_overfills_parent ... ok
+test best_limit_reprice_debounce_and_price_guard_both_cancel_safely ... ok
+test iceberg_display_replenishment_no_burst_and_partial_fee_hand_ledger ... ok
+test malformed_display_guard_clock_and_parent_progress_are_rejected ... ok
+test failed_transaction_rolls_back_partial_fill_cancel_and_parent_counters ... ok
+test both_algorithms_every_checkpoint_and_sqlite_restart_equal_original_receipts ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.84s
+

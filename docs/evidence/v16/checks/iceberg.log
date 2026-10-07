@@ -1,0 +1,10 @@
+memory run=0 ns=880770000
+memory run=1 ns=870613625
+memory run=2 ns=884959542
+memory run=3 ns=894106084
+memory run=4 ns=891387000
+memory run=5 ns=900478541
+memory run=6 ns=898491792
+durable run=0 ns=2668967500 rss=8241152
+durable run=1 ns=2714772792 rss=8323072
+durable run=2 ns=2679745250 rss=8372224

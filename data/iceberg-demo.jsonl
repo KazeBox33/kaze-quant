@@ -1,0 +1,10 @@
+{"seq":1,"command":{"type":"quote","market":0,"quote":{"sequence":1,"timestamp_ns":1,"bid":100,"ask":101,"bid_quantity":0,"ask_quantity":0}}}
+{"seq":2,"command":{"type":"quote","market":0,"quote":{"sequence":2,"timestamp_ns":2,"bid":100,"ask":101,"bid_quantity":1,"ask_quantity":1}}}
+{"seq":3,"command":{"type":"quote","market":0,"quote":{"sequence":3,"timestamp_ns":3,"bid":100,"ask":101,"bid_quantity":1,"ask_quantity":1}}}
+{"seq":4,"command":{"type":"quote","market":0,"quote":{"sequence":4,"timestamp_ns":4,"bid":100,"ask":101,"bid_quantity":1,"ask_quantity":1}}}
+{"seq":5,"command":{"type":"quote","market":0,"quote":{"sequence":5,"timestamp_ns":6,"bid":100,"ask":101,"bid_quantity":0,"ask_quantity":0}}}
+{"seq":6,"command":{"type":"quote","market":0,"quote":{"sequence":6,"timestamp_ns":7,"bid":100,"ask":101,"bid_quantity":3,"ask_quantity":3}}}
+{"seq":7,"command":{"type":"quote","market":0,"quote":{"sequence":7,"timestamp_ns":100,"bid":100,"ask":101,"bid_quantity":0,"ask_quantity":0}}}
+{"seq":8,"command":{"type":"quote","market":0,"quote":{"sequence":8,"timestamp_ns":101,"bid":100,"ask":101,"bid_quantity":3,"ask_quantity":3}}}
+{"seq":9,"command":{"type":"quote","market":0,"quote":{"sequence":9,"timestamp_ns":105,"bid":100,"ask":101,"bid_quantity":0,"ask_quantity":0}}}
+{"seq":10,"command":{"type":"quote","market":0,"quote":{"sequence":10,"timestamp_ns":106,"bid":100,"ask":101,"bid_quantity":1,"ask_quantity":1}}}

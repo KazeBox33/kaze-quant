@@ -1,0 +1,17 @@
+   Compiling kaze-quant v0.6.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+error: lifetime may not live long enough
+   --> tests/algorithms.rs:255:9
+    |
+254 |       let view = |quote, engine: &kaze_quant::engine::Engine| -> StrategyView<'_> {
+    |                                  -                               ---------------- return type of closure is StrategyView<'2>
+    |                                  |
+    |                                  let's call the lifetime of this reference `'1`
+255 | /         StrategyView {
+256 | |             quote,
+257 | |             account: engine.account(),
+258 | |             active_orders: engine.active_count(),
+259 | |         }
+    | |_________^ returning this value requires that `'1` must outlive `'2`
+
+error: could not compile `kaze-quant` (test "algorithms") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

@@ -77,3 +77,6 @@ Linux/macOS [CI 37579229668](https://github.com/KazeBox33/kaze-quant/actions/run
 
 
 后续 v10 已完成有界固定毛量外部父子执行生命周期，见[EXTERNAL_PLAN](EXTERNAL_PLAN.md)。原币手续费/净仓位与本节纸面目标语义不同，尚未把composition直接自动路由到外部账户。
+
+
+后续v16将执行器扩展为四政策并提供composition v2统一进度/报告，原v1即时/TWAP保持兼容；Iceberg/BestLimit操作、边界与故障证据见[ALGORITHMIC_EXECUTION](ALGORITHMIC_EXECUTION.md)。

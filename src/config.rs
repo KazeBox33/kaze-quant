@@ -18,7 +18,7 @@ pub mod money {
 
 pub const SCHEMA_VERSION: u32 = 1;
 /// 更新会改变重放语义的代码时必须递增；旧日志不可悄悄采用新规则。
-pub const EXECUTION_REVISION: &str = "kaze-paper-v2-conditional";
+pub const EXECUTION_REVISION: &str = "kaze-paper-v3-algorithms";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -376,6 +376,12 @@ impl Strategy for BuiltinStrategy {
     fn decision(&self) -> Option<&crate::target::Decision> {
         match self {
             Self::Composition(s) => s.decision(),
+            _ => None,
+        }
+    }
+    fn diagnostics(&self) -> Option<serde_json::Value> {
+        match self {
+            Self::Composition(s) => s.diagnostics(),
             _ => None,
         }
     }

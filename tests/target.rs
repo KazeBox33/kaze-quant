@@ -366,7 +366,7 @@ fn malformed_parameters_and_engine_child_corruption_fail_closed() {
     };
     assert!(CompositionStrategy::new(p).is_err());
     let mut p = plan();
-    p.version = 2;
+    p.version = 3;
     assert!(config(p).validate().is_err());
     let c = config(plan());
     let mut r = PaperRuntime::new(c.clone()).unwrap();

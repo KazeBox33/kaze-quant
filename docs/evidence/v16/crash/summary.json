@@ -1,0 +1,293 @@
+{
+  "success": true,
+  "binary_sha256": "c597355929843ba203558d8dfc4ab498a810c7984dac2652a288e05a928650f7",
+  "ledgers": [
+    {
+      "algorithm": "iceberg",
+      "input_sha256": "a6280075842b5615e5600ec605149afe49f7f7008d0ee7ff44e9de0ebd2c4960",
+      "config_sha256": "03f4261af7d15e02e0986cbec14ab38a9a95024896a8b60a1815ad42625228d5",
+      "child_requests": [
+        {
+          "side": "Buy",
+          "limit": 102,
+          "quantity": 3,
+          "time_in_force": "GoodTilCancelled"
+        },
+        {
+          "side": "Buy",
+          "limit": 102,
+          "quantity": 3,
+          "time_in_force": "GoodTilCancelled"
+        },
+        {
+          "side": "Buy",
+          "limit": 102,
+          "quantity": 3,
+          "time_in_force": "GoodTilCancelled"
+        },
+        {
+          "side": "Buy",
+          "limit": 102,
+          "quantity": 1,
+          "time_in_force": "GoodTilCancelled"
+        }
+      ],
+      "state": {
+        "clock_ns": 106,
+        "closed": true,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "8984",
+            "equity_minor": "9984",
+            "fees_minor": "6",
+            "halted": "finished",
+            "market": 0,
+            "metrics": {
+              "accepted": 4,
+              "cancelled": 0,
+              "fills": 6,
+              "max_drawdown_minor": "16",
+              "orders_examined": 6,
+              "peak_equity_minor": "10000",
+              "quotes": 10,
+              "rejected": 0
+            },
+            "pnl_minor": "-16",
+            "position_units": 10,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_decision": {
+              "action": "None",
+              "authorized_lots": 10,
+              "exposure_bps": 10000,
+              "order_id": null,
+              "parent_id": 1,
+              "position_lots": 10,
+              "projected_lots": 10,
+              "quote_sequence": 10,
+              "reason": "aligned",
+              "target_lots": 10,
+              "timestamp_ns": 106
+            },
+            "strategy_diagnostics": {
+              "algorithm": {
+                "display_lots": 3,
+                "limit": 102,
+                "replenish_interval_ns": 5,
+                "type": "iceberg"
+              },
+              "child": null,
+              "parent": {
+                "id": 1,
+                "progress": {
+                  "cancelled_children": 0,
+                  "filled_lots": 10,
+                  "reprice_requests": 0,
+                  "submitted_children": 4
+                },
+                "side": "Buy",
+                "start_ns": 1,
+                "start_position": 0,
+                "target": 10,
+                "total": 10
+              },
+              "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+            },
+            "symbol": "ICEBERG-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 11,
+        "schema_version": 1
+      },
+      "audit_chain_sha256": "3a4a755e69e958ae33e7a81377c0a80db311fce1afd1bd182b577494abc36bbe"
+    },
+    {
+      "algorithm": "best-limit",
+      "input_sha256": "253ef3ad65d1cb8ec06005298a1e5caae3f17724f780c954307585a8f84a7857",
+      "config_sha256": "820d193e7285b564628509a5cd0ea506ac67ca8cea6de0f718dc55840ec0879b",
+      "child_requests": [
+        {
+          "side": "Buy",
+          "limit": 100,
+          "quantity": 5,
+          "time_in_force": "GoodTilCancelled"
+        },
+        {
+          "side": "Buy",
+          "limit": 99,
+          "quantity": 3,
+          "time_in_force": "GoodTilCancelled"
+        },
+        {
+          "side": "Buy",
+          "limit": 98,
+          "quantity": 2,
+          "time_in_force": "GoodTilCancelled"
+        }
+      ],
+      "state": {
+        "clock_ns": 6,
+        "closed": true,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "9502",
+            "equity_minor": "9987",
+            "fees_minor": "3",
+            "halted": "finished",
+            "market": 0,
+            "metrics": {
+              "accepted": 3,
+              "cancelled": 2,
+              "fills": 3,
+              "max_drawdown_minor": "13",
+              "orders_examined": 3,
+              "peak_equity_minor": "10000",
+              "quotes": 6,
+              "rejected": 0
+            },
+            "pnl_minor": "-13",
+            "position_units": 5,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_decision": {
+              "action": "None",
+              "authorized_lots": 5,
+              "exposure_bps": 10000,
+              "order_id": null,
+              "parent_id": 1,
+              "position_lots": 5,
+              "projected_lots": 5,
+              "quote_sequence": 6,
+              "reason": "aligned",
+              "target_lots": 5,
+              "timestamp_ns": 6
+            },
+            "strategy_diagnostics": {
+              "algorithm": {
+                "limit_guard": 120,
+                "min_reprice_ns": 0,
+                "type": "best_limit"
+              },
+              "child": null,
+              "parent": {
+                "id": 1,
+                "progress": {
+                  "cancelled_children": 2,
+                  "filled_lots": 5,
+                  "reprice_requests": 2,
+                  "submitted_children": 3
+                },
+                "side": "Buy",
+                "start_ns": 1,
+                "start_position": 0,
+                "target": 5,
+                "total": 5
+              },
+              "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+            },
+            "symbol": "BEST-LIMIT-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 7,
+        "schema_version": 1
+      },
+      "audit_chain_sha256": "47d84f2c3a9502ed14a4c289ac61c8a6130b0867c37b8f56da27edff99b74f35"
+    }
+  ],
+  "cases": [
+    {
+      "algorithm": "iceberg",
+      "confirmed_prefix": 1,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 11
+    },
+    {
+      "algorithm": "iceberg",
+      "confirmed_prefix": 2,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 11
+    },
+    {
+      "algorithm": "iceberg",
+      "confirmed_prefix": 4,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 11
+    },
+    {
+      "algorithm": "iceberg",
+      "confirmed_prefix": 7,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 11
+    },
+    {
+      "algorithm": "iceberg",
+      "confirmed_prefix": 10,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 11
+    },
+    {
+      "algorithm": "best-limit",
+      "confirmed_prefix": 1,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 7
+    },
+    {
+      "algorithm": "best-limit",
+      "confirmed_prefix": 2,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 7
+    },
+    {
+      "algorithm": "best-limit",
+      "confirmed_prefix": 3,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 7
+    },
+    {
+      "algorithm": "best-limit",
+      "confirmed_prefix": 4,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 7
+    },
+    {
+      "algorithm": "best-limit",
+      "confirmed_prefix": 6,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 7
+    }
+  ],
+  "network_posts": 0,
+  "scope": "owned process kill after durable receipt, including visible/partial/fill/cancel/replacement stages; no mid-transaction injected timing, venue-native iceberg, queue priority, external algo routing or 24h claim"
+}

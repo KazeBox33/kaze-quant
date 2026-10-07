@@ -40,7 +40,19 @@ pub enum SizingConfig {
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
 pub enum Schedule {
     Immediate,
-    Twap { interval_ns: u64, slices: u16 },
+    Twap {
+        interval_ns: u64,
+        slices: u16,
+    },
+    Iceberg {
+        limit: Price,
+        display_lots: u64,
+        replenish_interval_ns: u64,
+    },
+    BestLimit {
+        limit_guard: Price,
+        min_reprice_ns: u64,
+    },
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -57,7 +69,7 @@ pub struct CompositionConfig {
 }
 impl CompositionConfig {
     pub fn validate(&self) -> Result<(), &'static str> {
-        if self.version != 1
+        if !matches!(self.version, 1 | 2)
             || self.max_spread_bps > 10000
             || self.cooldown_ns > MAX_TIME
             || !(1..=MAX_TIME).contains(&self.max_working_ns)
@@ -112,6 +124,21 @@ impl CompositionConfig {
         {
             return Err("invalid TWAP interval/horizon");
         }
+        match self.schedule {
+            Schedule::Iceberg {
+                display_lots,
+                replenish_interval_ns,
+                ..
+            } if !(1..=Quantity::MAX).contains(&display_lots)
+                || replenish_interval_ns > MAX_TIME =>
+            {
+                return Err("invalid Iceberg display/interval");
+            }
+            Schedule::BestLimit { min_reprice_ns, .. } if min_reprice_ns > MAX_TIME => {
+                return Err("invalid BestLimit reprice interval");
+            }
+            _ => (),
+        }
         Ok(())
     }
     pub fn window_slots(&self) -> usize {
@@ -132,12 +159,33 @@ impl CompositionConfig {
         {
             return Err("composition target outside market position/grid");
         }
+        match self.schedule {
+            Schedule::Iceberg {
+                limit,
+                display_lots,
+                ..
+            } => {
+                if !limit.units().is_multiple_of(m.price_tick)
+                    || !display_lots.is_multiple_of(m.quantity_step)
+                {
+                    return Err("Iceberg limit/display outside market grid");
+                }
+            }
+            Schedule::BestLimit { limit_guard, .. }
+                if !limit_guard.units().is_multiple_of(m.price_tick) =>
+            {
+                return Err("BestLimit guard outside market grid");
+            }
+            _ => (),
+        }
         Ok(())
     }
 }
 /// PaperRuntime 在已验证市场边界提供这些约束；不改变旧 StrategyView 的公开构造方式。
 #[derive(Clone, Copy)]
 pub struct Constraints {
+    pub price_tick: u64,
+    pub price_collar_bps: u32,
     pub quantity_step: u64,
     pub max_position: u64,
     pub fee_bps: u32,
@@ -146,6 +194,8 @@ pub struct Constraints {
 impl Constraints {
     pub fn from_market(m: &crate::config::MarketConfig) -> Self {
         Self {
+            price_tick: m.price_tick,
+            price_collar_bps: m.risk.price_collar_bps,
             quantity_step: m.quantity_step,
             max_position: m.engine.max_position,
             fee_bps: m.engine.fee_bps,
@@ -154,6 +204,8 @@ impl Constraints {
     }
     fn valid(self) -> bool {
         (1..=Quantity::MAX).contains(&self.quantity_step)
+            && (1..=Price::MAX).contains(&self.price_tick)
+            && self.price_collar_bps <= 10000
             && (1..=Quantity::MAX).contains(&self.max_position)
             && self.fee_bps <= 10000
             && self.max_order_notional > 0
@@ -181,6 +233,12 @@ pub enum DecisionReason {
     EngineRejected(RejectReason),
     InvalidContext,
     ParentCapacity,
+    ReplenishWaiting,
+    PriceMoved,
+    PriceGuard,
+    ForeignPosition,
+    PriceBand,
+    PriceGrid,
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -215,6 +273,17 @@ struct Parent {
     target: u64,
     side: Side,
     total: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    progress: Option<ParentProgress>,
+}
+/// 新算法按自己的成交回报核对父计划，不把手工成交当执行进度。
+#[derive(Clone, Default, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ParentProgress {
+    filled_lots: u64,
+    submitted_children: u64,
+    cancelled_children: u64,
+    reprice_requests: u64,
 }
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -285,7 +354,7 @@ impl CompositionStrategy {
     }
     fn authorized(&self, p: &Parent, step: u64, now: u64) -> u64 {
         match self.config.schedule {
-            Schedule::Immediate => p.total,
+            Schedule::Immediate | Schedule::Iceberg { .. } | Schedule::BestLimit { .. } => p.total,
             Schedule::Twap {
                 interval_ns,
                 slices,
@@ -295,6 +364,44 @@ impl CompositionStrategy {
                     .min(u64::from(slices));
                 (u128::from(p.total / step) * u128::from(due) / u128::from(slices)) as u64 * step
             }
+        }
+    }
+    fn tracks_parent_fills(&self) -> bool {
+        self.config.version == 2
+            || matches!(
+                self.config.schedule,
+                Schedule::Iceberg { .. } | Schedule::BestLimit { .. }
+            )
+    }
+    fn execution_limit(&self, side: Side, q: Quote) -> Price {
+        match self.config.schedule {
+            Schedule::Iceberg { limit, .. } => limit,
+            Schedule::BestLimit { .. } => {
+                if side == Side::Buy {
+                    q.bid
+                } else {
+                    q.ask
+                }
+            }
+            _ => {
+                if side == Side::Buy {
+                    q.ask
+                } else {
+                    q.bid
+                }
+            }
+        }
+    }
+    fn within_guard(&self, side: Side, limit: Price) -> bool {
+        match self.config.schedule {
+            Schedule::BestLimit { limit_guard, .. } => {
+                if side == Side::Buy {
+                    limit <= limit_guard
+                } else {
+                    limit >= limit_guard
+                }
+            }
+            _ => true,
         }
     }
     fn finish(&mut self, mut d: Decision, reason: DecisionReason, action: Action) -> Action {
@@ -381,6 +488,44 @@ impl CompositionStrategy {
         if v.active_orders > usize::from(self.child.is_some()) {
             return self.finish(d, DecisionReason::ForeignWorking, Action::None);
         }
+        if self.parent.as_ref().is_some_and(|p| {
+            p.progress.as_ref().is_some_and(|progress| {
+                let expected = if p.side == Side::Buy {
+                    p.start_position + progress.filled_lots
+                } else {
+                    p.start_position - progress.filled_lots
+                };
+                expected != pos
+            })
+        }) {
+            let action = if let Some(child) = &mut self.child {
+                if child.cancel_pending {
+                    Action::None
+                } else {
+                    child.cancel_pending = true;
+                    Action::Cancel(child.id)
+                }
+            } else {
+                Action::None
+            };
+            return self.finish(d, DecisionReason::ForeignPosition, action);
+        }
+        let desired_child_limit = self
+            .child
+            .as_ref()
+            .map(|child| self.execution_limit(child.request.side, v.quote));
+        let price_guard = self.child.as_ref().is_some_and(|child| {
+            !self.within_guard(
+                child.request.side,
+                desired_child_limit.expect("child limit"),
+            )
+        });
+        let min_reprice_ns =
+            if let Schedule::BestLimit { min_reprice_ns, .. } = self.config.schedule {
+                Some(min_reprice_ns)
+            } else {
+                None
+            };
         if let Some(child) = &mut self.child {
             d.order_id = Some(child.id);
             if child.cancel_pending {
@@ -392,15 +537,32 @@ impl CompositionStrategy {
             };
             let expired = v.quote.timestamp_ns.saturating_sub(child.submitted_ns)
                 >= self.config.max_working_ns;
-            if wrong || expired {
+            let reprice = min_reprice_ns.is_some_and(|interval| {
+                child.request.limit != desired_child_limit.expect("child limit")
+                    && v.quote.timestamp_ns.saturating_sub(child.submitted_ns) >= interval
+            });
+            if wrong || expired || price_guard || reprice {
                 child.cancel_pending = true;
                 let id = child.id;
+                if reprice
+                    && !wrong
+                    && !expired
+                    && !price_guard
+                    && let Some(p) = &mut self.parent
+                    && let Some(progress) = &mut p.progress
+                {
+                    progress.reprice_requests += 1;
+                }
                 return self.finish(
                     d,
                     if wrong {
                         DecisionReason::TargetChanged
-                    } else {
+                    } else if expired {
                         DecisionReason::WorkingExpired
+                    } else if price_guard {
+                        DecisionReason::PriceGuard
+                    } else {
+                        DecisionReason::PriceMoved
                     },
                     Action::Cancel(id),
                 );
@@ -423,6 +585,16 @@ impl CompositionStrategy {
             return self.finish(d, DecisionReason::Dust, Action::None);
         }
         let side = if target > pos { Side::Buy } else { Side::Sell };
+        if let Schedule::Iceberg {
+            replenish_interval_ns,
+            ..
+        } = self.config.schedule
+            && self
+                .last_submit_ns
+                .is_some_and(|t| v.quote.timestamp_ns.saturating_sub(t) < replenish_interval_ns)
+        {
+            return self.finish(d, DecisionReason::ReplenishWaiting, Action::None);
+        }
         if side == Side::Buy
             && self
                 .last_submit_ns
@@ -448,25 +620,47 @@ impl CompositionStrategy {
                 target,
                 side,
                 total: delta,
+                progress: self.tracks_parent_fills().then(ParentProgress::default),
             });
         }
         let p = self.parent.as_ref().expect("parent installed");
         d.parent_id = Some(p.id);
         let authorized = self.authorized(p, c.quantity_step, v.quote.timestamp_ns);
         d.authorized_lots = authorized;
-        let completed = pos.abs_diff(p.start_position);
+        let completed = p.progress.as_ref().map_or_else(
+            || pos.abs_diff(p.start_position),
+            |progress| progress.filled_lots,
+        );
         let due = authorized.saturating_sub(completed);
         if due == 0 {
             return self.finish(d, DecisionReason::SliceNotDue, Action::None);
         }
-        let limit = match side {
-            Side::Buy => v.quote.ask,
-            Side::Sell => v.quote.bid,
-        };
+        let limit = self.execution_limit(side, v.quote);
+        if !self.within_guard(side, limit) {
+            return self.finish(d, DecisionReason::PriceGuard, Action::None);
+        }
+        if self.tracks_parent_fills() {
+            if !limit.units().is_multiple_of(c.price_tick) {
+                return self.finish(d, DecisionReason::PriceGrid, Action::None);
+            }
+            let reference = if side == Side::Buy {
+                v.quote.ask
+            } else {
+                v.quote.bid
+            };
+            if u128::from(limit.units().abs_diff(reference.units())) * 10000
+                > u128::from(reference.units()) * u128::from(c.price_collar_bps)
+            {
+                return self.finish(d, DecisionReason::PriceBand, Action::None);
+            }
+        }
+        // 目标预算仍按现价计算；实际买单冻结/资源夹紧必须按委托限价覆盖费用。
+        let execution_per_unit =
+            i128::from(limit.units()) + fee(i128::from(limit.units()), c.fee_bps);
         let budget = (c.max_order_notional / i128::from(limit.units()))
             .min(i128::from(Quantity::MAX)) as u64;
         let available = match side {
-            Side::Buy => (v.account.available_cash() / per_unit)
+            Side::Buy => (v.account.available_cash() / execution_per_unit)
                 .max(0)
                 .min(i128::from(Quantity::MAX)) as u64,
             Side::Sell => pos - v.account.reserved_sell(),
@@ -474,6 +668,13 @@ impl CompositionStrategy {
         let size = due
             .min(delta)
             .min(self.config.max_child_lots)
+            .min(
+                if let Schedule::Iceberg { display_lots, .. } = self.config.schedule {
+                    display_lots
+                } else {
+                    Quantity::MAX
+                },
+            )
             .min(budget)
             .min(available)
             / c.quantity_step
@@ -539,6 +740,16 @@ impl CompositionStrategy {
             {
                 return Err("invalid target parent");
             }
+            if p.progress.is_some() != self.tracks_parent_fills()
+                || p.progress.as_ref().is_some_and(|progress| {
+                    progress.filled_lots > p.total
+                        || progress.submitted_children > crate::engine::MAX_LIFETIME_ORDERS
+                        || progress.cancelled_children > progress.submitted_children
+                        || progress.reprice_requests > progress.submitted_children
+                })
+            {
+                return Err("invalid algorithm parent progress");
+            }
         } else if self.generation != 0 {
             return Err("target generation lacks parent");
         }
@@ -553,6 +764,32 @@ impl CompositionStrategy {
                 }))
         {
             return Err("invalid target child");
+        }
+        if let Some(ch) = &self.child
+            && self.tracks_parent_fills()
+        {
+            let display = if let Schedule::Iceberg { display_lots, .. } = config.schedule {
+                display_lots
+            } else {
+                Quantity::MAX
+            };
+            if ch.request.quantity.units() > config.max_child_lots.min(display)
+                || !self.within_guard(ch.request.side, ch.request.limit)
+                || matches!(config.schedule, Schedule::Iceberg { limit, .. } if ch.request.limit != limit)
+                || self
+                    .parent
+                    .as_ref()
+                    .and_then(|p| p.progress.as_ref())
+                    .is_none_or(|p| {
+                        p.submitted_children == 0
+                            || self
+                                .parent
+                                .as_ref()
+                                .is_some_and(|parent| p.filled_lots + ch.remaining > parent.total)
+                    })
+            {
+                return Err("algorithm child outside display/guard/progress");
+            }
         }
         if let Some(d) = &self.decision
             && (d.quote_sequence == 0
@@ -632,6 +869,11 @@ impl Strategy for CompositionStrategy {
         };
         match result {
             Ok(id) => {
+                if let Some(p) = &mut self.parent
+                    && let Some(progress) = &mut p.progress
+                {
+                    progress.submitted_children += 1;
+                }
                 self.child = Some(Child {
                     id,
                     request: r,
@@ -656,6 +898,11 @@ impl Strategy for CompositionStrategy {
                         return;
                     }
                     ch.remaining -= f.quantity;
+                    if let Some(p) = &mut self.parent
+                        && let Some(progress) = &mut p.progress
+                    {
+                        progress.filled_lots += f.quantity;
+                    }
                     if ch.remaining == 0 {
                         self.child = None;
                     }
@@ -664,6 +911,11 @@ impl Strategy for CompositionStrategy {
             Event::Cancelled { order_id, .. }
                 if self.child.as_ref().is_some_and(|c| c.id == order_id) =>
             {
+                if let Some(p) = &mut self.parent
+                    && let Some(progress) = &mut p.progress
+                {
+                    progress.cancelled_children += 1;
+                }
                 self.child = None;
             }
             _ => {}
@@ -677,5 +929,8 @@ impl Strategy for CompositionStrategy {
     }
     fn decision(&self) -> Option<&Decision> {
         CompositionStrategy::decision(self)
+    }
+    fn diagnostics(&self) -> Option<serde_json::Value> {
+        self.tracks_parent_fills().then(|| serde_json::json!({"algorithm":self.config.schedule,"parent":self.parent,"child":self.child,"scope":"single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"}))
     }
 }

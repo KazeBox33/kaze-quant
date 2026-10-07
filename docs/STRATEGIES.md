@@ -42,3 +42,8 @@ cargo run --locked --release --bin kaze-research -- reports/research-plan.json r
 ## breakout-bracket v1与条件回调
 
 新增`Action::SubmitConditional/CancelConditional`、`on_conditional_event`与恢复时`validate_conditionals`默认钩子；自定义策略需要跟踪自己的条件ID与子单映射。标准策略参数/单次阶段/恢复/未保护部分入场范围见[CONDITIONAL_ORDERS](CONDITIONAL_ORDERS.md)。使用PaperRuntime/kaze-run；轻量CSV replay不支持执行条件动作。
+
+
+## composition v2与可插拔算法执行
+
+即时/TWAP/Iceberg/BestLimit使用同一执行器和资源/反馈事务路径，v2增加自己成交父进度与人工成交隔离；bar-ATR现有execution.schedule也可配置新两政策。旧v1即时/TWAP不新增报告/检查点字段。语义与例子见[ALGORITHMIC_EXECUTION](ALGORITHMIC_EXECUTION.md)。

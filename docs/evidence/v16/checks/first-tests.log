@@ -1,0 +1,76 @@
+   Compiling kaze-quant v0.6.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.71s
+     Running tests/bar_strategy.rs (target/debug/deps/bar_strategy-b1d732fc8473f3f8)
+
+running 8 tests
+test sizing_caps_and_integer_distance_prevent_flat_price_division_by_zero ... ok
+test incomplete_bar_does_not_change_signal_and_atr_growth_reduces_target ... ok
+test gap_resets_warmup_and_no_future_fill_is_synthesized ... ok
+test market_position_grid_and_hard_history_risk_still_bound_generated_orders ... ok
+test state_factory_rejects_identity_window_source_and_future_conflicts ... ok
+test future_pending_bar_is_rejected_by_runtime_restore ... ok
+test every_quote_restore_is_identical_and_generates_both_buy_and_sell ... ok
+test sqlite_restarts_with_open_bar_and_indicators_and_failed_batch_rolls_back ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.57s
+
+     Running tests/paper.rs (target/debug/deps/paper-d26528f27c2fd486)
+
+running 15 tests
+test action_overflow_halts_before_applying_any_signal_even_if_strategy_ignores_error ... ok
+test duplicate_or_gap_commands_are_atomic_in_memory ... ok
+test history_capacity_rejects_without_consuming_ids_or_engine_metrics ... ok
+test custom_batch_strategy_shares_liquidity_and_receives_execution_callbacks ... ok
+test budgets_routing_and_fees_follow_hand_ledger ... ok
+test bad_quote_and_unknown_market_do_not_advance_clock_or_state ... ok
+test drawdown_trip_preserves_filled_position_and_releases_rest ... ok
+test finish_seals_session_and_operator_halt_is_irreversible ... ok
+test mean_reversion_warms_window_and_executes_on_next_quote ... ok
+test config_and_wire_types_fail_on_invalid_bounds_and_typos ... ok
+test no_market_is_a_business_rejection ... ok
+test passive_config_rejects_unknown_variant_fields ... ok
+test order_notional_price_collar_and_grid_are_checked ... ok
+test quote_gap_cancels_before_new_quote_can_fill_resting_order ... ok
+test watchdog_boundary_and_cross_asset_timeout_are_deterministic ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/store.rs (target/debug/deps/store-4b221f97a2aab88b)
+
+running 11 tests
+test invalid_late_command_rolls_back_whole_candidate_and_sequence ... ok
+test hot_history_remains_bounded_and_ids_never_reuse_beyond_legacy_capacity ... ok
+test duplicates_inside_and_after_restart_never_reapply ... ok
+test disk_write_failure_keeps_memory_unchanged_and_poisoned_until_recovery ... ok
+test mid_history_damage_requires_full_audit_and_is_never_silently_repaired ... ok
+test online_backup_restores_identical_state_and_never_overwrites ... ok
+test reader_pinned_wal_applies_backpressure_then_resumes ... ok
+test exclusive_writer_and_manifest_changes_are_rejected ... ok
+test checkpoint_corruption_and_rehashed_invalid_state_are_rejected ... ok
+test real_sqlite_full_rolls_back_and_recovers_last_confirmed_batch ... ok
+test batches_restart_and_full_audit_match_every_reference_receipt ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.93s
+
+     Running tests/target.rs (target/debug/deps/target-27512fc9291b9ef7)
+
+running 16 tests
+test missed_slice_times_and_working_partial_order_never_create_burst_children ... ok
+test expired_child_is_cancelled_and_replaced_only_on_later_quote ... ok
+test cooldown_does_not_cancel_own_working_order_or_block_exit ... ok
+test grid_and_twap_integer_remainder_are_exact_and_never_fill_same_quote ... ok
+test invalid_context_zero_budget_position_cap_dust_and_single_slice_are_bounded ... ok
+test manual_order_is_not_silently_adopted_or_cancelled_by_composition ... ok
+test cash_sizing_includes_per_unit_fee_and_platform_capacity_rejection_clears_proposal ... ok
+test repeated_target_and_partial_fills_do_not_duplicate_pending_exposure ... ok
+test research_warmup_seeds_indicators_but_never_transfers_training_positions ... ok
+test pending_cancel_survives_strategy_restore_without_replacement_permission ... ok
+test spread_gate_cancels_pending_buys_and_does_not_block_risk_reduction ... ok
+test target_reversal_cancels_remaining_before_selling_actual_partial_position ... ok
+test malformed_parameters_and_engine_child_corruption_fail_closed ... ok
+test signal_prefixes_and_every_checkpoint_produce_identical_causal_decisions ... ok
+test failed_transaction_rolls_back_partial_fill_and_child_progress_together ... ok
+test sqlite_batch_retries_restarts_and_failed_write_keep_identical_parent_child_receipts ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.50s
+

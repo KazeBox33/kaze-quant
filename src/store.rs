@@ -17,7 +17,7 @@ const MAX_COMMAND: usize = 8192;
 const MAX_RECEIPT: usize = 8 * 1024 * 1024;
 const MAX_BATCH_RECEIPTS: usize = 16 * 1024 * 1024;
 type AuditRow = (u64, Vec<u8>, Vec<u8>, Vec<u8>);
-const REVISION: &str = "kaze-sql-v2-conditional";
+const REVISION: &str = "kaze-sql-v3-algorithms";
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct StoreOptions {

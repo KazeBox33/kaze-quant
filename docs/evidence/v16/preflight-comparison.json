@@ -1,0 +1,72 @@
+{
+  "iceberg": {
+    "public_prefix_commands": 100000,
+    "changed_raw_receipts": 0,
+    "all_other_notices_equal": true,
+    "excluded_notice_types": [
+      "strategy_decision",
+      "risk_rejected"
+    ],
+    "notice_counts": [
+      {
+        "strategy_decision": 100000,
+        "engine": 154
+      },
+      {
+        "strategy_decision": 100000,
+        "engine": 154
+      }
+    ],
+    "notice_json_lines_sha256": "92c2743913e5b1e43cc7ffce088ac2928d5199f81c29a5e6097629ad421c4792",
+    "million_final_fields_equal": [
+      "cash_minor",
+      "equity_minor",
+      "fees_minor",
+      "pnl_minor",
+      "position_units",
+      "reserved_cash_minor",
+      "metrics",
+      "strategy_diagnostics"
+    ],
+    "risk_rejections_before": 3544,
+    "risk_rejections_after": 0,
+    "before_binary_sha256": "c597355929843ba203558d8dfc4ab498a810c7984dac2652a288e05a928650f7",
+    "after_binary_sha256": "5ad24c23ce9ec5eaca71d81eadce18c5a6edb304bcf90ebece4748a625548dfa",
+    "scope": "first 100000 command non-decision/non-risk notices compared exactly; million final fields equal, not million per-event equality or alternating performance attribution"
+  },
+  "best-limit": {
+    "public_prefix_commands": 100000,
+    "changed_raw_receipts": 0,
+    "all_other_notices_equal": true,
+    "excluded_notice_types": [
+      "strategy_decision",
+      "risk_rejected"
+    ],
+    "notice_counts": [
+      {
+        "strategy_decision": 100000,
+        "engine": 74
+      },
+      {
+        "strategy_decision": 100000,
+        "engine": 74
+      }
+    ],
+    "notice_json_lines_sha256": "b39478cbb0397bfff9b108acaf28c275f648f2eef1cc58b10ee8f02bbbf5b4b2",
+    "million_final_fields_equal": [
+      "cash_minor",
+      "equity_minor",
+      "fees_minor",
+      "pnl_minor",
+      "position_units",
+      "reserved_cash_minor",
+      "metrics",
+      "strategy_diagnostics"
+    ],
+    "risk_rejections_before": 0,
+    "risk_rejections_after": 0,
+    "before_binary_sha256": "c597355929843ba203558d8dfc4ab498a810c7984dac2652a288e05a928650f7",
+    "after_binary_sha256": "5ad24c23ce9ec5eaca71d81eadce18c5a6edb304bcf90ebece4748a625548dfa",
+    "scope": "first 100000 command non-decision/non-risk notices compared exactly; million final fields equal, not million per-event equality or alternating performance attribution"
+  }
+}

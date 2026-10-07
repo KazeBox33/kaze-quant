@@ -156,10 +156,14 @@ impl BarAtrStrategy {
             .unwrap_or(0)
     }
     pub fn diagnostics(&self) -> serde_json::Value {
-        serde_json::json!({"source":"observed bid OHLC, not traded-volume candles","closed_bars":self.closed_bars,"missing_buckets":self.missing_buckets,
+        let mut diagnostics = serde_json::json!({"source":"observed bid OHLC, not traded-volume candles","closed_bars":self.closed_bars,"missing_buckets":self.missing_buckets,
             "last_closed":self.last_closed,"pending":self.bars.pending(),"atr_units":self.atr.value(),"trend_mean_units":self.mean.value(),
             "ready":!self.faulted && self.atr.value().is_some() && self.mean.value().is_some(),"exposure":self.exposure,"distance_units":self.distance_units(),
-            "requested_target_lots":self.requested_target(),"faulted":self.faulted,"scope":"long-only paper signal and ATR distance sizing; no installed stop loss, exchange candle volume, future data, external venue route or alpha proof"})
+            "requested_target_lots":self.requested_target(),"faulted":self.faulted,"scope":"long-only paper signal and ATR distance sizing; no installed stop loss, exchange candle volume, future data, external venue route or alpha proof"});
+        if let Some(execution) = self.execution.diagnostics() {
+            diagnostics["execution"] = execution;
+        }
+        diagnostics
     }
     fn validate_state(&self, p: &Parameters) -> Result<(), &'static str> {
         p.validate()?;

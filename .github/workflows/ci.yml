@@ -65,6 +65,11 @@ jobs:
           cargo build --locked --release --bin kaze-run
           target/release/kaze-run --config configs/bar-atr-demo.json --input data/bar-atr-demo.jsonl --db reports/ci-bar.db --finish --verify-full --report reports/ci-bar.json
           target/release/kaze-run --config configs/bar-atr-demo.json --db reports/ci-bar.db --recover-only --verify-full --report reports/ci-bar-recovery.json
+      - name: Unified paper execution matches BestLimit source intent trace and survives crashes
+        run: |
+          cargo build --locked --release --bin kaze-run --example algo_reference
+          python3 scripts/algo_crash.py --output reports/ci-algo-crash
+          python3 scripts/algo_compare.py --binary target/release/examples/algo_reference --source docs/evidence/v16/upstream-best-limit.py.txt --output reports/ci-best-limit-compare --repeats 1
       - name: Local conditional CTA survives committed crash stages
         run: |
           cargo build --locked --release --bin kaze-run
@@ -98,6 +103,8 @@ jobs:
             reports/ci-bar-recovery.json
             reports/ci-orders.jsonl
             reports/ci-conditional-crash/summary.json
+            reports/ci-algo-crash/summary.json
+            reports/ci-best-limit-compare/summary.json
             reports/ci-net-execution-crash/summary.json
             reports/ci-net-execution.json
             reports/ci-net-budget.json

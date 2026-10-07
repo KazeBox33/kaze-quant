@@ -120,3 +120,8 @@ JSON 报告是某一高水位的状态检查点/观察结果，不是恢复输�
 ## 0.6条件运行容量
 
 等待条件独立有界；单条SQLite回执8MiB、整批编码回执16MiB、检查点64MiB，仍受磁盘/WAL配额约束。大规模多资产同时间触发可能整批容量拒绝，确认前不前移输入高水位；拒绝批次不输出成交确认。策略Paused保留持仓，停止限价跳空不保证成交，见[CONDITIONAL_ORDERS](CONDITIONAL_ORDERS.md)。旧会话只能由原二进制恢复，不删除manifest或修改执行版本绕过绑定。
+
+
+## 0.7统一执行会话
+
+composition v2的四种算法保存自己的成交进度，v1旧Immediate/TWAP保留原经济规则。执行/SQL版本变化后保留旧二进制审计旧会话，新二进制新路径运行。Iceberg等待不冻结整父量；BestLimit撤单确认前不替换。人工成交造成ForeignPosition时停止并核对，不自动吸收外部仓位。示例与完整边界见[ALGORITHMIC_EXECUTION](ALGORITHMIC_EXECUTION.md)。这些是纸面算法，没有连接外部连续下单路由。

@@ -1,0 +1,158 @@
+{
+  "version": "v16 / 0.7.0",
+  "iceberg": {
+    "before": "no display/replenish policy",
+    "child_lots": [
+      3,
+      3,
+      3,
+      1
+    ],
+    "first_reserved_minor": 309,
+    "cash_minor": "8984",
+    "position": 10,
+    "fees_minor": "6",
+    "million_memory_median_ns": 878301084,
+    "million_quotes_per_second": 1138561.7281100838,
+    "hundred_thousand_durable_median_ns": 2694011500,
+    "durable_quotes_per_second": 37119.3664169585,
+    "risk_rejections_initial_to_final": [
+      3544,
+      0
+    ],
+    "partial_fee_fills": 6,
+    "scope": "synthetic visible child limit, no native hidden queue"
+  },
+  "best_limit": {
+    "before": "no own-side price-follow/replacement policy",
+    "child_lots": [
+      5,
+      3,
+      2
+    ],
+    "child_prices": [
+      100,
+      99,
+      98
+    ],
+    "cancelled": 2,
+    "filled_lots": 5,
+    "cash_minor": "9502",
+    "fees_minor": "3",
+    "million_memory_median_ns": 885502334,
+    "million_quotes_per_second": 1129302.5005171811,
+    "hundred_thousand_durable_median_ns": 2651899500,
+    "durable_quotes_per_second": 37708.819659266876,
+    "upstream_intent_actions": 100000,
+    "upstream_all_original_intent_traces_equal": true,
+    "method_median_ns": {
+      "kaze": 21656833,
+      "vnpy-method": 46080625
+    },
+    "scope": "source exact AST BestLimit class, stub event publication/no gateway or account, deterministic min=max5, immediate terminal cancel feedback, zero liquidity/no fills; Kaze CSV+full paper risk/account/core/retention+same intent digest; timing costs differ; no full framework, realistic maker queue, Iceberg speed, external route or platform superiority comparison"
+  },
+  "unified_parent": {
+    "before": "v1 Immediate/TWAP position-derived progress",
+    "after": "v2 all four schedules count actual own fills and report accepted/cancelled/reprice children",
+    "twap_v1_v2_original_receipts_equal": "14-test suite v2 TWAP case; CLI v2 21 commands audit+recovery equal",
+    "foreign_position": "hold and cancel own child if needed, not multi-strategy subaccounts"
+  },
+  "recovery": {
+    "sigkill_cases": 10,
+    "success": true,
+    "scope": "owned process kill after durable receipt, including visible/partial/fill/cancel/replacement stages; no mid-transaction injected timing, venue-native iceberg, queue priority, external algo routing or 24h claim"
+  },
+  "preflight": {
+    "iceberg": {
+      "public_prefix_commands": 100000,
+      "changed_raw_receipts": 0,
+      "all_other_notices_equal": true,
+      "excluded_notice_types": [
+        "strategy_decision",
+        "risk_rejected"
+      ],
+      "notice_counts": [
+        {
+          "strategy_decision": 100000,
+          "engine": 154
+        },
+        {
+          "strategy_decision": 100000,
+          "engine": 154
+        }
+      ],
+      "notice_json_lines_sha256": "92c2743913e5b1e43cc7ffce088ac2928d5199f81c29a5e6097629ad421c4792",
+      "million_final_fields_equal": [
+        "cash_minor",
+        "equity_minor",
+        "fees_minor",
+        "pnl_minor",
+        "position_units",
+        "reserved_cash_minor",
+        "metrics",
+        "strategy_diagnostics"
+      ],
+      "risk_rejections_before": 3544,
+      "risk_rejections_after": 0,
+      "before_binary_sha256": "c597355929843ba203558d8dfc4ab498a810c7984dac2652a288e05a928650f7",
+      "after_binary_sha256": "5ad24c23ce9ec5eaca71d81eadce18c5a6edb304bcf90ebece4748a625548dfa",
+      "scope": "first 100000 command non-decision/non-risk notices compared exactly; million final fields equal, not million per-event equality or alternating performance attribution"
+    },
+    "best-limit": {
+      "public_prefix_commands": 100000,
+      "changed_raw_receipts": 0,
+      "all_other_notices_equal": true,
+      "excluded_notice_types": [
+        "strategy_decision",
+        "risk_rejected"
+      ],
+      "notice_counts": [
+        {
+          "strategy_decision": 100000,
+          "engine": 74
+        },
+        {
+          "strategy_decision": 100000,
+          "engine": 74
+        }
+      ],
+      "notice_json_lines_sha256": "b39478cbb0397bfff9b108acaf28c275f648f2eef1cc58b10ee8f02bbbf5b4b2",
+      "million_final_fields_equal": [
+        "cash_minor",
+        "equity_minor",
+        "fees_minor",
+        "pnl_minor",
+        "position_units",
+        "reserved_cash_minor",
+        "metrics",
+        "strategy_diagnostics"
+      ],
+      "risk_rejections_before": 0,
+      "risk_rejections_after": 0,
+      "before_binary_sha256": "c597355929843ba203558d8dfc4ab498a810c7984dac2652a288e05a928650f7",
+      "after_binary_sha256": "5ad24c23ce9ec5eaca71d81eadce18c5a6edb304bcf90ebece4748a625548dfa",
+      "scope": "first 100000 command non-decision/non-risk notices compared exactly; million final fields equal, not million per-event equality or alternating performance attribution"
+    }
+  },
+  "legacy_compatibility": {
+    "same_original_receipts_and_state": true,
+    "median_ns": {
+      "old": 2698877750,
+      "new": 2661859875
+    },
+    "new_over_old_time": 0.9862839748854871,
+    "alternating_pairs": 7
+  },
+  "checks": {
+    "fmt": true,
+    "clippy_all_features_all_targets_deny_warnings": true,
+    "rustdoc_deny_warnings": true,
+    "debug_rust": 285,
+    "release_rust": 285,
+    "python": 15,
+    "new_algorithm_tests": 14,
+    "new_sigkill_cases": 10,
+    "network_orders_this_iteration": 0
+  },
+  "limits": "paper single-market algorithms; no mainnet, external algo route, venue queue/hidden liquidity, real partial fill, new 24h or alpha acceptance"
+}

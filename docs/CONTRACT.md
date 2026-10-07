@@ -163,3 +163,8 @@ Engine 改用可复用槽位、ID 哈希索引、按提交顺序的历史/活跃
 ## v15 本地条件与CTA增量
 
 每资产最多min(max_active_orders,4096)等待意图，bid/ask阈值、到期和OCO索引可重建。报价推进先watchdog/到期、既有订单撮合与回撤停止，再激活条件，最后生成策略动作；同报价提交/激活不成交。等待不冻结，激活完整重风控；失败一次终结不自动重试，成功接受子单即取消同组等待同伴。条件ID/普通订单ID不同，OCO不控制已经工作的子单。breakout-bracket仅完整入场后建固定退出组，部分入场未保护，跳空停止限价可能不成交。条件与策略检查点同事务，SQLite单回执8MiB、整批编码总量16MiB，超限整批不确认。执行/SQL版本升级绑定0.6二进制，旧会话保留旧可执行文件。详细接口、边界、手算与测量见[CONDITIONAL_ORDERS](CONDITIONAL_ORDERS.md)、[FEATURE_SCORECARD](FEATURE_SCORECARD.md)。
+
+
+## v16统一算法执行增量
+
+CompositionStrategy增加Iceberg固定价/显示量/补单间隔与BestLimit本方最优价/价格guard/接受后跟价间隔。与即时/TWAP共用单子单、资源、回报和事务；composition v2给四政策统一按自己Fill计算父进度，v1旧即时/TWAP保留原形状/语义。新政策实际限价含逐lot费预算、价格网格/价格带前置检查，不绕过平台风控。旧单先在报价撮合再规划，撤单回报前不替换，同报价最多一动作；人工成交不采用为父进度。原生冰山、外部队列/maker身份、真实撤单延迟和自动外部路由未提供。配置/API迁移与边界见[ALGORITHMIC_EXECUTION](ALGORITHMIC_EXECUTION.md)，公开基线与逐原意图源码对照见[FEATURE_SCORECARD](FEATURE_SCORECARD.md)。
