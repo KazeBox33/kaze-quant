@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "max_commands": 1000000,
+  "markets": [
+    {
+      "symbol": "BTCUSDT-QUOTE",
+      "price_tick": 10,
+      "quantity_step": 1,
+      "engine": {
+        "initial_cash": "1000000000000",
+        "max_position": 100000,
+        "max_active_orders": 128,
+        "max_orders": 4096,
+        "fee_bps": 2,
+        "latency_ns": 1000000
+      },
+      "risk": {
+        "max_order_notional": "50000000000",
+        "max_drawdown": "100000000000",
+        "max_quote_age_ns": 60000000000,
+        "price_collar_bps": 100
+      },
+      "strategy": {
+        "type": "registered",
+        "name": "managed",
+        "version": 1,
+        "parameters": {
+          "max_working": 64,
+          "members": [
+            {
+              "name": "atr-0",
+              "initial_cash": "500000000000",
+              "max_position": 100000,
+              "strategy": {
+                "type": "registered",
+                "name": "bar-atr",
+                "version": 1,
+                "parameters": {
+                  "bar_interval_ns": 1000000000,
+                  "atr_period": 14,
+                  "trend_window": 20,
+                  "trend_band_bps": 1,
+                  "distance_budget_minor": "1000000",
+                  "atr_multiple_bps": 20000,
+                  "min_distance_units": 100,
+                  "max_target_lots": 200,
+                  "execution": {
+                    "max_spread_bps": 5,
+                    "cooldown_ns": 100000000,
+                    "min_rebalance_lots": 1,
+                    "max_child_lots": 50,
+                    "max_working_ns": 2000000000,
+                    "schedule": {
+                      "type": "twap",
+                      "interval_ns": 1000000000,
+                      "slices": 4
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "atr-1",
+              "initial_cash": "500000000000",
+              "max_position": 100000,
+              "strategy": {
+                "type": "registered",
+                "name": "bar-atr",
+                "version": 1,
+                "parameters": {
+                  "bar_interval_ns": 1000000000,
+                  "atr_period": 14,
+                  "trend_window": 20,
+                  "trend_band_bps": 1,
+                  "distance_budget_minor": "1000000",
+                  "atr_multiple_bps": 20000,
+                  "min_distance_units": 100,
+                  "max_target_lots": 200,
+                  "execution": {
+                    "max_spread_bps": 5,
+                    "cooldown_ns": 100000000,
+                    "min_rebalance_lots": 1,
+                    "max_child_lots": 50,
+                    "max_working_ns": 2000000000,
+                    "schedule": {
+                      "type": "twap",
+                      "interval_ns": 1000000000,
+                      "slices": 4
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "units": {
+        "currency": "USDT",
+        "money_scale": 100000000,
+        "quantity_scale": 100000
+      }
+    }
+  ]
+}

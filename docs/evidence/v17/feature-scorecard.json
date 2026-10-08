@@ -1,0 +1,127 @@
+{
+  "version": "0.8.0",
+  "success": true,
+  "network_posts": 0,
+  "capabilities": [
+    {
+      "name": "Lifecycle and warmup",
+      "before": "one always-on strategy",
+      "after": "init/start/stop/resume; Ready warmup; owner-only stop; actual positions retained"
+    },
+    {
+      "name": "Shared core and subaccounts",
+      "before": "per-market account only",
+      "after": "one liquidity source; owned cash/stock/fees/reserves; exact total reconciliation; inactive transfers"
+    },
+    {
+      "name": "Owned conditions and audit",
+      "before": "single strategy namespace",
+      "after": "ID-based activation, OCO scope, owner decisions per quote"
+    },
+    {
+      "name": "Bounded restore",
+      "before": "no manager quota",
+      "after": "8 members/64 work/1024 indicator quota before allocations; 14 SIGKILL recoveries"
+    }
+  ],
+  "checks": {
+    "rust_debug_passed": 301,
+    "rust_release_passed": 301,
+    "python_passed": 15,
+    "managed_new_tests": 16,
+    "sigkill_cases": 14,
+    "fmt": "pass; fmt-final.log",
+    "clippy": "pass; clippy-bounded.log; all-features/all-targets -D warnings",
+    "rustdoc": "pass; rustdoc-bounded.log; -D warnings"
+  },
+  "workloads": [
+    {
+      "members": 1,
+      "quotes": 100000,
+      "memory_median_ns": 92625625,
+      "memory_quotes_per_second": 1079614.847403189,
+      "durable_median_ns": 2313320250,
+      "durable_quotes_per_second": 43227.91018666784,
+      "durable_commands": 100002,
+      "rss_sample_peak_mib_min": 8.1875,
+      "rss_sample_peak_mib_max": 8.328125,
+      "accepted": 51,
+      "fills": 51,
+      "cash_minor": "1000011800049",
+      "fees_minor": "11111951",
+      "position_units": 0,
+      "risk_rejections": 0
+    },
+    {
+      "members": 2,
+      "quotes": 100000,
+      "memory_median_ns": 165196917,
+      "memory_quotes_per_second": 605338.1734720872,
+      "durable_median_ns": 2639779417,
+      "durable_quotes_per_second": 37881.95307380867,
+      "durable_commands": 100004,
+      "rss_sample_peak_mib_min": 8.46875,
+      "rss_sample_peak_mib_max": 8.546875,
+      "accepted": 102,
+      "fills": 102,
+      "cash_minor": "1000023600098",
+      "fees_minor": "22223902",
+      "position_units": 0,
+      "risk_rejections": 0
+    },
+    {
+      "members": 8,
+      "quotes": 100000,
+      "memory_median_ns": 567583916,
+      "memory_quotes_per_second": 176185.4012790595,
+      "durable_median_ns": 4307718458,
+      "durable_quotes_per_second": 23214.144790332535,
+      "durable_commands": 100016,
+      "rss_sample_peak_mib_min": 10.0625,
+      "rss_sample_peak_mib_max": 10.265625,
+      "accepted": 408,
+      "fills": 408,
+      "cash_minor": "1000094400392",
+      "fees_minor": "88895608",
+      "position_units": 0,
+      "risk_rejections": 0
+    }
+  ],
+  "one_member": {
+    "direct_memory_median_ns": 92618375,
+    "managed_memory_median_ns": 92625625,
+    "time_change_percent": 0.007827820343431213,
+    "normalized_receipts_and_economics_equal": true,
+    "scope": "same-build seven alternating pairs; no stable speedup/zero cost guarantee"
+  },
+  "legacy": {
+    "old_median_ns": 2463037166,
+    "new_median_ns": 2455958042,
+    "time_change_percent": -0.287414420607246,
+    "raw_receipts_and_whole_state_equal": true,
+    "scope": "own v16/v17 ATR seven alternating pairs; no optimization attribution"
+  },
+  "initial_to_full_decision_trace": {
+    "2": {
+      "initial_memory_median_ns": 23703250,
+      "final_memory_median_ns": 165196917,
+      "time_ratio": 6.969378334194678,
+      "initial_durable_median_ns": 2513872000,
+      "final_durable_median_ns": 2639779417
+    },
+    "8": {
+      "initial_memory_median_ns": 34893875,
+      "final_memory_median_ns": 567583916,
+      "time_ratio": 16.266004162621662,
+      "initial_durable_median_ns": 2743993958,
+      "final_durable_median_ns": 4307718458
+    }
+  },
+  "comparison_limits": "initial outputs omitted per-quote member decisions; final larger audited output costs more; across builds/time not isolated causal comparison; duplicated fixed-size signals change exposure, no diversification/alpha/rate rank; no upstream full platform/module measurement",
+  "raw_reports": [
+    "bench/summary.json",
+    "bench-final/summary.json",
+    "legacy-pairs-final/summary.json",
+    "crash-final/summary.json"
+  ]
+}

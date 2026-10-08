@@ -18,7 +18,7 @@ pub mod money {
 
 pub const SCHEMA_VERSION: u32 = 1;
 /// 更新会改变重放语义的代码时必须递增；旧日志不可悄悄采用新规则。
-pub const EXECUTION_REVISION: &str = "kaze-paper-v3-algorithms";
+pub const EXECUTION_REVISION: &str = "kaze-paper-v4-managed";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -338,6 +338,12 @@ impl StrategyConfig {
     }
 }
 impl Strategy for BuiltinStrategy {
+    fn owned_order_ids(&self) -> Vec<OrderId> {
+        match self {
+            Self::Composition(s) => s.owned_order_ids(),
+            _ => Vec::new(),
+        }
+    }
     fn checkpoint(&self) -> Option<BuiltinStrategy> {
         Some(self.clone())
     }

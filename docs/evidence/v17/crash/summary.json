@@ -1,0 +1,524 @@
+{
+  "success": true,
+  "binary_sha256": "e8d6d1a3a1c3c47af3238d1a9be72ed4abcf3014e7394616cca09779ff7dfdc7",
+  "ledgers": [
+    {
+      "algorithm": "managed",
+      "input_sha256": "2ff61ef560e0f6695d9e6fbd6663c55d09e25dc277945cc7e9540b18a94ba556",
+      "config_sha256": "8725bdeedd7bad0f1e425f77f44743d2746d60a5057d7a96703305771d6bea44",
+      "members": [
+        {
+          "active_orders": 0,
+          "capital_minor": "4700",
+          "cash_minor": "4193",
+          "decision": {
+            "action": "None",
+            "authorized_lots": 5,
+            "exposure_bps": 10000,
+            "order_id": null,
+            "parent_id": 1,
+            "position_lots": 5,
+            "projected_lots": 5,
+            "quote_sequence": 3,
+            "reason": "aligned",
+            "target_lots": 5,
+            "timestamp_ns": 3
+          },
+          "diagnostics": {
+            "algorithm": {
+              "type": "immediate"
+            },
+            "child": null,
+            "parent": {
+              "id": 1,
+              "progress": {
+                "cancelled_children": 0,
+                "filled_lots": 5,
+                "reprice_requests": 0,
+                "submitted_children": 1
+              },
+              "side": "Buy",
+              "start_ns": 1,
+              "start_position": 0,
+              "target": 5,
+              "total": 5
+            },
+            "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+          },
+          "fees_minor": "2",
+          "lifecycle": "stopped",
+          "name": "alpha",
+          "owner": 0,
+          "pending_buy_units": 0,
+          "position_units": 5,
+          "reserved_cash_minor": "0",
+          "reserved_sell_units": 0,
+          "waiting_conditions": 0
+        },
+        {
+          "active_orders": 0,
+          "capital_minor": "5300",
+          "cash_minor": "4793",
+          "decision": {
+            "action": "None",
+            "authorized_lots": 5,
+            "exposure_bps": 10000,
+            "order_id": null,
+            "parent_id": 1,
+            "position_lots": 5,
+            "projected_lots": 5,
+            "quote_sequence": 4,
+            "reason": "aligned",
+            "target_lots": 5,
+            "timestamp_ns": 4
+          },
+          "diagnostics": {
+            "algorithm": {
+              "type": "immediate"
+            },
+            "child": null,
+            "parent": {
+              "id": 1,
+              "progress": {
+                "cancelled_children": 0,
+                "filled_lots": 5,
+                "reprice_requests": 0,
+                "submitted_children": 1
+              },
+              "side": "Buy",
+              "start_ns": 1,
+              "start_position": 0,
+              "target": 5,
+              "total": 5
+            },
+            "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+          },
+          "fees_minor": "2",
+          "lifecycle": "stopped",
+          "name": "beta",
+          "owner": 1,
+          "pending_buy_units": 0,
+          "position_units": 5,
+          "reserved_cash_minor": "0",
+          "reserved_sell_units": 0,
+          "waiting_conditions": 0
+        }
+      ],
+      "state": {
+        "clock_ns": 4,
+        "closed": true,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "8986",
+            "equity_minor": "9986",
+            "fees_minor": "4",
+            "halted": "finished",
+            "market": 0,
+            "metrics": {
+              "accepted": 2,
+              "cancelled": 0,
+              "fills": 4,
+              "max_drawdown_minor": "14",
+              "orders_examined": 5,
+              "peak_equity_minor": "10000",
+              "quotes": 4,
+              "rejected": 0
+            },
+            "pnl_minor": "-14",
+            "position_units": 10,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 2,
+            "strategy_diagnostics": {
+              "conditional_owners": [],
+              "members": [
+                {
+                  "active_orders": 0,
+                  "capital_minor": "4700",
+                  "cash_minor": "4193",
+                  "decision": {
+                    "action": "None",
+                    "authorized_lots": 5,
+                    "exposure_bps": 10000,
+                    "order_id": null,
+                    "parent_id": 1,
+                    "position_lots": 5,
+                    "projected_lots": 5,
+                    "quote_sequence": 3,
+                    "reason": "aligned",
+                    "target_lots": 5,
+                    "timestamp_ns": 3
+                  },
+                  "diagnostics": {
+                    "algorithm": {
+                      "type": "immediate"
+                    },
+                    "child": null,
+                    "parent": {
+                      "id": 1,
+                      "progress": {
+                        "cancelled_children": 0,
+                        "filled_lots": 5,
+                        "reprice_requests": 0,
+                        "submitted_children": 1
+                      },
+                      "side": "Buy",
+                      "start_ns": 1,
+                      "start_position": 0,
+                      "target": 5,
+                      "total": 5
+                    },
+                    "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+                  },
+                  "fees_minor": "2",
+                  "lifecycle": "stopped",
+                  "name": "alpha",
+                  "owner": 0,
+                  "pending_buy_units": 0,
+                  "position_units": 5,
+                  "reserved_cash_minor": "0",
+                  "reserved_sell_units": 0,
+                  "waiting_conditions": 0
+                },
+                {
+                  "active_orders": 0,
+                  "capital_minor": "5300",
+                  "cash_minor": "4793",
+                  "decision": {
+                    "action": "None",
+                    "authorized_lots": 5,
+                    "exposure_bps": 10000,
+                    "order_id": null,
+                    "parent_id": 1,
+                    "position_lots": 5,
+                    "projected_lots": 5,
+                    "quote_sequence": 4,
+                    "reason": "aligned",
+                    "target_lots": 5,
+                    "timestamp_ns": 4
+                  },
+                  "diagnostics": {
+                    "algorithm": {
+                      "type": "immediate"
+                    },
+                    "child": null,
+                    "parent": {
+                      "id": 1,
+                      "progress": {
+                        "cancelled_children": 0,
+                        "filled_lots": 5,
+                        "reprice_requests": 0,
+                        "submitted_children": 1
+                      },
+                      "side": "Buy",
+                      "start_ns": 1,
+                      "start_position": 0,
+                      "target": 5,
+                      "total": 5
+                    },
+                    "scope": "single-market paper parent/child; cancel acknowledgement before replacement; no native iceberg or external queue model"
+                  },
+                  "fees_minor": "2",
+                  "lifecycle": "stopped",
+                  "name": "beta",
+                  "owner": 1,
+                  "pending_buy_units": 0,
+                  "position_units": 5,
+                  "reserved_cash_minor": "0",
+                  "reserved_sell_units": 0,
+                  "waiting_conditions": 0
+                }
+              ],
+              "order_owners": [],
+              "scope": "single-market long-only paper; one shared matching core, fixed member order, explicit stopped-member capital transfers; no cross-market/shared-currency portfolio, sandbox, external route or alpha",
+              "strategy": "managed"
+            },
+            "symbol": "MANAGED-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 14,
+        "schema_version": 1
+      },
+      "audit_chain_sha256": "80094b6145d1553dcaabe4030bd6121671df516864c4c2a2169a8496ef5c65ba"
+    },
+    {
+      "algorithm": "managed-bracket",
+      "input_sha256": "23e1dfd32c6af04d2f9126d321b87d2f0c6a1ed9db8ba36e1b0c113a2e0cf228",
+      "config_sha256": "896006a7ce4f50645a14a809df5facfa19084ffab7341727d4e2f42909581124",
+      "members": [
+        {
+          "active_orders": 0,
+          "capital_minor": "5000",
+          "cash_minor": "5028",
+          "decision": null,
+          "diagnostics": {
+            "oco_group": 1,
+            "phase": {
+              "type": "complete"
+            },
+            "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+            "strategy": "breakout-bracket"
+          },
+          "fees_minor": "2",
+          "lifecycle": "stopped",
+          "name": "alpha",
+          "owner": 0,
+          "pending_buy_units": 0,
+          "position_units": 0,
+          "reserved_cash_minor": "0",
+          "reserved_sell_units": 0,
+          "waiting_conditions": 0
+        },
+        {
+          "active_orders": 0,
+          "capital_minor": "5000",
+          "cash_minor": "5028",
+          "decision": null,
+          "diagnostics": {
+            "oco_group": 2,
+            "phase": {
+              "type": "complete"
+            },
+            "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+            "strategy": "breakout-bracket"
+          },
+          "fees_minor": "2",
+          "lifecycle": "stopped",
+          "name": "beta",
+          "owner": 1,
+          "pending_buy_units": 0,
+          "position_units": 0,
+          "reserved_cash_minor": "0",
+          "reserved_sell_units": 0,
+          "waiting_conditions": 0
+        }
+      ],
+      "state": {
+        "clock_ns": 50,
+        "closed": true,
+        "markets": [
+          {
+            "active_orders": 0,
+            "cash_minor": "10056",
+            "conditionals": {
+              "last_sequence": 4,
+              "last_time_ns": 40,
+              "metrics": {
+                "accepted": 6,
+                "activation_rejected": 0,
+                "cancelled": 2,
+                "expired": 0,
+                "rejected": 0,
+                "triggered": 4
+              },
+              "next_id": 7,
+              "pending": []
+            },
+            "equity_minor": "10056",
+            "fees_minor": "4",
+            "halted": "finished",
+            "market": 0,
+            "metrics": {
+              "accepted": 4,
+              "cancelled": 0,
+              "fills": 4,
+              "max_drawdown_minor": "8",
+              "orders_examined": 4,
+              "peak_equity_minor": "10058",
+              "quotes": 5,
+              "rejected": 0
+            },
+            "pnl_minor": "56",
+            "position_units": 0,
+            "reserved_cash_minor": "0",
+            "risk_rejections": 0,
+            "strategy_diagnostics": {
+              "conditional_owners": [],
+              "members": [
+                {
+                  "active_orders": 0,
+                  "capital_minor": "5000",
+                  "cash_minor": "5028",
+                  "decision": null,
+                  "diagnostics": {
+                    "oco_group": 1,
+                    "phase": {
+                      "type": "complete"
+                    },
+                    "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+                    "strategy": "breakout-bracket"
+                  },
+                  "fees_minor": "2",
+                  "lifecycle": "stopped",
+                  "name": "alpha",
+                  "owner": 0,
+                  "pending_buy_units": 0,
+                  "position_units": 0,
+                  "reserved_cash_minor": "0",
+                  "reserved_sell_units": 0,
+                  "waiting_conditions": 0
+                },
+                {
+                  "active_orders": 0,
+                  "capital_minor": "5000",
+                  "cash_minor": "5028",
+                  "decision": null,
+                  "diagnostics": {
+                    "oco_group": 2,
+                    "phase": {
+                      "type": "complete"
+                    },
+                    "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+                    "strategy": "breakout-bracket"
+                  },
+                  "fees_minor": "2",
+                  "lifecycle": "stopped",
+                  "name": "beta",
+                  "owner": 1,
+                  "pending_buy_units": 0,
+                  "position_units": 0,
+                  "reserved_cash_minor": "0",
+                  "reserved_sell_units": 0,
+                  "waiting_conditions": 0
+                }
+              ],
+              "order_owners": [],
+              "scope": "single-market long-only paper; one shared matching core, fixed member order, explicit stopped-member capital transfers; no cross-market/shared-currency portfolio, sandbox, external route or alpha",
+              "strategy": "managed"
+            },
+            "symbol": "MANAGED-BRACKET-DEMO",
+            "units": {
+              "currency": "SIM",
+              "money_scale": 100,
+              "quantity_scale": 1
+            }
+          }
+        ],
+        "processed": 10,
+        "schema_version": 1
+      },
+      "audit_chain_sha256": "c4272f0ac00146a5d6dc68612ae71a8d7e17d989067bd348e390ec8267f51124"
+    }
+  ],
+  "cases": [
+    {
+      "algorithm": "managed",
+      "confirmed_prefix": 1,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 14
+    },
+    {
+      "algorithm": "managed",
+      "confirmed_prefix": 4,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 14
+    },
+    {
+      "algorithm": "managed",
+      "confirmed_prefix": 5,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 14
+    },
+    {
+      "algorithm": "managed",
+      "confirmed_prefix": 6,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 14
+    },
+    {
+      "algorithm": "managed",
+      "confirmed_prefix": 8,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 14
+    },
+    {
+      "algorithm": "managed",
+      "confirmed_prefix": 10,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 14
+    },
+    {
+      "algorithm": "managed",
+      "confirmed_prefix": 11,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 14
+    },
+    {
+      "algorithm": "managed",
+      "confirmed_prefix": 12,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 14
+    },
+    {
+      "algorithm": "managed",
+      "confirmed_prefix": 13,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 14
+    },
+    {
+      "algorithm": "managed-bracket",
+      "confirmed_prefix": 5,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 10
+    },
+    {
+      "algorithm": "managed-bracket",
+      "confirmed_prefix": 6,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 10
+    },
+    {
+      "algorithm": "managed-bracket",
+      "confirmed_prefix": 7,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 10
+    },
+    {
+      "algorithm": "managed-bracket",
+      "confirmed_prefix": 8,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 10
+    },
+    {
+      "algorithm": "managed-bracket",
+      "confirmed_prefix": 9,
+      "signal": "SIGKILL",
+      "all_payload_receipt_chain_rows_equal": true,
+      "state_equal": true,
+      "full_audit_commands": 10
+    }
+  ],
+  "network_posts": 0,
+  "scope": "owned process kill after committed control/partial fill/ownership rejection/stop/transfer/conditional phases; one shared paper Engine, no mid-transaction injection, physical power failure, authentication sandbox, external venue, 24h or alpha claim"
+}

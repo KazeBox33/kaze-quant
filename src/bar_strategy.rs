@@ -203,6 +203,9 @@ impl BarAtrStrategy {
     }
 }
 impl Strategy for BarAtrStrategy {
+    fn owned_order_ids(&self) -> Vec<OrderId> {
+        self.execution.owned_order_ids()
+    }
     fn on_quote(&mut self, v: StrategyView<'_>) -> Action {
         if self.observe(v.quote).is_err() {
             self.faulted = true;

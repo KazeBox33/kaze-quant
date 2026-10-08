@@ -7,8 +7,65 @@ pub struct StrategyView<'a> {
     pub active_orders: usize,
 }
 
+#[derive(Clone, Copy)]
+pub enum ActionSource {
+    Strategy,
+    Operator,
+    Conditional(crate::conditional::ConditionalId),
+}
+
 /// 泛型调用会静态分发；策略只借用快照，不能直接改账户。
 pub trait Strategy {
+    fn validate_market_config(
+        &self,
+        _market: &crate::config::MarketConfig,
+    ) -> Result<(), &'static str> {
+        Ok(())
+    }
+    /// 可选管理策略的动作准入。普通策略保留原路径，管理器逐动作核对所有权和子账资源。
+    fn begin_action(
+        &mut self,
+        _action: Action,
+        _source: ActionSource,
+        _engine: &crate::engine::Engine,
+    ) -> Result<(), crate::paper::RiskReject> {
+        Ok(())
+    }
+    fn end_action(&mut self) {}
+    fn action_owner(&self) -> Option<usize> {
+        None
+    }
+    fn validate_control(
+        &self,
+        _owner: usize,
+        _operation: crate::managed::Control,
+    ) -> Result<(), &'static str> {
+        Err("strategy is not managed")
+    }
+    fn control(
+        &mut self,
+        _owner: usize,
+        _operation: crate::managed::Control,
+        _actions: &mut ActionBuffer,
+    ) {
+    }
+    fn validate_owned_action(&self, _owner: usize, _action: Action) -> Result<(), &'static str> {
+        Err("strategy is not managed")
+    }
+    fn stage_owned_action(&mut self, _owner: usize, _action: Action, _actions: &mut ActionBuffer) {}
+    fn validate_transfer(
+        &self,
+        _from: usize,
+        _to: usize,
+        _amount: i128,
+    ) -> Result<(), &'static str> {
+        Err("strategy is not managed")
+    }
+    fn transfer(&mut self, _from: usize, _to: usize, _amount: i128) {}
+    fn on_market_halt(&mut self) {}
+    fn owned_order_ids(&self) -> Vec<OrderId> {
+        Vec::new()
+    }
     fn on_quote(&mut self, _view: StrategyView<'_>) -> Action {
         Action::None
     }
@@ -35,6 +92,7 @@ pub trait Strategy {
     ) -> Result<(), &'static str> {
         Ok(())
     }
+    fn visit_owned_decisions(&self, _visitor: &mut dyn FnMut(usize, &crate::target::Decision)) {}
     fn decision(&self) -> Option<&crate::target::Decision> {
         None
     }
@@ -224,6 +282,9 @@ impl ActionBuffer {
             capacity,
             overflowed: false,
         })
+    }
+    pub(crate) fn invalidate(&mut self) {
+        self.overflowed = true;
     }
     pub fn clear(&mut self) {
         self.actions.clear();

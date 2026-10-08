@@ -25,6 +25,8 @@ impl StrategyRegistry {
             .expect("unique standard strategy");
         r.register("breakout-bracket", 1, crate::bracket_strategy::factory)
             .expect("unique standard strategy");
+        r.register("managed", 1, crate::managed::factory)
+            .expect("unique standard strategy");
         r
     }
     pub fn register(

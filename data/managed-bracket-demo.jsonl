@@ -1,0 +1,9 @@
+{"seq":1,"command":{"type":"strategy_control","market":0,"owner":0,"operation":"init"}}
+{"seq":2,"command":{"type":"strategy_control","market":0,"owner":1,"operation":"init"}}
+{"seq":3,"command":{"type":"strategy_control","market":0,"owner":0,"operation":"start"}}
+{"seq":4,"command":{"type":"strategy_control","market":0,"owner":1,"operation":"start"}}
+{"seq":5,"command":{"type":"quote","market":0,"quote":{"sequence":1,"timestamp_ns":10,"bid":99,"ask":100,"bid_quantity":6,"ask_quantity":6}}}
+{"seq":6,"command":{"type":"quote","market":0,"quote":{"sequence":2,"timestamp_ns":20,"bid":100,"ask":101,"bid_quantity":6,"ask_quantity":6}}}
+{"seq":7,"command":{"type":"quote","market":0,"quote":{"sequence":3,"timestamp_ns":30,"bid":100,"ask":101,"bid_quantity":6,"ask_quantity":6}}}
+{"seq":8,"command":{"type":"quote","market":0,"quote":{"sequence":4,"timestamp_ns":40,"bid":111,"ask":112,"bid_quantity":6,"ask_quantity":6}}}
+{"seq":9,"command":{"type":"quote","market":0,"quote":{"sequence":5,"timestamp_ns":50,"bid":111,"ask":112,"bid_quantity":6,"ask_quantity":6}}}

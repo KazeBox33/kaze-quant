@@ -168,3 +168,8 @@ Engine 改用可复用槽位、ID 哈希索引、按提交顺序的历史/活跃
 ## v16统一算法执行增量
 
 CompositionStrategy增加Iceberg固定价/显示量/补单间隔与BestLimit本方最优价/价格guard/接受后跟价间隔。与即时/TWAP共用单子单、资源、回报和事务；composition v2给四政策统一按自己Fill计算父进度，v1旧即时/TWAP保留原形状/语义。新政策实际限价含逐lot费预算、价格网格/价格带前置检查，不绕过平台风控。旧单先在报价撮合再规划，撤单回报前不替换，同报价最多一动作；人工成交不采用为父进度。原生冰山、外部队列/maker身份、真实撤单延迟和自动外部路由未提供。配置/API迁移与边界见[ALGORITHMIC_EXECUTION](ALGORITHMIC_EXECUTION.md)，公开基线与逐原意图源码对照见[FEATURE_SCORECARD](FEATURE_SCORECARD.md)。
+
+
+## v17单市场多策略管理
+
+managed v1在一个Engine上划分所有成员子账，initial_cash精确分配市场现金。仅自己的现金/库存可冻结，所有子账字段合计与核心账户完全相同，工作订单/条件ID与owner覆盖精确核对。生命周期显式init/start/stop，停止仅撤自己的单并保留真实仓位；全市场暂停仍覆盖全部成员。条件激活携带ID、成员局部OCO命名空间，反馈只路由所属成员。现金转移仅初始化且停止的成员间以free资源/剩余capital执行，不改变核心现金。角色身份来自可信本地命令而非认证沙箱；参数、容量、API、手算和恢复边界见[MANAGED_STRATEGIES](MANAGED_STRATEGIES.md)。多资产市场仍是各自预算，没有跨市场融资/组合NAV。原策略回执保持兼容；普通激活回调包装保持源API，新增trait方法默认无行为。恢复风险拒绝计数上界按最多4096条件激活+64策略动作/命令校验，不再沿用64的较窄历史界限。包/执行/SQL版本升级，旧会话用旧二进制。

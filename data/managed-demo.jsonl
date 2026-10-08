@@ -1,0 +1,13 @@
+{"seq":1,"command":{"type":"strategy_control","market":0,"owner":0,"operation":"init"}}
+{"seq":2,"command":{"type":"strategy_control","market":0,"owner":1,"operation":"init"}}
+{"seq":3,"command":{"type":"strategy_control","market":0,"owner":0,"operation":"start"}}
+{"seq":4,"command":{"type":"strategy_control","market":0,"owner":1,"operation":"start"}}
+{"seq":5,"command":{"type":"quote","market":0,"quote":{"sequence":1,"timestamp_ns":1,"bid":100,"ask":101,"bid_quantity":0,"ask_quantity":0}}}
+{"seq":6,"command":{"type":"quote","market":0,"quote":{"sequence":2,"timestamp_ns":2,"bid":100,"ask":101,"bid_quantity":3,"ask_quantity":3}}}
+{"seq":7,"command":{"type":"quote","market":0,"quote":{"sequence":3,"timestamp_ns":3,"bid":100,"ask":101,"bid_quantity":3,"ask_quantity":3}}}
+{"seq":8,"command":{"type":"strategy_action","market":0,"owner":0,"action":{"Cancel":2}}}
+{"seq":9,"command":{"type":"cancel","market":0,"order_id":2}}
+{"seq":10,"command":{"type":"strategy_control","market":0,"owner":0,"operation":"stop"}}
+{"seq":11,"command":{"type":"quote","market":0,"quote":{"sequence":4,"timestamp_ns":4,"bid":100,"ask":101,"bid_quantity":4,"ask_quantity":4}}}
+{"seq":12,"command":{"type":"strategy_control","market":0,"owner":1,"operation":"stop"}}
+{"seq":13,"command":{"type":"strategy_transfer","market":0,"from":0,"to":1,"amount":"300"}}

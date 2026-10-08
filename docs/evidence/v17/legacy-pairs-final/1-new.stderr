@@ -1,0 +1,3 @@
+recovered=0 recovery_ns=15396500
+report=reports/managed-v17/legacy-pairs-final/1-new.json
+commands=100000 batches=391 elapsed_ns=2509261083

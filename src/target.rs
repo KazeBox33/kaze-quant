@@ -848,6 +848,9 @@ impl CompositionStrategy {
     }
 }
 impl Strategy for CompositionStrategy {
+    fn owned_order_ids(&self) -> Vec<OrderId> {
+        self.child.as_ref().map(|c| vec![c.id]).unwrap_or_default()
+    }
     fn on_quote(&mut self, v: StrategyView<'_>) -> Action {
         self.warmup(v.quote);
         Action::None

@@ -1,0 +1,22 @@
+   Compiling kaze-quant v0.8.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.77s
+     Running tests/managed.rs (target/debug/deps/managed-c56f3d9178c5e90a)
+
+running 14 tests
+test global_position_limit_still_limits_sum_of_members ... ok
+test aggregate_capital_duplicate_nested_or_legacy_child_configuration_rejected ... ok
+test owned_condition_activation_rechecks_budget_releases_identity_and_respects_work_capacity ... ok
+test no_borrowing_cash_or_stock_from_another_member ... ok
+test finish_halts_every_member_and_releases_work_but_preserves_actual_positions ... ok
+test explicit_lifecycle_invalid_transitions_do_not_mutate_and_resume_retains_parent ... ok
+test ready_warmup_updates_indicators_but_cannot_place_orders ... ok
+test stopped_transfer_is_free_capital_only_and_preserves_total ... ok
+test stop_one_bracket_cancels_only_its_waiting_conditions ... ok
+test shared_liquidity_partial_fee_subledgers_and_owner_stop_hand_ledger ... ok
+test malformed_accounts_ownership_child_references_and_capital_are_rejected_without_panic ... ok
+test identical_brackets_have_separate_conditions_oco_and_fill_owners ... ok
+test invalid_lifecycle_later_in_batch_rolls_back_fill_fee_and_stop ... ok
+test every_command_sqlite_restart_dedupe_and_failed_batch_preserve_original_ownership_and_state ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.73s
+

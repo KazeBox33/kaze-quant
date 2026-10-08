@@ -125,3 +125,8 @@ JSON 报告是某一高水位的状态检查点/观察结果，不是恢复输�
 ## 0.7统一执行会话
 
 composition v2的四种算法保存自己的成交进度，v1旧Immediate/TWAP保留原经济规则。执行/SQL版本变化后保留旧二进制审计旧会话，新二进制新路径运行。Iceberg等待不冻结整父量；BestLimit撤单确认前不替换。人工成交造成ForeignPosition时停止并核对，不自动吸收外部仓位。示例与完整边界见[ALGORITHMIC_EXECUTION](ALGORITHMIC_EXECUTION.md)。这些是纸面算法，没有连接外部连续下单路由。
+
+
+## 0.8多策略操作
+
+managed成员显式初始化和启动；停止成员只撤该owner普通订单与等待条件，不自动卖出仓位。市场风控暂停仍是全市场锁定。初始化且Ready/Stopped的成员才允许按free资金和capital转移；记录在同一事务，不改核心现金。订单/条件归属和子账跟完整原回执一起恢复核对；新版本新会话。初始状态/命令/强杀用例见[MANAGED_STRATEGIES](MANAGED_STRATEGIES.md)。

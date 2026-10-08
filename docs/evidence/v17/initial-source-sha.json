@@ -1,0 +1,8 @@
+{
+  "src/managed.rs": "813b735ce5c58a58af8775ec59bd30e90af649b2bd7d261e360777bf59e3faff",
+  "src/paper.rs": "a702c8ccd8dbb44a392c93e77e96b904d650e1a92a965c472aea21849b66f111",
+  "src/strategy.rs": "cc19678241f4fe29188c7b400db6532304dc0309812eda86d8a4f24ef7b9d7bf",
+  "src/conditional.rs": "850efcc2abd5b091bdd4716cb1eb48c65ab8627942ee06f3896900a162cd0448",
+  "tests/managed.rs": "032760843924485ce5cfe20281bbe25b63aa8ba702db85f25d8305f0059b2cea",
+  "examples/managed_reference.rs": "6c66d18cce99dceda870c2613f69c3c2f31a31659915f5eb9d6145c77c2bf587"
+}

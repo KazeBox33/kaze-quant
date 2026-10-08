@@ -182,6 +182,12 @@ impl BracketStrategy {
     }
 }
 impl Strategy for BracketStrategy {
+    fn owned_order_ids(&self) -> Vec<OrderId> {
+        match self.phase {
+            Phase::EntryWorking { id, .. } | Phase::ExitWorking { id, .. } => vec![id],
+            _ => Vec::new(),
+        }
+    }
     fn on_quote_batch(&mut self, view: StrategyView<'_>, actions: &mut ActionBuffer) {
         match self.phase.clone() {
             Phase::New => {

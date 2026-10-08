@@ -1,0 +1,166 @@
+{
+  "config_file_sha256": "4fc3753001031cf89040eae8648c2aa9a04358d006fe8479fb46c169c3c52df7",
+  "digest_rule": "init prefix excluded, seq normalized to input quote sequence, OwnedAction omitted; u64 LE receipt length + serde JSON bytes; stored receipts remain unmodified",
+  "elapsed_ns": 167178167,
+  "input_sha256": "c22be361be4144d983bc334735806aae85e16f4273f57516145ba5ac69671379",
+  "receipt_sha256": "3d264d6913814096d1cda2eb2ebd6366881434d777d60848ef1aeca7193be875",
+  "state": {
+    "clock_ns": 1704067610285000000,
+    "closed": false,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "1000023600098",
+        "equity_minor": "1000023600098",
+        "fees_minor": "22223902",
+        "halted": null,
+        "market": 0,
+        "metrics": {
+          "accepted": 102,
+          "cancelled": 0,
+          "fills": 102,
+          "max_drawdown_minor": "24073570",
+          "orders_examined": 156,
+          "peak_equity_minor": "1000045139366",
+          "quotes": 100000,
+          "rejected": 0
+        },
+        "pnl_minor": "23600098",
+        "position_units": 0,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "strategy_diagnostics": {
+          "conditional_owners": [],
+          "members": [
+            {
+              "active_orders": 0,
+              "capital_minor": "500000000000",
+              "cash_minor": "500011800049",
+              "decision": {
+                "action": "None",
+                "authorized_lots": 200,
+                "exposure_bps": 0,
+                "order_id": null,
+                "parent_id": 28,
+                "position_lots": 0,
+                "projected_lots": 0,
+                "quote_sequence": 100000,
+                "reason": "aligned",
+                "target_lots": 0,
+                "timestamp_ns": 1704067610285000000
+              },
+              "diagnostics": {
+                "atr_units": 998,
+                "closed_bars": 409,
+                "distance_units": 1996,
+                "exposure": false,
+                "faulted": false,
+                "last_closed": {
+                  "close": 42450600,
+                  "high": 42450600,
+                  "low": 42450600,
+                  "observations": 44,
+                  "open": 42450600,
+                  "start_ns": 1704067609000000000
+                },
+                "missing_buckets": 1,
+                "pending": {
+                  "close": 42450600,
+                  "high": 42450600,
+                  "low": 42450600,
+                  "observations": 24,
+                  "open": 42450600,
+                  "start_ns": 1704067610000000000
+                },
+                "ready": true,
+                "requested_target_lots": 0,
+                "scope": "long-only paper signal and ATR distance sizing; no installed stop loss, exchange candle volume, future data, external venue route or alpha proof",
+                "source": "observed bid OHLC, not traded-volume candles",
+                "trend_mean_units": 42446970
+              },
+              "fees_minor": "11111951",
+              "lifecycle": "running",
+              "name": "atr-0",
+              "owner": 0,
+              "pending_buy_units": 0,
+              "position_units": 0,
+              "reserved_cash_minor": "0",
+              "reserved_sell_units": 0,
+              "waiting_conditions": 0
+            },
+            {
+              "active_orders": 0,
+              "capital_minor": "500000000000",
+              "cash_minor": "500011800049",
+              "decision": {
+                "action": "None",
+                "authorized_lots": 200,
+                "exposure_bps": 0,
+                "order_id": null,
+                "parent_id": 28,
+                "position_lots": 0,
+                "projected_lots": 0,
+                "quote_sequence": 100000,
+                "reason": "aligned",
+                "target_lots": 0,
+                "timestamp_ns": 1704067610285000000
+              },
+              "diagnostics": {
+                "atr_units": 998,
+                "closed_bars": 409,
+                "distance_units": 1996,
+                "exposure": false,
+                "faulted": false,
+                "last_closed": {
+                  "close": 42450600,
+                  "high": 42450600,
+                  "low": 42450600,
+                  "observations": 44,
+                  "open": 42450600,
+                  "start_ns": 1704067609000000000
+                },
+                "missing_buckets": 1,
+                "pending": {
+                  "close": 42450600,
+                  "high": 42450600,
+                  "low": 42450600,
+                  "observations": 24,
+                  "open": 42450600,
+                  "start_ns": 1704067610000000000
+                },
+                "ready": true,
+                "requested_target_lots": 0,
+                "scope": "long-only paper signal and ATR distance sizing; no installed stop loss, exchange candle volume, future data, external venue route or alpha proof",
+                "source": "observed bid OHLC, not traded-volume candles",
+                "trend_mean_units": 42446970
+              },
+              "fees_minor": "11111951",
+              "lifecycle": "running",
+              "name": "atr-1",
+              "owner": 1,
+              "pending_buy_units": 0,
+              "position_units": 0,
+              "reserved_cash_minor": "0",
+              "reserved_sell_units": 0,
+              "waiting_conditions": 0
+            }
+          ],
+          "order_owners": [],
+          "scope": "single-market long-only paper; one shared matching core, fixed member order, explicit stopped-member capital transfers; no cross-market/shared-currency portfolio, sandbox, external route or alpha",
+          "strategy": "managed"
+        },
+        "symbol": "BTCUSDT-QUOTE",
+        "units": {
+          "currency": "USDT",
+          "money_scale": 100000000,
+          "quantity_scale": 100000
+        }
+      }
+    ],
+    "processed": 100004,
+    "schema_version": 1
+  },
+  "timing": "CSV decode + shared paper core + receipt serialization/hash + retention; no SQLite; final audit excluded",
+  "members": 2,
+  "round": 2
+}

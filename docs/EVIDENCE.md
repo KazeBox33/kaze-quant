@@ -1,3 +1,11 @@
+# 0.8多策略管理增量（v17）
+
+策略init/start/stop/resume、订单/条件归属、共享撮合核心和可核对子账完成。16新专项、本机debug/release各301Rust及15Python、14次已确认阶段强杀恢复通过。十万公开报价1/2/8成员最终持久吞吐43,228/37,882/23,214报价每秒；完整决策审计的新增成本及原始轮次见[逐功能数据](FEATURE_SCORECARD.md)、[接口/手算](MANAGED_STRATEGIES.md)、[验证身份](evidence/v17/validation.json)。本轮0网络订单，远程CI未确认；仍单市场纸面管理，无跨市场共享现金/组合NAV、连续外部策略路由或新增生产准入结论。
+
+以下保留历史验收记录，较新的逐功能记录优先。
+
+---
+
 # 0.7统一算法执行证据（v16）
 
 四种纸面政策统一父子进度；Iceberg与BestLimit的手算、10次SIGKILL恢复、固定上游意图与公开百万报价验收已完成。debug/release各285Rust、15Python。完整性能、退步、双方成本范围与原始记录见[FEATURE_SCORECARD](FEATURE_SCORECARD.md)、[验证身份](evidence/v16/validation.json)。本轮0网络订单，不增加24h/alpha/主网准入结论。

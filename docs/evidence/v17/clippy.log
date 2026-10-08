@@ -1,0 +1,25 @@
+    Checking kaze-quant v0.8.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+error: called `filter(..).next()` on an `Iterator`
+   --> tests/managed.rs:195:9
+    |
+195 | /         r.engine(0)
+196 | |             .unwrap()
+197 | |             .orders()
+198 | |             .iter()
+199 | |             .filter(|o| o.status.is_active())
+200 | |             .next()
+    | |___________________^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#filter_next
+    = note: `-D clippy::filter-next` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::filter_next)]`
+help: use `.find(..)` instead
+    |
+195 ~         r.engine(0)
+196 +             .unwrap()
+197 +             .orders()
+198 +             .iter().find(|o| o.status.is_active())
+    |
+
+error: could not compile `kaze-quant` (test "managed") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

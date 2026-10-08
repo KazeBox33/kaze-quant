@@ -47,3 +47,8 @@ cargo run --locked --release --bin kaze-research -- reports/research-plan.json r
 ## composition v2与可插拔算法执行
 
 即时/TWAP/Iceberg/BestLimit使用同一执行器和资源/反馈事务路径，v2增加自己成交父进度与人工成交隔离；bar-ATR现有execution.schedule也可配置新两政策。旧v1即时/TWAP不新增报告/检查点字段。语义与例子见[ALGORITHMIC_EXECUTION](ALGORITHMIC_EXECUTION.md)。
+
+
+## v17多策略接入
+
+使用registered managed v1配置members，把标准内置策略或bar-atr/breakout-bracket v1作为成员。composition子策略要求v2；成员从Created开始，用命令init/start后执行，Ready报价只预热，Stopped冻结指标进度。策略读取自己的虚拟Account和活跃数量，反馈只路由所属订单/条件。ordinary Submit/Cancel在managed市场不带owner会拒绝；可信操作方用StrategyAction显式指定owner，不能越权操作别人的ID。完整示例、资本转移/事务恢复与容量见[MANAGED_STRATEGIES](MANAGED_STRATEGIES.md)。

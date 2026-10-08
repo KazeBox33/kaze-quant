@@ -44,3 +44,5 @@ pub mod continuous;
 pub mod target;
 
 pub mod external_plan;
+
+pub mod managed;

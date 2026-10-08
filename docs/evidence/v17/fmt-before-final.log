@@ -1,0 +1,91 @@
+Diff in /Users/xiedongjin/Workspace/learning/kaze-quant/examples/managed_reference.rs:3:
+ use kaze_quant::{
+     config::PaperConfig,
+     journal::{file_hash, hex},
+-    paper::{Command, Envelope, PaperRuntime, Notice},
++    paper::{Command, Envelope, Notice, PaperRuntime},
+     replay::QuoteReader,
+ };
+ use sha2::{Digest, Sha256};
+Diff in /Users/xiedongjin/Workspace/learning/kaze-quant/examples/managed_reference.rs:16:
+     let c: PaperConfig = serde_json::from_reader(File::open(&args[0])?)?;
+     let mut r = PaperRuntime::new(c)?;
+     r.configure_retention(64)?;
+-    let c=r.config().clone();
+-    let members=if let kaze_quant::config::StrategyConfig::Registered{name,parameters,..}=&c.markets[0].strategy {
+-        if name!="managed" {return Err("managed config required".into());}
+-        parameters["members"].as_array().ok_or("members absent")?.len()
+-    }else{return Err("managed config required".into());};
+-    for owner in 0..members {for operation in [kaze_quant::managed::Control::Init,kaze_quant::managed::Control::Start]{r.process(&Envelope{seq:r.processed()+1,command:Command::StrategyControl{market:0,owner,operation}})?;}}
+-    let offset=r.processed();
++    let c = r.config().clone();
++    let members = if let kaze_quant::config::StrategyConfig::Registered {
++        name, parameters, ..
++    } = &c.markets[0].strategy
++    {
++        if name != "managed" {
++            return Err("managed config required".into());
++        }
++        parameters["members"]
++            .as_array()
++            .ok_or("members absent")?
++            .len()
++    } else {
++        return Err("managed config required".into());
++    };
++    for owner in 0..members {
++        for operation in [
++            kaze_quant::managed::Control::Init,
++            kaze_quant::managed::Control::Start,
++        ] {
++            r.process(&Envelope {
++                seq: r.processed() + 1,
++                command: Command::StrategyControl {
++                    market: 0,
++                    owner,
++                    operation,
++                },
++            })?;
++        }
++    }
++    let offset = r.processed();
+     let input_sha256 = file_hash(Path::new(&args[1]))?;
+     let config_sha256 = file_hash(Path::new(&args[0]))?;
+     let mut h = Sha256::new();
+Diff in /Users/xiedongjin/Workspace/learning/kaze-quant/examples/managed_reference.rs:30:
+     for q in QuoteReader::new(BufReader::new(File::open(&args[1])?))? {
+         let q = q?;
+         let mut receipt = r.process(&Envelope {
+-            seq: q.sequence+offset,
++            seq: q.sequence + offset,
+             command: Command::Quote {
+                 market: 0,
+                 quote: q,
+Diff in /Users/xiedongjin/Workspace/learning/kaze-quant/examples/managed_reference.rs:38:
+         })?;
+         // Only this benchmark normalizes the explicit initialization prefix and ownership notices.
+         // Stored CLI receipts remain exact and are independently audited.
+-        receipt.seq-=offset;
+-        receipt.notices.retain(|n|!matches!(n,Notice::OwnedAction{..}));
++        receipt.seq -= offset;
++        receipt
++            .notices
++            .retain(|n| !matches!(n, Notice::OwnedAction { .. }));
+         let bytes = serde_json::to_vec(&receipt)?;
+         h.update((bytes.len() as u64).to_le_bytes());
+         h.update(bytes);
+Diff in /Users/xiedongjin/Workspace/learning/kaze-quant/src/managed.rs:172:
+                 _ => return Err("managed child checkpoint identity changed".into()),
+             };
+             match (name.as_str(), *version) {
+-                ("bar-atr",1)=>crate::bar_strategy::factory(parameters,state.as_ref()),
+-                ("breakout-bracket",1)=>crate::bracket_strategy::factory(parameters,state.as_ref()),
+-                _=>Err("unsupported managed child factory".into()),
++                ("bar-atr", 1) => crate::bar_strategy::factory(parameters, state.as_ref()),
++                ("breakout-bracket", 1) => {
++                    crate::bracket_strategy::factory(parameters, state.as_ref())
++                }
++                _ => Err("unsupported managed child factory".into()),
+             }
+         }
+         (c, None) => Ok(Box::new(c.build()?)),

@@ -1,0 +1,8 @@
+{
+  "selection": "header + first 100000 rows of normalized contiguous public archive prefix; no filter or reorder",
+  "quotes": 100000,
+  "normalized_sha256": "c22be361be4144d983bc334735806aae85e16f4273f57516145ba5ac69671379",
+  "source_manifest": "source-million.manifest.json",
+  "source_million_sha256": "4725608a261cbff4a2879bef7d7cff7984eb1f70248ba4e627b56ab0eeeafd31",
+  "timestamp_rule": "event_time ms to ns; monotone clamp by existing binance-bookticker-prefix-v1 transform; source manifest records clamps"
+}

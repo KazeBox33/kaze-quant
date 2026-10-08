@@ -1,0 +1,198 @@
+{
+  "audit_chain_sha256": "6fb083f09f1e2729d44ea837f7e50572b9b8961db7f7c2655ff4e770aa2d8a7f",
+  "binary_sha256": "14f1a244a00eabb718fbb0f51acc04a6a27c7227c480086f804397f0b13de5d0",
+  "config_sha256": "0549bcf97260c788b45b0cd927e06775acfaebdb1ad6249380a3fd6102a1a527",
+  "input_sha256": null,
+  "recovered_commands": 10,
+  "recovery_ns": 8949791,
+  "run": {
+    "batch_size": 256,
+    "commit_histogram_counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "commit_max_ns": 0,
+    "commit_total_ns": 0,
+    "committed_batches": 0,
+    "elapsed_ns": 0,
+    "flush_ms": 5,
+    "histogram_rule": "bucket i upper bound 2^i ns; batch commit duration, excludes queue wait and stdout",
+    "received_commands": 0
+  },
+  "schema_version": 1,
+  "state": {
+    "clock_ns": 50,
+    "closed": true,
+    "markets": [
+      {
+        "active_orders": 0,
+        "cash_minor": "10056",
+        "conditionals": {
+          "last_sequence": 4,
+          "last_time_ns": 40,
+          "metrics": {
+            "accepted": 6,
+            "activation_rejected": 0,
+            "cancelled": 2,
+            "expired": 0,
+            "rejected": 0,
+            "triggered": 4
+          },
+          "next_id": 7,
+          "pending": []
+        },
+        "equity_minor": "10056",
+        "fees_minor": "4",
+        "halted": "finished",
+        "market": 0,
+        "metrics": {
+          "accepted": 4,
+          "cancelled": 0,
+          "fills": 4,
+          "max_drawdown_minor": "8",
+          "orders_examined": 4,
+          "peak_equity_minor": "10058",
+          "quotes": 5,
+          "rejected": 0
+        },
+        "pnl_minor": "56",
+        "position_units": 0,
+        "reserved_cash_minor": "0",
+        "risk_rejections": 0,
+        "strategy_diagnostics": {
+          "conditional_owners": [],
+          "members": [
+            {
+              "active_orders": 0,
+              "capital_minor": "5000",
+              "cash_minor": "5028",
+              "decision": null,
+              "diagnostics": {
+                "oco_group": 1,
+                "phase": {
+                  "type": "complete"
+                },
+                "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+                "strategy": "breakout-bracket"
+              },
+              "fees_minor": "2",
+              "lifecycle": "stopped",
+              "name": "alpha",
+              "owner": 0,
+              "pending_buy_units": 0,
+              "position_units": 0,
+              "reserved_cash_minor": "0",
+              "reserved_sell_units": 0,
+              "waiting_conditions": 0
+            },
+            {
+              "active_orders": 0,
+              "capital_minor": "5000",
+              "cash_minor": "5028",
+              "decision": null,
+              "diagnostics": {
+                "oco_group": 2,
+                "phase": {
+                  "type": "complete"
+                },
+                "scope": "single-cycle paper breakout; fixed stop-limit exits; no guaranteed fill or alpha",
+                "strategy": "breakout-bracket"
+              },
+              "fees_minor": "2",
+              "lifecycle": "stopped",
+              "name": "beta",
+              "owner": 1,
+              "pending_buy_units": 0,
+              "position_units": 0,
+              "reserved_cash_minor": "0",
+              "reserved_sell_units": 0,
+              "waiting_conditions": 0
+            }
+          ],
+          "order_owners": [],
+          "scope": "single-market long-only paper; one shared matching core, fixed member order, explicit stopped-member capital transfers; no cross-market/shared-currency portfolio, sandbox, external route or alpha",
+          "strategy": "managed"
+        },
+        "symbol": "MANAGED-BRACKET-DEMO",
+        "units": {
+          "currency": "SIM",
+          "money_scale": 100,
+          "quantity_scale": 1
+        }
+      }
+    ],
+    "processed": 10,
+    "schema_version": 1
+  },
+  "storage": "sqlite-wal-full",
+  "storage_stats": {
+    "database_limit_bytes": 1073741824,
+    "hot_state_bytes": 2667,
+    "logical_database_bytes": 32768,
+    "wal_bytes": 177192,
+    "wal_soft_limit_bytes": 67108864
+  },
+  "verified_commands": 10
+}

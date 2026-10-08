@@ -365,6 +365,15 @@ impl ConditionalBook {
         policy: TriggerPolicy,
         mut activate: impl FnMut(OrderRequest) -> Result<OrderId, ActivationReject>,
     ) -> Result<Vec<ConditionalEvent>, &'static str> {
+        self.on_quote_owned(q, policy, |_, request| activate(request))
+    }
+    /// 激活携带条件身份，管理器不按可能重复的请求内容猜测归属。
+    pub fn on_quote_owned(
+        &mut self,
+        q: Quote,
+        policy: TriggerPolicy,
+        mut activate: impl FnMut(ConditionalId, OrderRequest) -> Result<OrderId, ActivationReject>,
+    ) -> Result<Vec<ConditionalEvent>, &'static str> {
         q.validate()?;
         if self.last_sequence.is_some_and(|s| q.sequence <= s) || q.timestamp_ns < self.last_time_ns
         {
@@ -377,7 +386,7 @@ impl ConditionalBook {
             let Some(w) = self.remove(id) else {
                 continue;
             }; // 可能已被先触发的OCO同伴撤销。
-            match activate(w.request.order) {
+            match activate(id, w.request.order) {
                 Ok(order_id) => {
                     self.metrics.triggered += 1;
                     events.push(ConditionalEvent::Triggered {
@@ -405,6 +414,19 @@ impl ConditionalBook {
             }
         }
         Ok(events)
+    }
+    /// 仅用于可信子策略的只读身份验证，不发布此投影的统计或拿它执行。
+    pub(crate) fn filtered_validation(
+        &self,
+        mut select: impl FnMut(Waiting) -> Option<Waiting>,
+    ) -> Self {
+        let mut b = Self::new(self.capacity).expect("existing capacity");
+        for w in self.pending.values() {
+            if let Some(w) = select(*w) {
+                b.insert(w);
+            }
+        }
+        b
     }
     pub fn snapshot(&self) -> Option<ConditionalSnapshot> {
         // 从未使用的模块不改变旧配置的快照/报告字节，便于原始回执回归。

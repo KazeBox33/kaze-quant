@@ -1,0 +1,14 @@
+   Compiling kaze-quant v0.8.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+error: lifetime may not live long enough
+   --> tests/managed.rs:345:9
+    |
+344 |       let path = |s: &mut Value| {
+    |                      -         - return type of closure is &'2 mut Value
+    |                      |
+    |                      let's call the lifetime of this reference `'1`
+345 | /         s.pointer_mut("/markets/0/strategy/registered/state")
+346 | |             .unwrap()
+    | |_____________________^ returning this value requires that `'1` must outlive `'2`
+
+error: could not compile `kaze-quant` (test "managed") due to 1 previous error
+warning: build failed, waiting for other jobs to finish...

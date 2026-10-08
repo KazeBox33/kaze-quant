@@ -1,0 +1,5 @@
+Darwin xiedongjindeMacBook-Pro.local 25.5.0 Darwin Kernel Version 25.5.0: Tue Jun  9 22:28:17 PDT 2026; root:xnu-12377.121.10~1/RELEASE_ARM64_T8142 arm64
+Apple M5
+ProductName:		macOS
+ProductVersion:		26.5.2
+BuildVersion:		25F84

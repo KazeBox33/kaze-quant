@@ -1,0 +1,44 @@
+   Compiling kaze-quant v0.8.0 (/Users/xiedongjin/Workspace/learning/kaze-quant)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.42s
+     Running tests/algorithms.rs (target/debug/deps/algorithms-605881599308b8fa)
+
+running 14 tests
+test fixed_limit_resources_use_limit_including_fee_instead_of_current_ask ... ok
+test best_limit_reversal_uses_actual_fills_and_sells_at_ask_then_waits ... ok
+test best_limit_reprice_debounce_and_price_guard_both_cancel_safely ... ok
+test best_limit_partial_fill_before_reprice_ack_and_never_overfills_parent ... ok
+test halt_releases_visible_order_without_liquidating_filled_position ... ok
+test known_price_band_is_filtered_before_proposal_without_platform_rejection ... ok
+test foreign_completed_manual_fill_is_not_adopted_as_parent_progress ... ok
+test iceberg_display_replenishment_no_burst_and_partial_fee_hand_ledger ... ok
+test v2_immediate_has_shared_parent_report_and_resource_contract ... ok
+test pending_reprice_without_cancel_ack_survives_restore_and_never_replaces ... ok
+test malformed_display_guard_clock_and_parent_progress_are_rejected ... ok
+test v2_twap_preserves_v1_original_receipts_and_tracks_actual_parent_fills ... ok
+test failed_transaction_rolls_back_partial_fill_cancel_and_parent_counters ... ok
+test both_algorithms_every_checkpoint_and_sqlite_restart_equal_original_receipts ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.40s
+
+     Running tests/target.rs (target/debug/deps/target-be8123fb551b0692)
+
+running 16 tests
+test missed_slice_times_and_working_partial_order_never_create_burst_children ... ok
+test manual_order_is_not_silently_adopted_or_cancelled_by_composition ... ok
+test cash_sizing_includes_per_unit_fee_and_platform_capacity_rejection_clears_proposal ... ok
+test expired_child_is_cancelled_and_replaced_only_on_later_quote ... ok
+test invalid_context_zero_budget_position_cap_dust_and_single_slice_are_bounded ... ok
+test grid_and_twap_integer_remainder_are_exact_and_never_fill_same_quote ... ok
+test cooldown_does_not_cancel_own_working_order_or_block_exit ... ok
+test repeated_target_and_partial_fills_do_not_duplicate_pending_exposure ... ok
+test research_warmup_seeds_indicators_but_never_transfers_training_positions ... ok
+test spread_gate_cancels_pending_buys_and_does_not_block_risk_reduction ... ok
+test pending_cancel_survives_strategy_restore_without_replacement_permission ... ok
+test target_reversal_cancels_remaining_before_selling_actual_partial_position ... ok
+test malformed_parameters_and_engine_child_corruption_fail_closed ... ok
+test signal_prefixes_and_every_checkpoint_produce_identical_causal_decisions ... ok
+test failed_transaction_rolls_back_partial_fill_and_child_progress_together ... ok
+test sqlite_batch_retries_restarts_and_failed_write_keep_identical_parent_child_receipts ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.80s
+
