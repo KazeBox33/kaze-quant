@@ -89,7 +89,7 @@ jobs:
           target/release/examples/net_execution_demo target reports/ci-net-execution > reports/ci-net-execution.json
           target/release/examples/net_execution_demo budget reports/ci-net-budget > reports/ci-net-budget.json
           target/release/examples/net_execution_demo residual reports/ci-net-residual > reports/ci-net-residual.json
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: storage-evidence-${{ matrix.os }}
           path: |
