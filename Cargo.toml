@@ -43,7 +43,7 @@ features = ["blocking", "json", "rustls-tls"]
 optional = true
 
 [dependencies.hmac]
-version = "0.12"
+version = "0.13"
 optional = true
 
 [dependencies.tungstenite]
